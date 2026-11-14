@@ -1,23 +1,63 @@
-// Orbite circulaire (version minimale, utilisee a la fin du lancement).
-// La Phase 4 l'enrichira : ellipse, HUD (altitude, vitesse, periode), vitesse x1 / x1000.
-//
-// L'orbite est definie par son rayon et par deux vecteurs unitaires orthogonaux :
-//   p0 = direction de la position a theta = 0, t0 = direction du mouvement a theta = 0.
-// Position : (p0 cos theta + t0 sin theta) * rayon.
+// Orbite de Kepler (ellipse) : le CubeSat avance selon l'anomalie moyenne,
+// l'altitude et la vitesse varient entre periapsis et apoapsis.
+// timeScale : 1 = temps reel (periode ~95,6 min), 1000 = un tour en quelques secondes.
 
 import * as THREE from 'three';
 
-export function createOrbit({ radius, p0, t0, period }) {
+function solveKepler(M, e) {
+  let E = M;
+  for (let i = 0; i < 10; i++) {
+    const dE = (E - e * Math.sin(E) - M) / (1 - e * Math.cos(E));
+    E -= dE;
+    if (Math.abs(dE) < 1e-10) break;
+  }
+  return E;
+}
+
+export function createOrbit({
+  a,
+  e = 0,
+  p0,
+  t0,
+  period,
+  earthRadiusKm = 6378,
+  muKm3s2 = 398600,
+  timeScale = 1
+}) {
+  const ecc = Math.min(0.95, Math.max(0, e));
   const P0 = p0.clone().normalize();
   const T0 = t0.clone().normalize();
   const normal = new THREE.Vector3().crossVectors(P0, T0).normalize();
-  const omega = (Math.PI * 2) / period;
+  const n = (Math.PI * 2) / period;
+  const bOverA = Math.sqrt(1 - ecc * ecc);
+  const aKm = a * earthRadiusKm;
+
+  const tmpPos = new THREE.Vector3();
+  const tmpDir = new THREE.Vector3();
+  const tmpX = new THREE.Vector3();
+  const basis = new THREE.Matrix4();
+
+  function positionAtMean(M, out = new THREE.Vector3()) {
+    const E = solveKepler(M, ecc);
+    const x = a * (Math.cos(E) - ecc);
+    const y = a * bOverA * Math.sin(E);
+    return out.copy(P0).multiplyScalar(x).addScaledVector(T0, y);
+  }
+
+  function directionAtMean(M, out = new THREE.Vector3()) {
+    const E = solveKepler(M, ecc);
+    const denom = 1 - ecc * Math.cos(E);
+    const vx = -Math.sin(E) / denom;
+    const vy = (bOverA * Math.cos(E)) / denom;
+    return out.copy(P0).multiplyScalar(vx).addScaledVector(T0, vy).normalize();
+  }
 
   const SEGMENTS = 256;
   const pts = [];
+  const tmp = new THREE.Vector3();
   for (let i = 0; i < SEGMENTS; i++) {
-    const a = (i / SEGMENTS) * Math.PI * 2;
-    pts.push(P0.clone().multiplyScalar(Math.cos(a)).addScaledVector(T0, Math.sin(a)).multiplyScalar(radius));
+    const M = (i / SEGMENTS) * Math.PI * 2;
+    pts.push(positionAtMean(M, tmp).clone());
   }
   const geometry = new THREE.BufferGeometry().setFromPoints(pts);
   const material = new THREE.LineDashedMaterial({
@@ -34,44 +74,55 @@ export function createOrbit({ radius, p0, t0, period }) {
   ring.name = 'orbite';
 
   const attached = [];
-  let theta = 0;
+  let meanAnomaly = 0;
+  let scale = timeScale;
   let ringTarget = 0.6;
 
-  const tmpPos = new THREE.Vector3();
-  const tmpDir = new THREE.Vector3();
-  const tmpX = new THREE.Vector3();
-  const basis = new THREE.Matrix4();
-
-  function positionAt(a, out = new THREE.Vector3()) {
-    return out.copy(P0).multiplyScalar(Math.cos(a)).addScaledVector(T0, Math.sin(a)).multiplyScalar(radius);
-  }
-  function directionAt(a, out = new THREE.Vector3()) {
-    return out.copy(P0).multiplyScalar(-Math.sin(a)).addScaledVector(T0, Math.cos(a));
-  }
-
   function place(item) {
-    const a = theta + item.offset;
-    positionAt(a, tmpPos);
-    directionAt(a, tmpDir);
+    const M = meanAnomaly + item.offset;
+    positionAtMean(M, tmpPos);
+    directionAtMean(M, tmpDir);
     item.object.position.copy(tmpPos);
-    // +Y = zenith, +Z = sens du mouvement.
     const up = tmpPos.clone().normalize();
     tmpX.crossVectors(up, tmpDir).normalize();
     basis.makeBasis(tmpX, up, tmpDir);
     item.object.quaternion.setFromRotationMatrix(basis);
   }
 
+  function telemetry() {
+    const E = solveKepler(meanAnomaly, ecc);
+    const rScene = a * (1 - ecc * Math.cos(E));
+    const rKm = rScene * earthRadiusKm;
+    const speedKms = Math.sqrt(Math.max(0, muKm3s2 * (2 / rKm - 1 / aKm)));
+    return {
+      altitudeKm: rKm - earthRadiusKm,
+      speedKms,
+      periodMin: period / 60,
+      periapsisKm: aKm * (1 - ecc) - earthRadiusKm,
+      apoapsisKm: aKm * (1 + ecc) - earthRadiusKm,
+      eccentricity: ecc,
+      timeScale: scale
+    };
+  }
+
   return {
     object: ring,
-    radius,
+    radius: a,
+    a,
+    e: ecc,
     normal,
-    omega,
     get theta() {
-      return theta;
+      return meanAnomaly;
     },
-    positionAt,
-    directionAt,
-    /** Accroche un objet a l'orbite, avec un decalage angulaire (radians) facultatif. */
+    get timeScale() {
+      return scale;
+    },
+    positionAt: positionAtMean,
+    directionAt: directionAtMean,
+    telemetry,
+    setTimeScale(value) {
+      scale = value;
+    },
     attach(object, offset = 0) {
       const item = { object, offset };
       attached.push(item);
@@ -81,7 +132,8 @@ export function createOrbit({ radius, p0, t0, period }) {
       ringTarget = visible ? 0.6 : 0;
     },
     update(dt) {
-      theta += omega * dt;
+      meanAnomaly += n * dt * scale;
+      if (meanAnomaly > Math.PI * 4) meanAnomaly %= Math.PI * 2;
       for (const item of attached) place(item);
       material.opacity += (ringTarget - material.opacity) * Math.min(1, dt * 1.2);
     },

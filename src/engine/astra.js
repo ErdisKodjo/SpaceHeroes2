@@ -18,6 +18,7 @@ export class AstraEngine {
       return this.lastLine;
     }
     this.lastLine = entry;
+    window.dispatchEvent(new CustomEvent('astra-message', { detail: this.lastLine }));
     return entry;
   }
 
@@ -27,6 +28,7 @@ export class AstraEngine {
     if (candidates.length === 0) return this.say(null);
     const pick = candidates[Math.floor(Math.random() * candidates.length)];
     this.lastLine = pick;
+    window.dispatchEvent(new CustomEvent('astra-message', { detail: this.lastLine }));
     return pick;
   }
 

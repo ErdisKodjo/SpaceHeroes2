@@ -5,7 +5,8 @@
   "parametres": {
     "altitudeKm": 550,
     "rayonTerreKm": 6378,
-    "muTerre": 398600
+    "muTerre": 398600,
+    "excentricite": 0.035
   },
   "resultats": {
     "periodeMinutes": 95.6,

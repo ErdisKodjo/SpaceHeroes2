@@ -16,11 +16,13 @@ import { createOrbit } from './orbit.js';
 import { createParticlePool } from './particles.js';
 import orbitData from '../data/gmat/orbite_basse.json';
 
-const { altitudeKm: ALT_KM, rayonTerreKm: R_KM, muTerre: MU } = orbitData.parametres;
+const { altitudeKm: ALT_KM, rayonTerreKm: R_KM, muTerre: MU, excentricite: ECC = 0 } = orbitData.parametres;
 const ORBIT_RADIUS = 1 + ALT_KM / R_KM;
 const ORBIT_SPEED_KMS = Math.sqrt(MU / (R_KM + ALT_KM));
 const ORBIT_PERIOD_MIN = orbitData.resultats.periodeMinutes;
-const ORBIT_DISPLAY_PERIOD = 40; // secondes a l'ecran pour un tour
+const ORBIT_PERIOD_S = ORBIT_PERIOD_MIN * 60;
+const ORBIT_DISPLAY_PERIOD = 40; // secondes a l'ecran pour un tour pendant le lancement
+const LAUNCH_TIME_SCALE = ORBIT_PERIOD_S / ORBIT_DISPLAY_PERIOD;
 const OMEGA = (Math.PI * 2) / ORBIT_DISPLAY_PERIOD;
 
 const ROCKET_HEIGHT = 0.03;
@@ -84,6 +86,7 @@ function createOverlay(container) {
       count.className = `vis-count ${variant}`;
       void count.offsetWidth; // relance l'animation CSS
       if (text) count.classList.add('is-pop');
+      window.dispatchEvent(new CustomEvent('vis-announcer', { detail: { text, variant } }));
     },
     telemetry(html) {
       telemetry.innerHTML = html;
@@ -352,7 +355,16 @@ export function createLaunchSequence({ scene, camera, earth, container, sunDirec
         rocket.jettisonFairing();
         const p0 = trajectory(1, new THREE.Vector3()).normalize();
         const t0 = velocity(1, new THREE.Vector3()).normalize();
-        orbit = createOrbit({ radius: ORBIT_RADIUS, p0, t0, period: ORBIT_DISPLAY_PERIOD });
+        orbit = createOrbit({
+          a: ORBIT_RADIUS,
+          e: ECC,
+          p0,
+          t0,
+          period: ORBIT_PERIOD_S,
+          earthRadiusKm: R_KM,
+          muKm3s2: MU,
+          timeScale: LAUNCH_TIME_SCALE
+        });
         scene.add(orbit.object);
         cubesat = createCubeSat();
         scene.add(cubesat.object);

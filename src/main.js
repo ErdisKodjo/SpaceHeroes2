@@ -12,7 +12,9 @@ import { renderDashboard } from './ui/dashboard.js';
 import { renderAstra } from './ui/astra-widget.js';
 import { renderEpisode } from './ui/episode-view.js';
 import { mountScene } from './vis/scene.js';
+import { createGameAudio } from './audio/sfx.js';
 
+const appEl = document.getElementById('app');
 const dashboardEl = document.getElementById('dashboard');
 const episodeEl = document.getElementById('episode');
 const astraEl = document.getElementById('astra');
@@ -32,16 +34,49 @@ const runner = new EpisodeRunner(chapitre01, {
 
 // Vue 3D montee avant le demarrage du chapitre pour recevoir le premier 'episode-change'.
 const vue3d = mountScene(vue3dEl);
+const audio = createGameAudio();
+const audioBtn = document.getElementById('btn-audio');
+
+function paintAudioButton() {
+  audioBtn.textContent = audio.muted ? 'MUET' : 'SON';
+  audioBtn.setAttribute('aria-pressed', String(!audio.muted));
+  audioBtn.classList.toggle('is-muted', audio.muted);
+}
+paintAudioButton();
+audioBtn.addEventListener('click', () => {
+  audio.unlock();
+  audio.toggle();
+  paintAudioButton();
+});
+
+const unlockAudio = () => audio.unlock();
+window.addEventListener('pointerdown', unlockAudio, { once: true });
+window.addEventListener('keydown', unlockAudio, { once: true });
+
+window.addEventListener('astra-message', ({ detail }) => {
+  if (detail?.texte) audio.radio(detail.texte);
+});
+window.addEventListener('vis-announcer', ({ detail }) => {
+  const text = detail?.text || '';
+  const tick = text.match(/^T-(\d+)$/);
+  if (tick) audio.countdown(Number(tick[1]));
+  else if (detail?.variant === 'is-liftoff') audio.liftoff();
+  else if (detail?.variant === 'is-success') audio.success();
+});
+
 let busy = false; // une animation (ex. lancement) est en cours : bouton desactive
 let lastEpisodeId = null;
 
 function render() {
-  renderDashboard(dashboardEl, resources);
+  const episode = runner.currentEpisode || null;
+  appEl.classList.toggle('is-busy', busy);
+  appEl.classList.toggle('is-cinematic', busy && episode?.type === 'lancement');
+
+  renderDashboard(dashboardEl, resources, { chapter: chapitre01 });
   renderAstra(astraEl, astra.lastLine);
   renderEpisode(episodeEl, runner, { onNext: handleNext, busy });
 
   // Annonce les changements d'episode a la vue 3D (et a tout autre module interesse).
-  const episode = runner.currentEpisode || null;
   if (episode?.id !== lastEpisodeId) {
     lastEpisodeId = episode?.id ?? null;
     window.dispatchEvent(new CustomEvent('episode-change', { detail: { episode, index: runner.index } }));

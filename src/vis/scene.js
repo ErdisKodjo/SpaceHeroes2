@@ -2,14 +2,15 @@
 //
 // Phase 1 : fond etoile + Terre (jour/nuit, nuages, atmosphere) + eclairage solaire.
 // Phase 3 : sequence de lancement (launch.js), declenchee par l'episode "lancement".
-// Les phases suivantes brancheront ici cubesat.js (atelier), orbit.js (HUD), controls.js
-// et hud.js ; main.js ne connait que mountScene() et l'evenement 'episode-change'.
+// Phase 4 : HUD orbital (hud.js) + ellipse Kepler + vitesse x1 / x1000.
 
 import * as THREE from 'three';
 import './vis.css';
 import { createStarfield } from './particles.js';
 import { createEarth } from './earth.js';
 import { createLaunchSequence } from './launch.js';
+import { createOrbitHud } from './hud.js';
+import { createPlayerControls } from './controls.js';
 
 // Direction du Soleil (monde). Legerement de cote pour montrer le terminateur
 // jour/nuit et les lumieres des villes.
@@ -24,9 +25,9 @@ export function mountScene(container) {
 
   const scene = new THREE.Scene();
   // near tres petit : la camera descend a quelques "km" du pas de tir pendant le lancement.
-  const camera = new THREE.PerspectiveCamera(40, 1, 0.001, 2000);
+  const camera = new THREE.PerspectiveCamera(48, 1, 0.001, 2000);
   const cameraTarget = new THREE.Vector3(0, 0, 0);
-  const CAMERA_BASE = new THREE.Vector3(-0.6, 0.55, 3.4);
+  const CAMERA_BASE = new THREE.Vector3(-0.55, 0.42, 2.85);
   const cameraHome = CAMERA_BASE.clone(); // position de repos (ajustee au redimensionnement)
   camera.position.copy(cameraHome);
   camera.lookAt(cameraTarget);
@@ -58,6 +59,17 @@ export function mountScene(container) {
     getHomeView
   });
 
+  const hud = createOrbitHud(container);
+  let hudArmed = false;
+  hud.onTimeScale((scale) => launch.orbit?.setTimeScale(scale));
+
+  const player = createPlayerControls({
+    camera,
+    domElement: renderer.domElement,
+    isBlocked: () => launch.controlsCamera
+  });
+  player.onFirstInput(() => document.getElementById('cam-hint')?.classList.add('is-gone'));
+
   // --- Dimensionnement : suit la taille reelle du panneau (responsive, mobile). ---
   function resize() {
     const width = container.clientWidth || 320;
@@ -67,7 +79,6 @@ export function mountScene(container) {
     // Panneau etroit (mobile portrait) : on recule un peu pour garder la Terre entiere.
     const fit = camera.aspect < 1 ? 1 / camera.aspect : 1;
     cameraHome.copy(CAMERA_BASE).multiplyScalar(Math.min(fit, 1.8));
-    if (!launch.controlsCamera) camera.position.copy(cameraHome);
     camera.updateProjectionMatrix();
     launch.setViewport(height * renderer.getPixelRatio(), camera.fov);
   }
@@ -77,6 +88,7 @@ export function mountScene(container) {
 
   // --- Boucle d'animation ---
   const reduceMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+  if (reduceMotion) player.controls.autoRotate = false;
   const clock = new THREE.Clock();
   let frameId = 0;
   let running = true;
@@ -92,15 +104,17 @@ export function mountScene(container) {
     stars.update(elapsed);
     launch.update(delta);
 
-    if (!launch.controlsCamera) {
-      // Respiration lente de la camera : la scene n'est jamais figee.
-      camera.position.copy(cameraHome);
-      if (!reduceMotion) {
-        camera.position.x += Math.sin(elapsed * 0.11) * 0.08;
-        camera.position.y += Math.sin(elapsed * 0.07) * 0.05;
+    if (launch.launched && launch.orbit) {
+      if (!hudArmed) {
+        hudArmed = true;
+        launch.orbit.setTimeScale(1000);
+        hud.setTimeScale(1000);
+        hud.show();
       }
-      camera.lookAt(cameraTarget);
+      hud.update(launch.orbit.telemetry());
     }
+
+    player.update(delta);
 
     renderer.render(scene, camera);
   }
@@ -154,7 +168,9 @@ export function mountScene(container) {
       resizeObserver.disconnect();
       document.removeEventListener('visibilitychange', onVisibility);
       window.removeEventListener('episode-change', onEpisodeChange);
+      player.dispose();
       launch.dispose();
+      hud.dispose();
       stars.dispose();
       earth.dispose();
       renderer.dispose();

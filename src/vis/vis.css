@@ -1,22 +1,34 @@
 /* Vue 3D : mode cinema (lancement) + surimpression (compte a rebours, telemetrie). */
 
 #vue3d {
-  position: relative;
-  transition: height 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
+  position: absolute;
+  inset: 0;
 }
 
-#vue3d.vue3d--cinema {
-  height: min(72vh, 620px);
+#vue3d.vue3d--cinema::before,
+#vue3d.vue3d--cinema::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  z-index: 4;
+  height: 8vh;
+  background: #000;
+  pointer-events: none;
 }
+
+#vue3d.vue3d--cinema::before { top: 0; }
+#vue3d.vue3d--cinema::after { bottom: 0; }
 
 .vis-overlay {
   position: absolute;
   inset: 0;
+  z-index: 5;
   pointer-events: none;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  padding: 14px 16px;
+  padding: 10vh 28px 12vh;
   font-family: ui-monospace, 'Cascadia Mono', Consolas, 'SFMono-Regular', monospace;
   color: #e8f6ff;
   text-shadow: 0 1px 8px rgba(0, 0, 0, 0.85);
@@ -87,6 +99,78 @@
   color: #7cf0ff;
   font-weight: 700;
   margin-right: 0.3em;
+}
+
+/* HUD orbital (Phase 4) : reste visible apres le mode cinema. */
+.vis-hud {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(560px, 46vw);
+  bottom: 22px;
+  z-index: 6;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 8px 12px;
+  padding: 8px 10px;
+  border-radius: 10px;
+  background: rgba(6, 10, 28, 0.62);
+  border: 1px solid rgba(124, 240, 255, 0.22);
+  backdrop-filter: blur(8px);
+  font-family: ui-monospace, 'Cascadia Mono', Consolas, 'SFMono-Regular', monospace;
+  color: #e8f6ff;
+  font-size: 0.78rem;
+  font-variant-numeric: tabular-nums;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.45s ease;
+}
+
+.vis-hud[hidden] {
+  display: none !important;
+}
+
+.vis-hud.is-visible {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.vis-hud-stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem 1rem;
+}
+
+.vis-hud-stats b {
+  color: #7cf0ff;
+  font-weight: 700;
+  margin-right: 0.3em;
+}
+
+.vis-hud-scales {
+  display: flex;
+  gap: 6px;
+}
+
+.vis-hud-scale {
+  cursor: pointer;
+  border: 1px solid rgba(124, 240, 255, 0.35);
+  background: rgba(11, 16, 38, 0.85);
+  color: #cfefff;
+  border-radius: 999px;
+  padding: 4px 10px;
+  font: inherit;
+  font-size: 0.72rem;
+  letter-spacing: 0.04em;
+}
+
+.vis-hud-scale.is-active {
+  background: #7cf0ff;
+  color: #06101c;
+  border-color: #7cf0ff;
+  font-weight: 700;
 }
 
 @media (prefers-reduced-motion: reduce) {

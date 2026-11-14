@@ -5,15 +5,21 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <title>Space Heroes</title>
   <link rel="manifest" href="/manifest.json" />
-  <meta name="theme-color" content="#0b1026" />
+  <meta name="theme-color" content="#02040c" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Oxanium:wght@500;600;700;800&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="/src/ui/dashboard.css" />
 </head>
 <body>
   <div id="app">
+    <section id="vue3d" aria-label="Vue mission"></section>
+    <div class="hud-fx" aria-hidden="true"></div>
     <header id="dashboard"></header>
-    <main id="episode"></main>
     <aside id="astra"></aside>
-    <section id="vue3d"></section>
+    <main id="episode"></main>
+    <p class="hud-hint" id="cam-hint">Glisser · WASD · molette pour explorer</p>
+    <button type="button" id="btn-audio" class="hud-audio" aria-pressed="true" title="Couper le son">SON</button>
   </div>
   <script type="module" src="/src/main.js"></script>
 </body>
