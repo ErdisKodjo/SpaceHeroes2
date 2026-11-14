@@ -1,0 +1,99 @@
+/* Vue 3D : mode cinema (lancement) + surimpression (compte a rebours, telemetrie). */
+
+#vue3d {
+  position: relative;
+  transition: height 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+#vue3d.vue3d--cinema {
+  height: min(72vh, 620px);
+}
+
+.vis-overlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 14px 16px;
+  font-family: ui-monospace, 'Cascadia Mono', Consolas, 'SFMono-Regular', monospace;
+  color: #e8f6ff;
+  text-shadow: 0 1px 8px rgba(0, 0, 0, 0.85);
+  opacity: 0;
+  transition: opacity 0.6s ease;
+}
+
+.vis-overlay.is-visible {
+  opacity: 1;
+}
+
+.vis-caption-title {
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: #7cf0ff;
+}
+
+.vis-caption-sub {
+  margin-top: 2px;
+  font-size: 0.85rem;
+  opacity: 0.85;
+}
+
+.vis-count {
+  align-self: center;
+  text-align: center;
+  font-size: clamp(2rem, 9vw, 4.5rem);
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  font-variant-numeric: tabular-nums;
+}
+
+.vis-count.is-liftoff {
+  color: #ffd27a;
+}
+
+.vis-count.is-success {
+  color: #7cf0ff;
+  font-size: clamp(1.6rem, 6vw, 3.2rem);
+}
+
+.vis-count.is-pop {
+  animation: vis-pop 0.6s ease-out;
+}
+
+@keyframes vis-pop {
+  from {
+    transform: scale(1.35);
+    opacity: 0.15;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.vis-telemetry {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem 1.2rem;
+  font-size: 0.82rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.vis-telemetry b {
+  color: #7cf0ff;
+  font-weight: 700;
+  margin-right: 0.3em;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #vue3d {
+    transition: none;
+  }
+  .vis-count.is-pop {
+    animation: none;
+  }
+}

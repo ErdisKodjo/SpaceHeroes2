@@ -50,6 +50,7 @@
       "titre": "Le Lancement",
       "texte": "Choisis lanceur et orbite, verifie la compatibilite, lance.",
       "astra": "lancement_ch1_intro",
+      "bouton": "Lancer !",
       "cmlRequis": 2
     },
     {

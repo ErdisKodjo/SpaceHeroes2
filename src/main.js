@@ -11,7 +11,7 @@ import { computeScore, genererRapport } from './engine/score.js';
 import { renderDashboard } from './ui/dashboard.js';
 import { renderAstra } from './ui/astra-widget.js';
 import { renderEpisode } from './ui/episode-view.js';
-import { mountPlaceholderScene } from './vis/scene.js';
+import { mountScene } from './vis/scene.js';
 
 const dashboardEl = document.getElementById('dashboard');
 const episodeEl = document.getElementById('episode');
@@ -30,16 +30,40 @@ const runner = new EpisodeRunner(chapitre01, {
   onChange: render
 });
 
+// Vue 3D montee avant le demarrage du chapitre pour recevoir le premier 'episode-change'.
+const vue3d = mountScene(vue3dEl);
+let busy = false; // une animation (ex. lancement) est en cours : bouton desactive
+let lastEpisodeId = null;
+
 function render() {
   renderDashboard(dashboardEl, resources);
   renderAstra(astraEl, astra.lastLine);
-  renderEpisode(episodeEl, runner, { onNext: handleNext });
+  renderEpisode(episodeEl, runner, { onNext: handleNext, busy });
+
+  // Annonce les changements d'episode a la vue 3D (et a tout autre module interesse).
+  const episode = runner.currentEpisode || null;
+  if (episode?.id !== lastEpisodeId) {
+    lastEpisodeId = episode?.id ?? null;
+    window.dispatchEvent(new CustomEvent('episode-change', { detail: { episode, index: runner.index } }));
+  }
 }
 
-function handleNext() {
-  // Declenche l'evenement aleatoire du chapitre au moment de l'episode "lancement".
-  if (runner.currentEpisode?.id === 'lancement') {
+async function handleNext() {
+  if (busy) return;
+
+  // Episode "lancement" : evenement aleatoire du chapitre, puis sequence 3D complete
+  // (compte a rebours -> decollage -> orbite) avant de passer a la suite.
+  if (runner.currentEpisode?.type === 'lancement') {
     runner.declencherEvenement();
+    if (!vue3d.launched) {
+      busy = true;
+      render();
+      try {
+        await vue3d.launch();
+      } finally {
+        busy = false;
+      }
+    }
   }
 
   // Exemple d'evaluation CML par ASTRA (evaluateur independant, pas d'auto-evaluation) :
@@ -73,7 +97,22 @@ function handleNext() {
 astra.say('accueil');
 runner.start();
 render();
-mountPlaceholderScene(vue3dEl);
+
+// Raccourci de demonstration (jury, tests) : ?demo=lancement saute directement a
+// l'episode de lancement et declenche le compte a rebours apres l'arrivee de la camera.
+const demo = new URLSearchParams(location.search).get('demo');
+if (demo === 'lancement') {
+  while (!runner.isFinished && runner.currentEpisode.type !== 'lancement') runner.next();
+  // &t=17 : saute directement a T+17 s de la sequence (captures d'ecran, reglages).
+  const seek = Number(new URLSearchParams(location.search).get('t'));
+  if (seek > 0) {
+    vue3d.advance(4);
+    handleNext();
+    vue3d.advance(seek);
+  } else {
+    setTimeout(handleNext, 4000);
+  }
+}
 
 if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register('/service-worker.js').catch(() => {
