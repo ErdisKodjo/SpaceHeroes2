@@ -9,7 +9,7 @@
   },
   "atelier_ch1_intro": {
     "categorie": "narration",
-    "texte": "Voici l'Atelier : choisis tes composants, mais attention, ton CubeSat ne peut pas depasser 4 kg."
+    "texte": "Voici l'Atelier : choisis tes composants dans chaque famille. Attention, ton CubeSat ne peut pas depasser 4 kg."
   },
   "essais_ch1_intro": {
     "categorie": "narration",
@@ -27,9 +27,25 @@
     "categorie": "succes",
     "texte": "Orbite atteinte ! Et avec de la marge sur le carburant, vos equipes au sol peuvent respirer."
   },
+  "succes_2": {
+    "categorie": "succes",
+    "texte": "Excellent choix. Cette configuration optimise bien le compromis masse-performance."
+  },
+  "succes_3": {
+    "categorie": "succes",
+    "texte": "Critere valide. Continue sur cette lancee, tu construis une mission solide."
+  },
   "alerte_1": {
     "categorie": "alerte",
     "texte": "Attention, une de tes marges est proche d'etre depassee."
+  },
+  "alerte_2": {
+    "categorie": "alerte",
+    "texte": "Cette combinaison de composants cree un conflit de ressources. Verifie la masse totale."
+  },
+  "alerte_3": {
+    "categorie": "alerte",
+    "texte": "Le niveau CML requis n'est pas encore atteint. Continue l'evaluation avant de passer a la suite."
   },
   "echec_1": {
     "categorie": "echec",
@@ -38,5 +54,45 @@
   "atelier_test": {
     "categorie": "atelier",
     "texte": "Avec ce niveau de fiabilite, cette piece risque de lacher en vol. Tu veux la tester avant de la fabriquer ?"
+  },
+  "atelier_masse": {
+    "categorie": "atelier",
+    "texte": "Attention : la masse totale depasse la limite. Choisir un composant plus leger ou retirer une piece."
+  },
+  "atelier_budget": {
+    "categorie": "atelier",
+    "texte": "Le budget est serre. Peux-tu obtenir le meme resultat avec un composant moins couteux ?"
+  },
+  "atelier_complet": {
+    "categorie": "atelier",
+    "texte": "Toutes les familles sont configurees. La conception est prete pour les essais."
+  },
+  "essais_vibrations_ok": {
+    "categorie": "succes",
+    "texte": "Test vibrations reussi. La structure tient bien face aux charges du lancement."
+  },
+  "essais_vibrations_ko": {
+    "categorie": "alerte",
+    "texte": "Instabilite detectee en vibrations. Un renfort structural serait prudent."
+  },
+  "essais_thermique_ok": {
+    "categorie": "succes",
+    "texte": "Isolation thermique validee. Le satellite survivra aux cycles de temperature en orbite."
+  },
+  "essais_electrique_ok": {
+    "categorie": "succes",
+    "texte": "Compatibilite electrique confirmee. Pas de conflit de tension detecte."
+  },
+  "cml_niveau1_valide": {
+    "categorie": "succes",
+    "texte": "Niveau CML 1 valide. L'idee de mission est solide. On peut passer a la faisabilite."
+  },
+  "cml_niveau2_valide": {
+    "categorie": "succes",
+    "texte": "Niveau CML 2 valide. La faisabilite est etablie. L'Atelier peut maintenant etre finalise."
+  },
+  "cml_lancement_bloque": {
+    "categorie": "alerte",
+    "texte": "Le lancement est bloque. Les criteres CML requis ne sont pas encore valides. Retourne a la checklist."
   }
 }

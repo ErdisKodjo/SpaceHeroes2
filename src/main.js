@@ -1,3 +1,6 @@
+// Point d'entrée principal — Space Heroes
+// Flow : Hub QG → Sélection du rôle → Mission
+
 import chapitre01 from './data/chapters/chapitre_01.json';
 import dialoguesData from './data/astra/dialogues.json';
 import cmlCriteria from './data/cml/checklist.json';
@@ -7,36 +10,33 @@ import { CmlChecklist } from './engine/cml.js';
 import { AstraEngine } from './engine/astra.js';
 import { EpisodeRunner } from './engine/episode.js';
 import { computeScore, genererRapport } from './engine/score.js';
+import { settingsStore } from './engine/settings-store.js';
+import { playerStore } from './engine/player.js';
 
 import { renderDashboard } from './ui/dashboard.js';
 import { renderAstra } from './ui/astra-widget.js';
 import { renderEpisode } from './ui/episode-view.js';
 import { mountScene } from './vis/scene.js';
 import { createGameAudio } from './audio/sfx.js';
+import { createHub } from './ui/hub.js';
+import { applyDocumentSettings } from './ui/settings.js';
 
-const appEl = document.getElementById('app');
+// Applique les réglages visuels (taille police, daltonien, contrastes…) dès le démarrage.
+applyDocumentSettings();
+
+// Éléments du jeu (cachés pendant le hub).
+const appEl      = document.getElementById('app');
 const dashboardEl = document.getElementById('dashboard');
-const episodeEl = document.getElementById('episode');
-const astraEl = document.getElementById('astra');
-const vue3dEl = document.getElementById('vue3d');
+const episodeEl  = document.getElementById('episode');
+const astraEl    = document.getElementById('astra');
+const vue3dEl    = document.getElementById('vue3d');
 
-// --- Assemblage du moteur (identique quel que soit le chapitre charge) ---
-const resources = new ResourceManager(chapitre01.contraintes);
-const cml = new CmlChecklist(cmlCriteria);
-const astra = new AstraEngine(dialoguesData, cml);
-
-const runner = new EpisodeRunner(chapitre01, {
-  resources,
-  astra,
-  cml,
-  onChange: render
-});
-
-// Vue 3D montee avant le demarrage du chapitre pour recevoir le premier 'episode-change'.
+// La scène 3D tourne toujours en fond (Terre + étoiles) — même pendant le hub.
 const vue3d = mountScene(vue3dEl);
 const audio = createGameAudio();
-const audioBtn = document.getElementById('btn-audio');
 
+// Bouton son
+const audioBtn = document.getElementById('btn-audio');
 function paintAudioButton() {
   audioBtn.textContent = audio.muted ? 'MUET' : 'SON';
   audioBtn.setAttribute('aria-pressed', String(!audio.muted));
@@ -51,11 +51,15 @@ audioBtn.addEventListener('click', () => {
 
 const unlockAudio = () => audio.unlock();
 window.addEventListener('pointerdown', unlockAudio, { once: true });
-window.addEventListener('keydown', unlockAudio, { once: true });
+window.addEventListener('keydown',     unlockAudio, { once: true });
 
+// Réaction audio + visuelle aux répliques ASTRA.
 window.addEventListener('astra-message', ({ detail }) => {
   if (detail?.texte) audio.radio(detail.texte);
+  if (detail?.categorie === 'alerte' || detail?.categorie === 'echec') vue3d.flashWarning();
 });
+
+// Réaction audio aux annonces de la séquence de lancement.
 window.addEventListener('vis-announcer', ({ detail }) => {
   const text = detail?.text || '';
   const tick = text.match(/^T-(\d+)$/);
@@ -64,93 +68,135 @@ window.addEventListener('vis-announcer', ({ detail }) => {
   else if (detail?.variant === 'is-success') audio.success();
 });
 
-let busy = false; // une animation (ex. lancement) est en cours : bouton desactive
-let lastEpisodeId = null;
+// Réapplique les réglages visuels à chaque changement dans les Paramètres.
+window.addEventListener('settings-change', () => applyDocumentSettings());
 
-function render() {
-  const episode = runner.currentEpisode || null;
-  appEl.classList.toggle('is-busy', busy);
-  appEl.classList.toggle('is-cinematic', busy && episode?.type === 'lancement');
+// ─── HUB QG ───────────────────────────────────────────────────────────────
 
-  renderDashboard(dashboardEl, resources, { chapter: chapitre01 });
-  renderAstra(astraEl, astra.lastLine);
-  renderEpisode(episodeEl, runner, { onNext: handleNext, busy });
-
-  // Annonce les changements d'episode a la vue 3D (et a tout autre module interesse).
-  if (episode?.id !== lastEpisodeId) {
-    lastEpisodeId = episode?.id ?? null;
-    window.dispatchEvent(new CustomEvent('episode-change', { detail: { episode, index: runner.index } }));
-  }
+// Masquer les overlays du jeu pendant le hub.
+function hideGameUI() {
+  appEl.classList.add('is-hub');
+  document.getElementById('cam-hint')?.classList.add('is-gone');
 }
 
-async function handleNext() {
-  if (busy) return;
+function showGameUI() {
+  appEl.classList.remove('is-hub');
+}
 
-  // Episode "lancement" : evenement aleatoire du chapitre, puis sequence 3D complete
-  // (compte a rebours -> decollage -> orbite) avant de passer a la suite.
-  if (runner.currentEpisode?.type === 'lancement') {
-    runner.declencherEvenement();
-    if (!vue3d.launched) {
-      busy = true;
-      render();
-      try {
-        await vue3d.launch();
-      } finally {
-        busy = false;
-      }
+// Afficher le hub au démarrage (sauf si mode démo).
+const demo = new URLSearchParams(location.search).get('demo');
+
+if (demo) {
+  // Mode démonstration : saute directement à la mission.
+  startMission({ chapterId: 'chapitre_01' });
+} else {
+  hideGameUI();
+  createHub({ onStartMission: startMission });
+}
+
+// ─── MISSION ──────────────────────────────────────────────────────────────
+
+function startMission({ chapterId }) {
+  showGameUI();
+
+  // Pour l'instant seul le chapitre 1 est disponible.
+  const chapterData = chapitre01;
+
+  const resources = new ResourceManager(chapterData.contraintes);
+  const cml       = new CmlChecklist(cmlCriteria);
+  const astra     = new AstraEngine(dialoguesData, cml);
+
+  const runner = new EpisodeRunner(chapterData, {
+    resources,
+    astra,
+    cml,
+    onChange: render
+  });
+
+  let busy = false;
+  let lastEpisodeId = null;
+
+  function render() {
+    const episode = runner.currentEpisode || null;
+    appEl.classList.toggle('is-busy',      busy);
+    appEl.classList.toggle('is-cinematic', busy && episode?.type === 'lancement');
+
+    renderDashboard(dashboardEl, resources, { chapter: chapterData });
+    renderAstra(astraEl, astra.lastLine);
+    renderEpisode(episodeEl, runner, { onNext: handleNext, busy, resources, astra, cml });
+
+    if (episode?.id !== lastEpisodeId) {
+      lastEpisodeId = episode?.id ?? null;
+      window.dispatchEvent(new CustomEvent('episode-change', {
+        detail: { episode, index: runner.index }
+      }));
     }
   }
 
-  // Exemple d'evaluation CML par ASTRA (evaluateur independant, pas d'auto-evaluation) :
-  // au Briefing, on verifie qu'un objectif a bien ete defini (ici : toujours vrai, le
-  // chapitre en fournit un). A affiner quand le Briefing deviendra interactif.
-  if (runner.currentEpisode?.id === 'briefing') {
-    astra.evaluerCritereCml('cml1_objectif', () => Boolean(chapitre01.mission));
-    astra.evaluerCritereCml('cml1_classe_budget', () => Boolean(chapitre01.contraintes.budget));
+  async function handleNext() {
+    if (busy) return;
+
+    if (runner.currentEpisode?.type === 'lancement') {
+      runner.declencherEvenement();
+      if (!vue3d.launched) {
+        busy = true;
+        render();
+        try {
+          await vue3d.launch();
+        } finally {
+          busy = false;
+        }
+      }
+    }
+
+    if (runner.currentEpisode?.id === 'briefing') {
+      astra.evaluerCritereCml('cml1_objectif',      () => Boolean(chapterData.mission));
+      astra.evaluerCritereCml('cml1_classe_budget', () => Boolean(chapterData.contraintes.budget));
+    }
+
+    runner.next();
+
+    if (runner.isFinished) {
+      const score = computeScore({
+        objectifsReussis:      1,
+        valeurScientifique:    0.6,
+        efficaciteRessources:  1 - resources.ratio('budget'),
+        qualiteDecisions:      0.7,
+        delaisRespectes:       1
+      });
+      const rapport = genererRapport({
+        chapterId:            chapterData.id,
+        score,
+        resourcesSnapshot:    resources.snapshot(),
+        decisionsCles:        ['Choix du lanceur en covoiturage', 'Instrument unique pour tenir la masse'],
+        missionsReellesProches: ['CubeSat éducatif en orbite basse']
+      });
+      playerStore.enregistrerScore(chapterData.id, score);
+      console.log('Rapport post-mission', rapport);
+      // TODO Sprint 4 : afficher l'écran Bilan (bilan-view.js)
+    }
   }
 
-  runner.next();
+  astra.say('accueil');
+  runner.start();
+  render();
 
-  if (runner.isFinished) {
-    const rapport = genererRapport({
-      chapterId: chapitre01.id,
-      score: computeScore({
-        objectifsReussis: 1,
-        valeurScientifique: 0.6,
-        efficaciteRessources: 1 - resources.ratio('budget'),
-        qualiteDecisions: 0.7,
-        delaisRespectes: 1
-      }),
-      resourcesSnapshot: resources.snapshot(),
-      decisionsCles: ['Choix du lanceur en covoiturage', 'Instrument unique pour tenir la masse'],
-      missionsReellesProches: ['CubeSat educatif en orbite basse (exemple a affiner avec de vraies missions NASA)']
-    });
-    console.log('Rapport post-mission', rapport);
+  // Mode démo : saute directement au lancement.
+  if (demo === 'lancement') {
+    while (!runner.isFinished && runner.currentEpisode.type !== 'lancement') runner.next();
+    const seek = Number(new URLSearchParams(location.search).get('t'));
+    if (seek > 0) {
+      vue3d.advance(4);
+      handleNext();
+      vue3d.advance(seek);
+    } else {
+      setTimeout(handleNext, 4000);
+    }
   }
 }
 
-astra.say('accueil');
-runner.start();
-render();
-
-// Raccourci de demonstration (jury, tests) : ?demo=lancement saute directement a
-// l'episode de lancement et declenche le compte a rebours apres l'arrivee de la camera.
-const demo = new URLSearchParams(location.search).get('demo');
-if (demo === 'lancement') {
-  while (!runner.isFinished && runner.currentEpisode.type !== 'lancement') runner.next();
-  // &t=17 : saute directement a T+17 s de la sequence (captures d'ecran, reglages).
-  const seek = Number(new URLSearchParams(location.search).get('t'));
-  if (seek > 0) {
-    vue3d.advance(4);
-    handleNext();
-    vue3d.advance(seek);
-  } else {
-    setTimeout(handleNext, 4000);
-  }
-}
+// ─── PWA ──────────────────────────────────────────────────────────────────
 
 if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('/service-worker.js').catch(() => {
-    // Hors-ligne non critique pour le prototype ; a surveiller si l'enregistrement echoue.
-  });
+  navigator.serviceWorker.register('/service-worker.js').catch(() => {});
 }

@@ -1,0 +1,58 @@
+{
+  "nom": "instrument",
+  "label": "Instrument",
+  "emoji": "🔬",
+  "axes": ["precision", "sensibilite", "consommation", "masse_axe"],
+  "composants": [
+    {
+      "id": "capteur_temp",
+      "nom": "Capteur de température",
+      "masse": 0.02,
+      "puissanceW": 0.1,
+      "coutK": 2,
+      "deblocage": "au_depart",
+      "description": "Simple et fiable. Mesure la température interne et externe.",
+      "plafonds": { "precision": 3, "sensibilite": 3 }
+    },
+    {
+      "id": "camera_5mp",
+      "nom": "Caméra visible 5 MP",
+      "masse": 0.08,
+      "puissanceW": 2,
+      "coutK": 15,
+      "deblocage": "au_depart",
+      "description": "Images couleur 5 mégapixels de la surface terrestre.",
+      "plafonds": { "precision": 5, "sensibilite": 4 }
+    },
+    {
+      "id": "spectrometre_uv",
+      "nom": "Spectromètre UV",
+      "masse": 0.15,
+      "puissanceW": 4,
+      "coutK": 28,
+      "deblocage": "chapitre_02",
+      "description": "Analyse la composition atmosphérique par spectroscopie UV.",
+      "plafonds": { "precision": 6, "sensibilite": 6, "consommation": 3 }
+    },
+    {
+      "id": "magnetometre",
+      "nom": "Magnétomètre",
+      "masse": 0.06,
+      "puissanceW": 0.5,
+      "coutK": 10,
+      "deblocage": "au_depart",
+      "description": "Mesure le champ magnétique terrestre.",
+      "plafonds": { "sensibilite": 5, "precision": 4 }
+    },
+    {
+      "id": "radar_altimetre",
+      "nom": "Radar altimètre",
+      "masse": 0.22,
+      "puissanceW": 8,
+      "coutK": 42,
+      "deblocage": "chapitre_03",
+      "description": "Mesure l'altitude de la surface au centimètre près.",
+      "plafonds": { "precision": 6, "sensibilite": 5, "consommation": 2 }
+    }
+  ]
+}

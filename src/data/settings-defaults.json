@@ -1,0 +1,20 @@
+{
+  "difficulty": "ingenieur",
+  "gameMode": "campagne",
+  "tutorial": true,
+  "randomEvents": true,
+  "defaultTimeScale": 1000,
+  "volume": 0.7,
+  "sfxVolume": 1.0,
+  "voiceEnabled": true,
+  "ambientVolume": 0.4,
+  "graphicsQuality": "haute",
+  "fullscreen": false,
+  "reduceMotion": false,
+  "colorBlind": "none",
+  "highContrast": false,
+  "fontSize": "normale",
+  "subtitles": true,
+  "readingSpeed": "normale",
+  "language": "fr"
+}

@@ -407,3 +407,13 @@ html, body {
 @media (prefers-reduced-motion: reduce) {
   .astra-cercle, #episode button { animation: none; }
 }
+
+/* ── Mode hub : masque les overlays de jeu pendant le QG ── */
+#app.is-hub #dashboard,
+#app.is-hub #astra,
+#app.is-hub #episode,
+#app.is-hub #cam-hint,
+#app.is-hub #btn-audio {
+  opacity: 0;
+  pointer-events: none;
+}

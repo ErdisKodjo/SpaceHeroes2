@@ -1,0 +1,47 @@
+{
+  "nom": "energie",
+  "label": "Énergie",
+  "emoji": "⚡",
+  "axes": ["production", "stockage", "efficacite", "fiabilite"],
+  "composants": [
+    {
+      "id": "panneaux_gaas_1u",
+      "nom": "Panneaux solaires GaAs 1U",
+      "masse": 0.08,
+      "puissanceW": 8,
+      "coutK": 12,
+      "deblocage": "au_depart",
+      "description": "Cellules arséniure de gallium, haut rendement (28 %).",
+      "plafonds": { "production": 5, "efficacite": 5 }
+    },
+    {
+      "id": "panneaux_si_2u",
+      "nom": "Panneaux solaires Si 2U",
+      "masse": 0.14,
+      "puissanceW": 15,
+      "coutK": 8,
+      "deblocage": "au_depart",
+      "description": "Silicium, moins cher mais plus lourd.",
+      "plafonds": { "production": 6, "efficacite": 3 }
+    },
+    {
+      "id": "batterie_liion",
+      "nom": "Batterie Li-ion 20 Wh",
+      "masse": 0.22,
+      "coutK": 7,
+      "deblocage": "au_depart",
+      "description": "Stockage standard, rechargeable en éclipse.",
+      "plafonds": { "stockage": 5, "fiabilite": 4 }
+    },
+    {
+      "id": "rtg",
+      "nom": "Générateur RTG",
+      "masse": 0.50,
+      "puissanceW": 5,
+      "coutK": 95,
+      "deblocage": "chapitre_04",
+      "description": "5 W continus, indépendant du Soleil. Idéal pour Jupiter ou L1.",
+      "plafonds": { "production": 3, "fiabilite": 6 }
+    }
+  ]
+}

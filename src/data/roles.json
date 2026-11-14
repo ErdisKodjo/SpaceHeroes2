@@ -1,0 +1,46 @@
+[
+  {
+    "id": "directeur",
+    "nom": "Directeur de mission",
+    "sigle": "DM",
+    "emoji": "🎖️",
+    "description": "Tu arbitres les budgets et les priorités stratégiques. Tu peux imposer un veto et débloquer des réserves d'urgence.",
+    "competence": "Super-veto (2 jetons) · Réserve budgétaire d'urgence",
+    "infoReservee": "Budget global, réserve de contingence, indice de confiance",
+    "bonus": { "ressource": "budget", "facteur": 1.15 },
+    "couleur": "#ffd27a"
+  },
+  {
+    "id": "ingenieur_vehicule",
+    "nom": "Ingénieur véhicule",
+    "sigle": "IV",
+    "emoji": "🔧",
+    "description": "Tu maîtrises la masse, la structure et la propulsion. Tu calcules le delta-v et optimises chaque gramme.",
+    "competence": "Optimisation masse/Δv · Calculateur de transfert orbital",
+    "infoReservee": "Fiabilité réelle des composants, limites structurales, courbe Δv",
+    "bonus": { "ressource": "masse", "facteur": 0.9 },
+    "couleur": "#7cf0ff"
+  },
+  {
+    "id": "ingenieur_systemes",
+    "nom": "Ingénieur systèmes de bord",
+    "sigle": "ISB",
+    "emoji": "⚡",
+    "description": "Tu gères l'énergie, la thermique et les communications. Tu rebootes les sous-systèmes en cas de panne.",
+    "competence": "Routage d'énergie · Pointage antenne · Reboot système (30 s)",
+    "infoReservee": "Bilan électrique, télémétrie thermique (°C), qualité du signal",
+    "bonus": { "ressource": "puissance", "facteur": 1.1 },
+    "couleur": "#3ddc84"
+  },
+  {
+    "id": "responsable_science",
+    "nom": "Responsable science",
+    "sigle": "RSN",
+    "emoji": "🔬",
+    "description": "Tu maximises la valeur scientifique. Tu déclenches les instruments au bon moment et tu priorises les données.",
+    "competence": "Déclenchement instruments · Compression données · Requête correction d'orbite",
+    "infoReservee": "Score scientifique cumulé, mémoire de bord, fenêtres de survol",
+    "bonus": { "ressource": "donnees", "facteur": 1.2 },
+    "couleur": "#ff9ef5"
+  }
+]

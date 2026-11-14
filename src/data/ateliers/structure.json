@@ -1,0 +1,62 @@
+{
+  "nom": "structure",
+  "label": "Structure",
+  "emoji": "🛡️",
+  "axes": ["resistance", "legerete", "thermique", "radiation"],
+  "composants": [
+    {
+      "id": "chassis_alu",
+      "nom": "Châssis aluminium 6061",
+      "masse": 0.40,
+      "coutK": 10,
+      "deblocage": "au_depart",
+      "description": "Standard CubeSat, facile à usiner.",
+      "plafonds": { "resistance": 4, "legerete": 4 }
+    },
+    {
+      "id": "chassis_alLi",
+      "nom": "Châssis Al-Li",
+      "masse": 0.32,
+      "coutK": 14,
+      "deblocage": "au_depart",
+      "description": "Alliage aluminium-lithium, 20 % plus léger que l'alu standard.",
+      "plafonds": { "resistance": 5, "legerete": 5 }
+    },
+    {
+      "id": "chassis_titane",
+      "nom": "Châssis titane",
+      "masse": 0.30,
+      "coutK": 18,
+      "deblocage": "au_depart",
+      "description": "Résistance exceptionnelle, léger, coûteux.",
+      "plafonds": { "resistance": 6, "legerete": 5 }
+    },
+    {
+      "id": "chassis_cfrp",
+      "nom": "Châssis CFRP carbone",
+      "masse": 0.25,
+      "coutK": 28,
+      "deblocage": "chapitre_03",
+      "description": "Le plus léger, mais fragile aux impacts et cher.",
+      "plafonds": { "resistance": 4, "legerete": 6 }
+    },
+    {
+      "id": "mli",
+      "nom": "Isolation thermique MLI",
+      "masse": 0.05,
+      "coutK": 5,
+      "deblocage": "au_depart",
+      "description": "Couverture multi-couches, essentielle pour l'environnement spatial.",
+      "plafonds": { "thermique": 6 }
+    },
+    {
+      "id": "blindage_rad",
+      "nom": "Blindage anti-radiations",
+      "masse": 0.12,
+      "coutK": 15,
+      "deblocage": "chapitre_04",
+      "description": "Protège l'électronique des ceintures de Van Allen.",
+      "plafonds": { "radiation": 6 }
+    }
+  ]
+}

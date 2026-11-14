@@ -1,0 +1,38 @@
+{
+  "nom": "communications",
+  "label": "Communications",
+  "emoji": "📡",
+  "axes": ["debit", "portee", "consommation", "fiabilite"],
+  "composants": [
+    {
+      "id": "antenne_uhf",
+      "nom": "Antenne UHF patch",
+      "masse": 0.04,
+      "debitKbps": 9.6,
+      "coutK": 4,
+      "deblocage": "au_depart",
+      "description": "Faible débit mais fiable, omni-directionnelle.",
+      "plafonds": { "debit": 2, "portee": 3, "fiabilite": 5 }
+    },
+    {
+      "id": "antenne_xband",
+      "nom": "Antenne X-band",
+      "masse": 0.09,
+      "debitMbps": 100,
+      "coutK": 22,
+      "deblocage": "chapitre_02",
+      "description": "Haut débit, nécessite un pointage précis.",
+      "plafonds": { "debit": 6, "portee": 5, "consommation": 3 }
+    },
+    {
+      "id": "laser_optique",
+      "nom": "Liaison laser optique",
+      "masse": 0.12,
+      "debitGbps": 1,
+      "coutK": 55,
+      "deblocage": "chapitre_05",
+      "description": "1 Gbps, immunisé aux interférences radio. Exige un tracking précis.",
+      "plafonds": { "debit": 6, "portee": 6, "consommation": 2 }
+    }
+  ]
+}
