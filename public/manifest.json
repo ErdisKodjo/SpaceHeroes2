@@ -1,0 +1,10 @@
+{
+  "name": "Space Heroes",
+  "short_name": "SpaceHeroes",
+  "description": "Jeu de conception de mission spatiale - NASA Space Apps Challenge",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0b1026",
+  "theme_color": "#0b1026",
+  "icons": []
+}

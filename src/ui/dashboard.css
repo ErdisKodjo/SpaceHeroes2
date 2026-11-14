@@ -1,0 +1,127 @@
+:root {
+  color-scheme: light dark;
+  --bg: #0b1026;
+  --fg: #f0f2ff;
+  --vert: #3ddc84;
+  --orange: #ffb347;
+  --rouge: #ff5c5c;
+  --panel: #161b35;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: system-ui, -apple-system, Segoe UI, sans-serif;
+  background: var(--bg);
+  color: var(--fg);
+  padding: 0 16px;
+  padding-block: env(safe-area-inset-top, 0px) env(safe-area-inset-bottom, 0px);
+}
+
+#app {
+  max-width: 720px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+#dashboard {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(90px, 1fr));
+  gap: 8px;
+  padding: 12px 0;
+}
+
+.jauge {
+  background: var(--panel);
+  border-radius: 8px;
+  padding: 8px;
+  text-align: center;
+  font-size: 13px;
+}
+
+.jauge .valeur {
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.jauge.vert { border-left: 4px solid var(--vert); }
+.jauge.orange { border-left: 4px solid var(--orange); }
+.jauge.rouge { border-left: 4px solid var(--rouge); }
+
+#segments {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.segment-pastille {
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+}
+
+.segment-pastille.vert { background: var(--vert); color: #04210f; }
+.segment-pastille.orange { background: var(--orange); color: #3a2300; }
+.segment-pastille.rouge { background: var(--rouge); color: #3a0000; }
+
+#episode {
+  background: var(--panel);
+  border-radius: 12px;
+  padding: 16px;
+}
+
+#astra {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  background: var(--panel);
+  border-radius: 12px;
+  padding: 12px;
+}
+
+.astra-cercle {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: radial-gradient(circle, #7cf0ff, #2a6cff);
+  flex: none;
+  animation: pulse 2.4s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { transform: scale(1); opacity: 0.9; }
+  50% { transform: scale(1.12); opacity: 1; }
+}
+
+.astra-bulle {
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+button {
+  background: #2a6cff;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 10px 16px;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+#vue3d {
+  height: 220px;
+  border-radius: 12px;
+  overflow: hidden;
+  background: #000;
+}
+
+#vue3d canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}

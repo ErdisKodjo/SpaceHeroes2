@@ -1,0 +1,25 @@
+[
+  { "id": "cml1_objectif", "niveau": 1, "texte": "Objectif scientifique formule en une phrase" },
+  { "id": "cml1_unique", "niveau": 1, "texte": "Ce qui rend la mission unique est identifie" },
+  { "id": "cml1_fenetre", "niveau": 1, "texte": "Fenetre de lancement approximative choisie" },
+  { "id": "cml1_classe_budget", "niveau": 1, "texte": "Classe de budget visee" },
+  { "id": "cml1_croquis", "niveau": 1, "texte": "Premier croquis du vaisseau" },
+
+  { "id": "cml2_exigences", "niveau": 2, "texte": "Besoins scientifiques detailles en exigences de premier niveau" },
+  { "id": "cml2_ordres_grandeur", "niveau": 2, "texte": "Masse, puissance et budget estimes en ordre de grandeur" },
+  { "id": "cml2_risques", "niveau": 2, "texte": "Risques majeurs identifies" },
+  { "id": "cml2_lanceur", "niveau": 2, "texte": "Au moins un lanceur candidat liste" },
+  { "id": "cml2_technologies", "niveau": 2, "texte": "Technologies necessaires identifiees" },
+
+  { "id": "cml3_comparaison", "niveau": 3, "texte": "Au moins 2 architectures comparees" },
+  { "id": "cml3_effet_options", "niveau": 3, "texte": "Effet de chaque option sur science/cout/risque documente" },
+  { "id": "cml3_marges", "niveau": 3, "texte": "Marges techniques estimees pour chaque option" },
+  { "id": "cml3_sensibilite", "niveau": 3, "texte": "Sensibilite du design aux principaux risques evaluee" },
+  { "id": "cml3_option_retenue", "niveau": 3, "texte": "Option retenue justifiee face aux autres" },
+
+  { "id": "cml4_equipements", "niveau": 4, "texte": "Liste d'equipements complete" },
+  { "id": "cml4_cout", "niveau": 4, "texte": "Cout estime avec marge de reserve" },
+  { "id": "cml4_marges_validees", "niveau": 4, "texte": "Marges techniques validees" },
+  { "id": "cml4_verification", "niveau": 4, "texte": "Plan de verification (essais) defini" },
+  { "id": "cml4_risques_classes", "niveau": 4, "texte": "Risques classes avec piste de reduction" }
+]

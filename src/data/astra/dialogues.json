@@ -1,0 +1,42 @@
+{
+  "accueil": {
+    "categorie": "accueil",
+    "texte": "Bienvenue, passionnes de sciences et de conquete spatiale ! Vous etes sur le point de vivre une aventure reservee, jusqu'ici, a une poignee d'etres humains. Moi, c'est ASTRA, et je serai votre guide, de la premiere ligne du plan de mission jusqu'a la derniere transmission de votre vaisseau."
+  },
+  "briefing_ch1_intro": {
+    "categorie": "narration",
+    "texte": "Votre equipe universitaire s'apprete a lancer son tout premier satellite. Pas de panique : on va y aller etape par etape."
+  },
+  "atelier_ch1_intro": {
+    "categorie": "narration",
+    "texte": "Voici l'Atelier : choisis tes composants, mais attention, ton CubeSat ne peut pas depasser 4 kg."
+  },
+  "essais_ch1_intro": {
+    "categorie": "narration",
+    "texte": "Avant de lancer quoi que ce soit, on teste. Un defaut trouve ici coute bien moins cher qu'un defaut trouve en orbite."
+  },
+  "lancement_ch1_intro": {
+    "categorie": "narration",
+    "texte": "Ton CubeSat embarque en covoiturage avec d'autres satellites. Verifions que tout est compatible avant le compte a rebours."
+  },
+  "operations_ch1_intro": {
+    "categorie": "narration",
+    "texte": "Ton satellite est en orbite. Reste a etablir le premier contact radio."
+  },
+  "succes_1": {
+    "categorie": "succes",
+    "texte": "Orbite atteinte ! Et avec de la marge sur le carburant, vos equipes au sol peuvent respirer."
+  },
+  "alerte_1": {
+    "categorie": "alerte",
+    "texte": "Attention, une de tes marges est proche d'etre depassee."
+  },
+  "echec_1": {
+    "categorie": "echec",
+    "texte": "La mission est perdue, mais regardons ensemble ce qui s'est passe : ce n'est pas une punition, c'est une lecon."
+  },
+  "atelier_test": {
+    "categorie": "atelier",
+    "texte": "Avec ce niveau de fiabilite, cette piece risque de lacher en vol. Tu veux la tester avant de la fabriquer ?"
+  }
+}

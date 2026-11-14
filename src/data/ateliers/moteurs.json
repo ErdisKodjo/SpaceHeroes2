@@ -1,0 +1,27 @@
+{
+  "nom": "moteurs",
+  "axes": ["poussee", "efficacite", "legerete", "fiabilite"],
+  "technologies": [
+    {
+      "nom": "chimique",
+      "plafonds": { "poussee": 6, "efficacite": 3 },
+      "electriciteRequise": "aucune",
+      "coutBaseJetons": 20,
+      "deblocage": "au depart"
+    },
+    {
+      "nom": "cryogenique",
+      "plafonds": { "poussee": 5, "efficacite": 4 },
+      "electriciteRequise": "aucune",
+      "coutBaseJetons": 35,
+      "deblocage": "chapitre 5"
+    },
+    {
+      "nom": "ionique",
+      "plafonds": { "poussee": 2, "efficacite": 6 },
+      "electriciteRequise": "elevee",
+      "coutBaseJetons": 45,
+      "deblocage": "chapitre 9"
+    }
+  ]
+}

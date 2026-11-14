@@ -1,0 +1,75 @@
+{
+  "id": "chapitre_01",
+  "titre": "Le premier signal",
+  "sousTitre": "CubeSat",
+  "histoire": "Une jeune equipe universitaire lance son tout premier satellite. ASTRA fait decouvrir les bases.",
+  "mission": "Un CubeSat en orbite basse terrestre qui transmet un message et mesure la temperature.",
+  "contraintes": {
+    "budget": 5,
+    "masse": 4,
+    "puissance": 10,
+    "donnees": 5,
+    "communications": 5,
+    "duree": 12
+  },
+  "notionCle": "Masse, puissance, premier compromis",
+  "ressourcesNasa": [
+    "CubeSat 101 (phases du chapitre, ordres de grandeur)",
+    "Design and Develop Science Missions (4 segments simplifies)",
+    "Concept Maturity Levels (niveaux 1 et 2 seulement)"
+  ],
+  "episodes": [
+    {
+      "id": "briefing",
+      "type": "briefing",
+      "titre": "Le Briefing",
+      "texte": "Definis l'objectif et les exigences de la mission, recois le budget.",
+      "astra": "briefing_ch1_intro",
+      "cmlVise": 1
+    },
+    {
+      "id": "atelier",
+      "type": "atelier",
+      "titre": "L'Atelier",
+      "texte": "Concois le vaisseau (structure, energie, communications, instrument), dans la limite de 4 kg.",
+      "astra": "atelier_ch1_intro",
+      "cmlVise": 2,
+      "familleAtelier": "moteurs"
+    },
+    {
+      "id": "essais",
+      "type": "essais",
+      "titre": "Les Essais",
+      "texte": "Teste le vaisseau (vibrations, vide, thermique), corrige les defauts.",
+      "astra": "essais_ch1_intro",
+      "cmlRequis": 2
+    },
+    {
+      "id": "lancement",
+      "type": "lancement",
+      "titre": "Le Lancement",
+      "texte": "Choisis lanceur et orbite, verifie la compatibilite, lance.",
+      "astra": "lancement_ch1_intro",
+      "cmlRequis": 2
+    },
+    {
+      "id": "operations",
+      "type": "operations",
+      "titre": "Les Operations",
+      "texte": "Pilote la mission : premier contact radio, gestion des ressources en temps reel.",
+      "astra": "operations_ch1_intro"
+    },
+    {
+      "id": "bilan",
+      "type": "bilan",
+      "titre": "Le Bilan",
+      "texte": "Rapport de mission, score, medaille et analyse d'ASTRA.",
+      "astra": null
+    }
+  ],
+  "evenementAleatoire": {
+    "id": "fenetre_decalee",
+    "texte": "La fenetre de lancement est decalee de 2 semaines.",
+    "effet": { "duree": -2 }
+  }
+}

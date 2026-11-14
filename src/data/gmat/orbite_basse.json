@@ -1,0 +1,15 @@
+{
+  "type": "orbite_basse",
+  "statut": "placeholder_formule",
+  "note": "Table provisoire calculee par formule orbitale standard (T = 2*PI*sqrt(a^3/mu)), a remplacer par la vraie sortie GMAT des que la Piste 2 (plan 24h) l'a produite. Meme format de sortie, remplacement transparent.",
+  "parametres": {
+    "altitudeKm": 550,
+    "rayonTerreKm": 6378,
+    "muTerre": 398600
+  },
+  "resultats": {
+    "periodeMinutes": 95.6,
+    "passagesParJourSurUneStation": 4,
+    "dureeContactMoyenneMinutes": 8
+  }
+}
