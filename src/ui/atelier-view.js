@@ -8,6 +8,15 @@ import structureData    from '../data/ateliers/structure.json';
 import energieData      from '../data/ateliers/energie.json';
 import commsData        from '../data/ateliers/communications.json';
 import instrumentData   from '../data/ateliers/instrument.json';
+import { icon } from './icons.js';
+
+const FAMILLE_ICONS = {
+  moteurs:        'rocket',
+  structure:      'shield',
+  energie:        'solar',
+  communications: 'antenna',
+  instrument:     'microscope'
+};
 
 const FAMILLES = [
   { key: 'moteurs',       data: moteursData,    champ3d: 'moteur'    },
@@ -37,7 +46,7 @@ function getLabel(famille) {
 }
 
 function getEmoji(famille) {
-  return famille.data.emoji ?? '';
+  return icon(FAMILLE_ICONS[famille.key] ?? 'wrench', 14);
 }
 
 function isUnlocked(composant, chapterId = 'chapitre_01') {
@@ -140,8 +149,8 @@ export function createAtelierView(container, { resources, astra, chapterId = 'ch
           title="${!unlocked ? `Disponible : ${comp.deblocage}` : comp.description}">
           <div class="sh-atelier-comp-top">
             <span class="sh-atelier-comp-nom">${comp.nom}</span>
-            ${!unlocked ? '<span class="sh-atelier-comp-lock">🔒</span>' : ''}
-            ${selected  ? '<span class="sh-atelier-comp-sel">✓</span>'  : ''}
+            ${!unlocked ? `<span class="sh-atelier-comp-lock">${icon('lock', 13)}</span>` : ''}
+            ${selected  ? `<span class="sh-atelier-comp-sel">${icon('check', 13)}</span>`  : ''}
           </div>
           <div class="sh-atelier-comp-details">${details.join(' · ')}</div>
           <div class="sh-atelier-comp-desc">${comp.description}</div>
@@ -191,7 +200,7 @@ export function createAtelierView(container, { resources, astra, chapterId = 'ch
         <!-- Pied : message ASTRA + bouton valider -->
         <div class="sh-atelier-footer">
           <div class="sh-atelier-status ${st.ok ? 'is-ok' : 'is-warn'}">
-            ${st.ok ? '✅' : '⚠️'} ${st.msg}
+            ${st.ok ? icon('check', 15) : icon('warning', 15)} ${st.msg}
           </div>
           <button type="button" id="sh-atelier-valider"
             class="sh-atelier-valider" ${!st.ok ? 'disabled' : ''}>

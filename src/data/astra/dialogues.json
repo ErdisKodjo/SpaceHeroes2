@@ -94,5 +94,101 @@
   "cml_lancement_bloque": {
     "categorie": "alerte",
     "texte": "Le lancement est bloque. Les criteres CML requis ne sont pas encore valides. Retourne a la checklist."
+  },
+  "briefing_ch2_intro": {
+    "categorie": "narration",
+    "texte": "Cette fois, le satellite doit revoir le meme endroit de la Terre a la meme heure. C'est le principe de l'orbite heliosynchrone : la lumiere du Soleil reste comparable d'un passage a l'autre."
+  },
+  "atelier_ch2_intro": {
+    "categorie": "narration",
+    "texte": "Un imageur meteorologique a besoin d'une vue degagee et d'assez de debit pour renvoyer les images avant le passage suivant."
+  },
+  "essais_ch2_intro": {
+    "categorie": "narration",
+    "texte": "En orbite polaire, le satellite enchaine les eclipses. Verifie le thermique et l'alimentation avant le lancement."
+  },
+  "lancement_ch2_intro": {
+    "categorie": "narration",
+    "texte": "L'inclinaison visee est proche de 98 degres. Une erreur ici, et les passages ne tombent plus a heure fixe."
+  },
+  "operations_ch2_intro": {
+    "categorie": "narration",
+    "texte": "Premier passage au-dessus de l'ocean. Etablis le contact, puis ouvre l'instrument pendant que la scene est encore eclairee."
+  },
+  "briefing_ch3_intro": {
+    "categorie": "narration",
+    "texte": "Direction la Lune. Le transfert demande un coup de moteur precis, puis trois jours de silence relatif : le signal met deja quelques secondes a revenir."
+  },
+  "atelier_ch3_intro": {
+    "categorie": "narration",
+    "texte": "Loin de la Terre, la masse d'ergols et le debit radio comptent autant que l'instrument. Chaque kilogramme se paie en delta-v."
+  },
+  "essais_ch3_intro": {
+    "categorie": "narration",
+    "texte": "Le vide lunaire est sans appel. Un defaut thermique ou electrique ne se corrige pas une fois en route."
+  },
+  "lancement_ch3_intro": {
+    "categorie": "narration",
+    "texte": "Injection en orbite de parking, puis allumage vers la Lune. La fenetre est courte."
+  },
+  "operations_ch3_intro": {
+    "categorie": "narration",
+    "texte": "Le delai radio est d'environ trois secondes. Donne tes ordres en anticipant : la sonde a deja avance quand la reponse arrive."
+  },
+  "briefing_ch4_intro": {
+    "categorie": "narration",
+    "texte": "Mars ne s'aligne bien avec la Terre que tous les 26 mois. Rater cette fenetre, c'est attendre la suivante."
+  },
+  "atelier_ch4_intro": {
+    "categorie": "narration",
+    "texte": "A cette distance, les panneaux solaires faiblissent. Un RTG garantit des watts constants, mais il est lourd et cher."
+  },
+  "essais_ch4_intro": {
+    "categorie": "narration",
+    "texte": "La croisiere dure des mois. Ce qui tient une heure sur le banc doit tenir tout le trajet."
+  },
+  "lancement_ch4_intro": {
+    "categorie": "narration",
+    "texte": "Fenetre ouverte. Apres l'injection, plus personne ne rattrape la sonde avant Mars."
+  },
+  "operations_ch4_intro": {
+    "categorie": "narration",
+    "texte": "Le signal met une vingtaine de minutes a l'aller. Tu ne pilotes pas en direct : tu envoies une sequence, puis tu attends."
+  },
+  "briefing_ch5_intro": {
+    "categorie": "narration",
+    "texte": "Le point de Lagrange L1, entre le Soleil et la Terre, est un balcon sur le vent solaire. L'orbite en halo n'y reste pas toute seule."
+  },
+  "atelier_ch5_intro": {
+    "categorie": "narration",
+    "texte": "Il faut de la puissance pour les instruments et du debit pour prevenir la Terre avant qu'une tempete solaire n'arrive."
+  },
+  "essais_ch5_intro": {
+    "categorie": "narration",
+    "texte": "Hors de la magnetosphere, le blindage et la thermique ne sont plus optionnels."
+  },
+  "lancement_ch5_intro": {
+    "categorie": "narration",
+    "texte": "Insertion vers L1. Ensuite, de petites corrections maintiennent le halo."
+  },
+  "operations_ch5_intro": {
+    "categorie": "narration",
+    "texte": "Tu es en avant de la Terre. Ce que tu mesures maintenant, les magnetospheristes le verront une heure plus tard."
+  },
+  "bilan_or": {
+    "categorie": "succes",
+    "texte": "Mission accomplie, et avec de la marge. Ce rapport peut servir de reference a l'equipe suivante."
+  },
+  "bilan_argent": {
+    "categorie": "succes",
+    "texte": "La mission a tenu ses objectifs. Quelques arbitrages auraient encore elargi la marge."
+  },
+  "bilan_bronze": {
+    "categorie": "narration",
+    "texte": "Le satellite a fait le travail essentiel. Le rapport montre ou la conception etait juste, et ou elle etait tendue."
+  },
+  "bilan_aucun": {
+    "categorie": "echec",
+    "texte": "La mission est rentree, mais les marges n'ont pas suivi. Regardons les decisions une par une : c'est la que se trouve la prochaine reussite."
   }
 }

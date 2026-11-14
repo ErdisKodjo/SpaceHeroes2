@@ -1,0 +1,15 @@
+{
+  "type": "point_lagrange_l1",
+  "statut": "placeholder_formule",
+  "note": "Point de Lagrange L1 du système Soleil-Terre, à environ 1,5 million de km de la Terre en direction du Soleil. Les satellites réels (SOHO, ACE, DSCOVR) décrivent une orbite en halo autour de ce point, instable, d'une période d'environ 6 mois. Le délai lumière est d'environ 5 secondes. Table provisoire, à remplacer par une sortie GMAT.",
+  "parametres": {
+    "distanceTerreKm": 1500000,
+    "systeme": "Soleil-Terre",
+    "stabilite": "instable"
+  },
+  "resultats": {
+    "periodeHaloJours": 178,
+    "delaiRadioSecondes": 5,
+    "correctionsParAn": 4
+  }
+}

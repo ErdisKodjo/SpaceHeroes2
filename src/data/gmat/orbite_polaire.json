@@ -1,0 +1,17 @@
+{
+  "type": "orbite_polaire",
+  "statut": "placeholder_formule",
+  "note": "Orbite circulaire inclinée à 90 degrés, 500 km. Période calculée par T = 2*PI*sqrt(a^3/mu), a = 6878 km. Table provisoire, à remplacer par une sortie GMAT.",
+  "parametres": {
+    "altitudeKm": 500,
+    "rayonTerreKm": 6378,
+    "muTerre": 398600,
+    "inclinaisonDeg": 90,
+    "excentricite": 0
+  },
+  "resultats": {
+    "periodeMinutes": 94.6,
+    "passagesParJourSurUneStation": 2,
+    "dureeContactMoyenneMinutes": 10
+  }
+}

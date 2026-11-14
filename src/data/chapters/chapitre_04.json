@@ -1,0 +1,77 @@
+{
+  "id": "chapitre_04",
+  "titre": "Signal de Mars",
+  "sousTitre": "Sonde",
+  "histoire": "Mars s'éloigne et se rapproche sur un rythme de 26 mois. La fenêtre ouverte aujourd'hui ne se rouvrira pas avant la prochaine opposition utile.",
+  "mission": "Une sonde en orbite basse martienne, alimentée même loin du Soleil, qui attend jusqu'à vingt minutes la réponse de la Terre.",
+  "profil": "mars",
+  "gmat": "orbite_mars",
+  "contraintes": {
+    "budget": 40,
+    "masse": 200,
+    "puissance": 30,
+    "donnees": 20,
+    "communications": 10,
+    "duree": 36
+  },
+  "notionCle": "Fenêtre des 26 mois, RTG, délai radio d'environ 20 minutes",
+  "ressourcesNasa": [
+    "Mars Reconnaissance Orbiter",
+    "MAVEN et le délai de communication Terre-Mars"
+  ],
+  "episodes": [
+    {
+      "id": "briefing",
+      "type": "briefing",
+      "titre": "Le Briefing",
+      "texte": "La fenêtre de lancement est le premier choix. Tout le reste, puissance et autonomie, doit tenir jusqu'à l'arrivée.",
+      "astra": "briefing_ch4_intro",
+      "cmlVise": 1
+    },
+    {
+      "id": "atelier",
+      "type": "atelier",
+      "titre": "L'Atelier",
+      "texte": "Compare panneaux solaires et RTG. À plusieurs unités astronomiques, le Soleil ne suffit plus comme près de la Terre.",
+      "astra": "atelier_ch4_intro",
+      "cmlVise": 2,
+      "familleAtelier": "energie"
+    },
+    {
+      "id": "essais",
+      "type": "essais",
+      "titre": "Les Essais",
+      "texte": "Une croisière de plusieurs mois ne pardonne pas un défaut laissé au sol.",
+      "astra": "essais_ch4_intro",
+      "cmlRequis": 2
+    },
+    {
+      "id": "lancement",
+      "type": "lancement",
+      "titre": "Le Lancement",
+      "texte": "Injection sur la trajectoire interplanétaire. La fenêtre se referme ensuite pour 26 mois.",
+      "astra": "lancement_ch4_intro",
+      "bouton": "Lancer !",
+      "cmlRequis": 2
+    },
+    {
+      "id": "operations",
+      "type": "operations",
+      "titre": "Les Operations",
+      "texte": "Tu n'es plus en direct. Chaque commande est une séquence, et la réponse met une vingtaine de minutes.",
+      "astra": "operations_ch4_intro"
+    },
+    {
+      "id": "bilan",
+      "type": "bilan",
+      "titre": "Le Bilan",
+      "texte": "Rapport de mission, score, médaille et analyse d'ASTRA.",
+      "astra": null
+    }
+  ],
+  "evenementAleatoire": {
+    "id": "fenetre_etroite",
+    "texte": "La fenêtre de lancement se resserre. L'équipe perd quatre mois de marge calendaire.",
+    "effet": { "duree": -4 }
+  }
+}

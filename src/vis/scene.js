@@ -6,7 +6,7 @@
 
 import * as THREE from 'three';
 import './vis.css';
-import { createStarfield } from './particles.js';
+import { createStarfield, createParticlePool } from './particles.js';
 import { createEarth } from './earth.js';
 import { createLaunchSequence } from './launch.js';
 import { createOrbitHud } from './hud.js';
@@ -70,6 +70,11 @@ export function mountScene(container) {
   });
   player.onFirstInput(() => document.getElementById('cam-hint')?.classList.add('is-gone'));
 
+  // Pool de particules pour la célébration post-orbite
+  const celebPool = createParticlePool({ max: 400, additive: true });
+  scene.add(celebPool.object);
+  let celebActive = false;
+
   // --- Dimensionnement : suit la taille reelle du panneau (responsive, mobile). ---
   function resize() {
     const width = container.clientWidth || 320;
@@ -103,6 +108,7 @@ export function mountScene(container) {
     earth.update(reduceMotion ? delta * 0.2 : delta);
     stars.update(elapsed);
     launch.update(delta);
+    if (celebActive) celebPool.update(delta);
 
     if (launch.launched && launch.orbit) {
       if (!hudArmed) {
@@ -110,6 +116,8 @@ export function mountScene(container) {
         launch.orbit.setTimeScale(1000);
         hud.setTimeScale(1000);
         hud.show();
+        // Brancher le raycasting sur le CubeSat une fois en orbite
+        player.setCubesat(launch.cubesat?.object, launch.orbit);
       }
       hud.update(launch.orbit.telemetry());
     }
@@ -162,6 +170,36 @@ export function mountScene(container) {
     flashWarning() {
       earth.flash();
     },
+    /** Burst de particules dorées quand le CubeSat atteint l'orbite. */
+    celebrate() {
+      if (reduceMotion) return;
+      celebActive = true;
+      const origin = launch.cubesat?.object?.position ?? new THREE.Vector3(1.08, 0.3, 0.1);
+      const C_GOLD  = new THREE.Color(0xffd27a);
+      const C_WHITE = new THREE.Color(0xffffff);
+      const C_CYAN  = new THREE.Color(0x7cf0ff);
+      const palettes = [[C_GOLD, C_WHITE], [C_GOLD, C_GOLD], [C_CYAN, C_WHITE]];
+      const ePos = new THREE.Vector3();
+      const eVel = new THREE.Vector3();
+      const eAcc = new THREE.Vector3();
+      for (let i = 0; i < 320; i++) {
+        ePos.copy(origin).addScaledVector(
+          new THREE.Vector3(Math.random()-0.5, Math.random()-0.5, Math.random()-0.5), 0.04
+        );
+        const speed = 0.04 + Math.random() * 0.14;
+        eVel.set(Math.random()-0.5, Math.random()-0.5, Math.random()-0.5).normalize().multiplyScalar(speed);
+        eAcc.copy(origin).normalize().multiplyScalar(-0.004);
+        const pal = palettes[Math.floor(Math.random() * palettes.length)];
+        celebPool.emit({
+          position: ePos, velocity: eVel, acceleration: eAcc,
+          life: 1.4 + Math.random() * 1.2,
+          size: [0.003 + Math.random() * 0.004, 0.0003],
+          color: pal, alpha: 0.9, drag: 0.6
+        });
+      }
+      // Arrêter le pool après que toutes les particules soient mortes (~3 s)
+      setTimeout(() => { celebActive = false; }, 3200);
+    },
     dispose() {
       running = false;
       cancelAnimationFrame(frameId);
@@ -171,6 +209,7 @@ export function mountScene(container) {
       player.dispose();
       launch.dispose();
       hud.dispose();
+      celebPool.dispose();
       stars.dispose();
       earth.dispose();
       renderer.dispose();

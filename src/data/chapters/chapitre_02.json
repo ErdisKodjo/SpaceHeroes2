@@ -1,0 +1,77 @@
+{
+  "id": "chapitre_02",
+  "titre": "L'œil du cyclone",
+  "sousTitre": "Météo",
+  "histoire": "Une équipe doit surveiller les tempêtes. Pour comparer deux passages, le satellite doit revoir le même lieu à la même heure solaire.",
+  "mission": "Un satellite météorologique en orbite héliosynchrone qui image la couverture nuageuse et mesure la température de brillance.",
+  "profil": "meteo_sso",
+  "gmat": "orbite_heliosynchrone",
+  "contraintes": {
+    "budget": 8,
+    "masse": 12,
+    "puissance": 18,
+    "donnees": 10,
+    "communications": 8,
+    "duree": 18
+  },
+  "notionCle": "Orbite héliosynchrone, répétitivité, débit image",
+  "ressourcesNasa": [
+    "Terra et Aqua, orbite héliosynchrone",
+    "Worldview et les produits nuageux de la NASA"
+  ],
+  "episodes": [
+    {
+      "id": "briefing",
+      "type": "briefing",
+      "titre": "Le Briefing",
+      "texte": "Fixe l'heure solaire locale des passages et l'instrument qui doit voir à travers ou au-dessus des nuages.",
+      "astra": "briefing_ch2_intro",
+      "cmlVise": 1
+    },
+    {
+      "id": "atelier",
+      "type": "atelier",
+      "titre": "L'Atelier",
+      "texte": "Choisis une structure stable, assez de puissance pour l'imageur, et un débit capable de vider la mémoire avant le passage suivant.",
+      "astra": "atelier_ch2_intro",
+      "cmlVise": 2,
+      "familleAtelier": "instrument"
+    },
+    {
+      "id": "essais",
+      "type": "essais",
+      "titre": "Les Essais",
+      "texte": "Vibrations du lancement polaire, cycles thermiques rapides, compatibilité électrique de l'imageur.",
+      "astra": "essais_ch2_intro",
+      "cmlRequis": 2
+    },
+    {
+      "id": "lancement",
+      "type": "lancement",
+      "titre": "Le Lancement",
+      "texte": "Injection sur une orbite inclinée d'environ 98 degrés, à 700 km.",
+      "astra": "lancement_ch2_intro",
+      "bouton": "Lancer !",
+      "cmlRequis": 2
+    },
+    {
+      "id": "operations",
+      "type": "operations",
+      "titre": "Les Operations",
+      "texte": "Contact radio, ouverture de l'instrument au-dessus de la zone éclairée, transmission des scènes.",
+      "astra": "operations_ch2_intro"
+    },
+    {
+      "id": "bilan",
+      "type": "bilan",
+      "titre": "Le Bilan",
+      "texte": "Rapport de mission, score, médaille et analyse d'ASTRA.",
+      "astra": null
+    }
+  ],
+  "evenementAleatoire": {
+    "id": "couverture_nuageuse",
+    "texte": "Une masse nuageuse persistante masque la zone prioritaire. Il faut un passage supplémentaire.",
+    "effet": { "duree": -1 }
+  }
+}

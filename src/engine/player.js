@@ -8,7 +8,7 @@ const KEY = 'sh-player';
 const DEFAULT = {
   nom: 'Commandant',
   roleId: 'ingenieur_vehicule',
-  stats: { partiesJouees: 0, meilleursScores: {} }
+  stats: { partiesJouees: 0, meilleursScores: {}, jetons: 0 }
 };
 
 function load() {
@@ -44,12 +44,21 @@ export const playerStore = {
     }
   },
   enregistrerScore(chapterId, score) {
-    const best = _player.stats.meilleursScores[chapterId] ?? 0;
-    if (score > best) _player.stats.meilleursScores[chapterId] = score;
+    const best = _player.stats.meilleursScores[chapterId];
+    if (best === undefined || score > best) _player.stats.meilleursScores[chapterId] = score;
     _player.stats.partiesJouees += 1;
     save(_player);
   },
   getMeilleurScore(chapterId) {
     return _player.stats.meilleursScores[chapterId] ?? null;
+  },
+  get jetons() {
+    return _player.stats.jetons ?? 0;
+  },
+  ajouterJetons(n) {
+    const gain = Math.max(0, Math.round(n) || 0);
+    _player.stats.jetons = (_player.stats.jetons ?? 0) + gain;
+    save(_player);
+    return _player.stats.jetons;
   }
 };

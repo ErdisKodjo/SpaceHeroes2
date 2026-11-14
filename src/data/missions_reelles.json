@@ -1,0 +1,167 @@
+[
+  {
+    "id": "genesat-1",
+    "nom": "GeneSat-1",
+    "agence": "NASA",
+    "annee": 2006,
+    "profil": "leo_cubesat",
+    "reference": true,
+    "resume": "CubeSat 3U en orbite basse, premier satellite de la NASA entièrement construit autour d'une expérience biologique embarquée."
+  },
+  {
+    "id": "phonesat",
+    "nom": "PhoneSat",
+    "agence": "NASA",
+    "annee": 2013,
+    "profil": "leo_cubesat",
+    "resume": "CubeSats bâtis autour d'un téléphone du commerce, pour prouver qu'une plateforme très simple peut émettre depuis l'orbite."
+  },
+  {
+    "id": "nodes",
+    "nom": "Nodes",
+    "agence": "NASA",
+    "annee": 2016,
+    "profil": "leo_cubesat",
+    "resume": "Deux CubeSats qui ont démontré un réseau radio autonome en orbite basse."
+  },
+  {
+    "id": "dellingr",
+    "nom": "Dellingr",
+    "agence": "NASA",
+    "annee": 2017,
+    "profil": "leo_cubesat",
+    "resume": "CubeSat 6U de Goddard, pensé pour rendre les petites plateformes plus fiables."
+  },
+  {
+    "id": "terra",
+    "nom": "Terra",
+    "agence": "NASA",
+    "annee": 1999,
+    "profil": "meteo_sso",
+    "reference": true,
+    "resume": "Vaisseau amiral d'observation de la Terre, en orbite héliosynchrone, qui croise l'équateur à heure solaire stable."
+  },
+  {
+    "id": "aqua",
+    "nom": "Aqua",
+    "agence": "NASA",
+    "annee": 2002,
+    "profil": "meteo_sso",
+    "resume": "Satellite du cycle de l'eau, sur une orbite de l'après-midi, complémentaire de Terra."
+  },
+  {
+    "id": "suomi-npp",
+    "nom": "Suomi NPP",
+    "agence": "NASA / NOAA",
+    "annee": 2011,
+    "profil": "meteo_sso",
+    "resume": "Pont entre la recherche et la météo opérationnelle, avec un imageur qui reconstitue la couverture nuageuse."
+  },
+  {
+    "id": "landsat-9",
+    "nom": "Landsat 9",
+    "agence": "NASA / USGS",
+    "annee": 2021,
+    "profil": "meteo_sso",
+    "resume": "Imageur optique en orbite héliosynchrone, pour comparer les paysages d'une année sur l'autre sous la même lumière."
+  },
+  {
+    "id": "lro",
+    "nom": "Lunar Reconnaissance Orbiter",
+    "agence": "NASA",
+    "annee": 2009,
+    "profil": "lune",
+    "reference": true,
+    "resume": "Orbiteur de cartographie lunaire, à une centaine de kilomètres d'altitude, toujours en service."
+  },
+  {
+    "id": "grail",
+    "nom": "GRAIL",
+    "agence": "NASA",
+    "annee": 2011,
+    "profil": "lune",
+    "resume": "Deux sondes en formation qui ont cartographié le champ de gravité de la Lune."
+  },
+  {
+    "id": "ladee",
+    "nom": "LADEE",
+    "agence": "NASA",
+    "annee": 2013,
+    "profil": "lune",
+    "resume": "Étude de l'exosphère et de la poussière lunaires, sur une orbite basse qui s'est terminée par un impact volontaire."
+  },
+  {
+    "id": "lunar-flashlight",
+    "nom": "Lunar Flashlight",
+    "agence": "NASA",
+    "annee": 2022,
+    "profil": "lune",
+    "resume": "Petit satellite chargé de chercher de la glace dans les cratères polaires qui ne voient jamais le Soleil."
+  },
+  {
+    "id": "mro",
+    "nom": "Mars Reconnaissance Orbiter",
+    "agence": "NASA",
+    "annee": 2005,
+    "profil": "mars",
+    "reference": true,
+    "resume": "Orbiteur martien de reconnaissance, relais radio des engins au sol, conçu pour une longue mission autour de Mars."
+  },
+  {
+    "id": "odyssey",
+    "nom": "Mars Odyssey",
+    "agence": "NASA",
+    "annee": 2001,
+    "profil": "mars",
+    "resume": "Doyen des orbiteurs encore actifs autour de Mars, cartographe et relais de communication."
+  },
+  {
+    "id": "maven",
+    "nom": "MAVEN",
+    "agence": "NASA",
+    "annee": 2013,
+    "profil": "mars",
+    "resume": "Étudie l'échappement de l'atmosphère martienne. Le dialogue avec la Terre se compte en minutes, pas en secondes."
+  },
+  {
+    "id": "marco",
+    "nom": "MarCO",
+    "agence": "NASA",
+    "annee": 2018,
+    "profil": "mars",
+    "resume": "Deux CubeSats qui ont relayé l'atterrissage d'InSight, preuve qu'une petite plateforme peut servir jusqu'à Mars."
+  },
+  {
+    "id": "soho",
+    "nom": "SOHO",
+    "agence": "ESA / NASA",
+    "annee": 1995,
+    "profil": "l1",
+    "reference": true,
+    "resume": "Observatoire solaire placé en orbite de halo autour du point L1, en avant de la Terre."
+  },
+  {
+    "id": "ace",
+    "nom": "ACE",
+    "agence": "NASA",
+    "annee": 1997,
+    "profil": "l1",
+    "resume": "Mesure le vent solaire depuis L1 et donne à la Terre environ une heure d'avance sur les tempêtes."
+  },
+  {
+    "id": "dscovr",
+    "nom": "DSCOVR",
+    "agence": "NASA / NOAA",
+    "annee": 2015,
+    "profil": "l1",
+    "resume": "Sentinelle du vent solaire au point L1, et caméra qui renvoie le disque terrestre éclairé."
+  },
+  {
+    "id": "wind",
+    "nom": "Wind",
+    "agence": "NASA",
+    "annee": 1994,
+    "profil": "l1",
+    "resume": "Étudie le plasma du vent solaire. Sa place de travail est le voisinage du point L1."
+  }
+]

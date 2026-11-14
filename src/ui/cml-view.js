@@ -1,4 +1,5 @@
-// UI de la checklist CML (Sprint 2).
+import { settingsStore } from '../engine/settings-store.js';
+import { icon, statusDot } from './icons.js';
 // Affiche les 20 critères regroupés par niveau (1-4).
 // ASTRA interroge le joueur critère par critère ; le joueur ne coche jamais lui-même.
 
@@ -134,9 +135,7 @@ const NIVEAUX = [
 ];
 
 function statutBadge(statut) {
-  if (statut === 'vert')   return '<span class="cml-dot is-vert"  aria-label="Vert">●</span>';
-  if (statut === 'jaune')  return '<span class="cml-dot is-jaune" aria-label="Jaune">●</span>';
-  return                          '<span class="cml-dot is-rouge" aria-label="Rouge">●</span>';
+  return statusDot(statut);
 }
 
 export function createCmlView(container, { cml, astra, onNiveauValide } = {}) {
@@ -160,7 +159,7 @@ export function createCmlView(container, { cml, astra, onNiveauValide } = {}) {
           <button type="button" class="cml-btn-eval"
             data-id="${c.id}"
             title="Faire évaluer par ASTRA">
-            ÉVALUER
+            ${icon('telescope', 13)} ÉVALUER
           </button>
         </div>
       `).join('');

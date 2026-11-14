@@ -1,0 +1,18 @@
+{
+  "type": "orbite_haute",
+  "statut": "placeholder_formule",
+  "note": "Même demi-grand axe que l'orbite géostationnaire (T = 2*PI*sqrt(a^3/mu)), mais inclinaison non nulle : le satellite décrit un analemme dans le ciel et n'est pas fixe. Table provisoire, à remplacer par une sortie GMAT.",
+  "parametres": {
+    "altitudeKm": 35786,
+    "rayonTerreKm": 6378,
+    "muTerre": 398600,
+    "inclinaisonDeg": 28,
+    "excentricite": 0
+  },
+  "resultats": {
+    "periodeMinutes": 1436.1,
+    "periodeHeures": 23.93,
+    "passagesParJourSurUneStation": 1,
+    "dureeContactMoyenneMinutes": 1440
+  }
+}

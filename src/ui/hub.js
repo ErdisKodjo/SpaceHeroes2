@@ -5,6 +5,15 @@
 import { playerStore } from '../engine/player.js';
 import { createRoleSelect } from './role-select.js';
 import { createSettings } from './settings.js';
+import { icon, medalIcon } from './icons.js';
+
+const CHAPTER_ICONS = {
+  chapitre_01: 'satellite',
+  chapitre_02: 'storm',
+  chapitre_03: 'moon_dest',
+  chapitre_04: 'mars_dest',
+  chapitre_05: 'lagrange'
+};
 
 // Chapitres disponibles (à terme chargés dynamiquement).
 // Verrouillé = nécessite d'avoir terminé le chapitre précédent.
@@ -61,25 +70,32 @@ const CHAPTERS = [
   }
 ];
 
-function buildHTML() {
+function buildHTML(savedGame) {
   const role = playerStore.role;
   const nom  = playerStore.nom;
 
-  const cards = CHAPTERS.map(ch => {
+  const cards = CHAPTERS.map((ch, index) => {
+    const prevId = index === 0 ? null : CHAPTERS[index - 1].id;
+    const locked = index > 0 && playerStore.getMeilleurScore(prevId) === null;
+    ch = { ...ch, locked };
     const best  = playerStore.getMeilleurScore(ch.id);
-    const medal = best >= 85 ? '🥇' : best >= 70 ? '🥈' : best >= 50 ? '🥉' : '';
+    const medalHtml = best !== null ? medalIcon(best) : '';
     return `
       <button type="button"
         class="sh-hub-card ${ch.locked ? 'is-locked' : ''}"
         data-chapter="${ch.id}"
         ${ch.locked ? 'aria-disabled="true"' : ''}
         title="${ch.locked ? 'Terminez le chapitre précédent pour débloquer' : ch.titre}">
-        <div class="sh-hub-card-num">${ch.locked ? '🔒' : ch.num}</div>
-        <div class="sh-hub-card-emoji">${ch.locked ? '' : ch.emoji}</div>
+        <div class="sh-hub-card-num">
+          ${ch.locked ? icon('lock', 14) : ch.num}
+        </div>
+        <div class="sh-hub-card-emoji">
+          ${ch.locked ? '' : icon(CHAPTER_ICONS[ch.id] ?? 'satellite', 28, { label: ch.titre })}
+        </div>
         <div class="sh-hub-card-titre">${ch.titre}</div>
         <div class="sh-hub-card-sub">${ch.sousTitre}</div>
-        <div class="sh-hub-card-dest">${ch.destination}</div>
-        ${best !== null ? `<div class="sh-hub-card-best">${medal} ${best} pts</div>` : ''}
+        <div class="sh-hub-card-dest">${icon('compass', 11)} ${ch.destination}</div>
+        ${best !== null ? `<div class="sh-hub-card-best">${medalHtml} ${best} pts</div>` : ''}
       </button>
     `;
   }).join('');
@@ -96,11 +112,13 @@ function buildHTML() {
           </div>
           <div class="sh-hub-profile">
             <span class="sh-hub-role-badge" style="color:${role.couleur}">
-              ${role.emoji} ${role.sigle}
+              ${icon('user', 14)} ${role.sigle}
             </span>
             <span class="sh-hub-nom">${nom}</span>
             <button type="button" class="sh-hub-btn-icon" id="sh-hub-settings"
-              title="Paramètres" aria-label="Ouvrir les paramètres">⚙️</button>
+              title="Paramètres" aria-label="Ouvrir les paramètres">
+              ${icon('settings', 16)}
+            </button>
           </div>
         </header>
 
@@ -115,6 +133,15 @@ function buildHTML() {
               L'univers attend.
             </p>
           </div>
+
+          ${savedGame ? `
+          <div class="sh-hub-save-banner">
+            <span>${icon('save', 14)} Partie en cours · sauvegardée il y a ${savedGame.ageMin} min</span>
+            <button type="button" class="sh-hub-btn-continue" id="sh-hub-continue">
+              CONTINUER ${icon('arrowRight', 14)}
+            </button>
+          </div>
+          ` : ''}
 
           <!-- Cartes chapitres -->
           <div class="sh-hub-cards">
@@ -135,13 +162,13 @@ function buildHTML() {
   `;
 }
 
-export function createHub({ onStartMission } = {}) {
+export function createHub({ onStartMission, savedGame = null } = {}) {
   const container = document.createElement('div');
   container.id = 'sh-hub-root';
   document.body.appendChild(container);
 
   function render() {
-    container.innerHTML = buildHTML();
+    container.innerHTML = buildHTML(savedGame);
     bindEvents();
   }
 
@@ -150,13 +177,18 @@ export function createHub({ onStartMission } = {}) {
     container.querySelectorAll('.sh-hub-card:not(.is-locked)').forEach(btn => {
       btn.addEventListener('click', () => {
         const chapterId = btn.dataset.chapter;
-        startMission(chapterId);
+        startMission(chapterId, false);
       });
     });
 
     // Paramètres
     container.querySelector('#sh-hub-settings').addEventListener('click', () => {
       createSettings({ onClose: render });
+    });
+
+    // Continuer une partie sauvegardée
+    container.querySelector('#sh-hub-continue')?.addEventListener('click', () => {
+      startMission(savedGame.chapterId, true);
     });
 
     // Changer de rôle
@@ -167,12 +199,12 @@ export function createHub({ onStartMission } = {}) {
     });
   }
 
-  function startMission(chapterId) {
+  function startMission(chapterId, restore = false) {
     // Montrer l'écran de sélection du rôle, puis lancer la mission
     createRoleSelect({
       onConfirm: ({ roleId, nom }) => {
         container.remove();
-        onStartMission?.({ chapterId, roleId, nom });
+        onStartMission?.({ chapterId, roleId, nom, restore });
       }
     });
   }

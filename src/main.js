@@ -1,17 +1,17 @@
 // Point d'entrée principal — Space Heroes
 // Flow : Hub QG → Sélection du rôle → Mission
 
-import chapitre01 from './data/chapters/chapitre_01.json';
 import dialoguesData from './data/astra/dialogues.json';
 import cmlCriteria from './data/cml/checklist.json';
+import { getChapitre } from './data/catalogue.js';
 
 import { ResourceManager } from './engine/resources.js';
 import { CmlChecklist } from './engine/cml.js';
 import { AstraEngine } from './engine/astra.js';
 import { EpisodeRunner } from './engine/episode.js';
-import { computeScore, genererRapport } from './engine/score.js';
-import { settingsStore } from './engine/settings-store.js';
+import { evaluerMission } from './engine/bilan.js';
 import { playerStore } from './engine/player.js';
+import { sauvegarder, charger, restaurerResources, restaurerCml, ageSauvegarde, effacer } from './engine/save.js';
 
 import { renderDashboard } from './ui/dashboard.js';
 import { renderAstra } from './ui/astra-widget.js';
@@ -20,6 +20,8 @@ import { mountScene } from './vis/scene.js';
 import { createGameAudio } from './audio/sfx.js';
 import { createHub } from './ui/hub.js';
 import { applyDocumentSettings } from './ui/settings.js';
+import { createSplash } from './ui/splash.js';
+import { tutorialStep, resetTutorial } from './ui/tooltip.js';
 
 // Applique les réglages visuels (taille police, daltonien, contrastes…) dès le démarrage.
 applyDocumentSettings();
@@ -34,6 +36,14 @@ const vue3dEl    = document.getElementById('vue3d');
 // La scène 3D tourne toujours en fond (Terre + étoiles) — même pendant le hub.
 const vue3d = mountScene(vue3dEl);
 const audio = createGameAudio();
+
+// Splash screen au démarrage — se ferme quand les 4 textures NASA sont chargées.
+if (!demo) {
+  const splash = createSplash();
+  // earth.js émet 'texture-loaded' à chaque texture chargée
+  let texCount = 0;
+  window.addEventListener('texture-loaded', () => { splash.onProgress(++texCount); });
+}
 
 // Bouton son
 const audioBtn = document.getElementById('btn-audio');
@@ -71,6 +81,12 @@ window.addEventListener('vis-announcer', ({ detail }) => {
 // Réapplique les réglages visuels à chaque changement dans les Paramètres.
 window.addEventListener('settings-change', () => applyDocumentSettings());
 
+// Célébration 3D quand le CubeSat atteint l'orbite.
+window.addEventListener('orbite-atteinte', () => {
+  vue3d.celebrate?.();
+  tutorialStep('orbite');
+});
+
 // ─── HUB QG ───────────────────────────────────────────────────────────────
 
 // Masquer les overlays du jeu pendant le hub.
@@ -86,25 +102,64 @@ function showGameUI() {
 // Afficher le hub au démarrage (sauf si mode démo).
 const demo = new URLSearchParams(location.search).get('demo');
 
+let hubApi = null;
+let missionCleanup = () => {};
+
+function openHub() {
+  missionCleanup();
+  missionCleanup = () => {};
+  document.getElementById('sh-bilan-root')?.remove();
+  document.body.classList.remove('is-bilan');
+  hubApi?.dispose();
+  hideGameUI();
+  const save = charger();
+  hubApi = createHub({
+    onStartMission: startMission,
+    savedGame: save ? { chapterId: save.chapterId, ageMin: ageSauvegarde() } : null
+  });
+}
+
 if (demo) {
   // Mode démonstration : saute directement à la mission.
   startMission({ chapterId: 'chapitre_01' });
 } else {
-  hideGameUI();
-  createHub({ onStartMission: startMission });
+  openHub();
 }
 
 // ─── MISSION ──────────────────────────────────────────────────────────────
 
-function startMission({ chapterId }) {
+function startMission({ chapterId, restore = false }) {
+  missionCleanup();
+  hubApi?.dispose();
+  hubApi = null;
+  document.getElementById('sh-bilan-root')?.remove();
+  document.body.classList.remove('is-bilan');
   showGameUI();
 
-  // Pour l'instant seul le chapitre 1 est disponible.
-  const chapterData = chapitre01;
+  const chapterData = getChapitre(chapterId) || getChapitre('chapitre_01');
+  chapterId = chapterData.id;
 
   const resources = new ResourceManager(chapterData.contraintes);
   const cml       = new CmlChecklist(cmlCriteria);
   const astra     = new AstraEngine(dialoguesData, cml);
+
+  // Restaurer depuis sauvegarde si demandé
+  let savedSelections = {};
+  let savedFiabilite  = null;
+  let savedScoreOps   = null;
+  let startIndex      = 0;
+
+  if (restore) {
+    const save = charger();
+    if (save && save.chapterId === chapterId) {
+      restaurerResources(resources, save.resources);
+      restaurerCml(cml, save.cml);
+      savedSelections = save.selections ?? {};
+      savedFiabilite  = save.fiabilite  ?? null;
+      savedScoreOps   = save.scoreOps   ?? null;
+      startIndex      = save.episodeIndex ?? 0;
+    }
+  }
 
   const runner = new EpisodeRunner(chapterData, {
     resources,
@@ -113,8 +168,46 @@ function startMission({ chapterId }) {
     onChange: render
   });
 
+  // Avancer jusqu'à l'épisode sauvegardé
+  if (startIndex > 0) {
+    for (let i = 0; i < startIndex && !runner.isFinished; i++) runner.next();
+  }
+
   let busy = false;
   let lastEpisodeId = null;
+
+  // Auto-save après chaque changement d'épisode
+  function autoSave() {
+    if (demo) return;
+    sauvegarder({
+      chapterId,
+      episodeIndex: runner.index,
+      resources,
+      cml,
+      selections: savedSelections,
+      fiabilite:  savedFiabilite,
+      scoreOps:   savedScoreOps
+    });
+  }
+
+  let rapport = null;
+  function ensureRapport() {
+    if (rapport) return rapport;
+    rapport = evaluerMission({
+      chapter: chapterData,
+      resources,
+      cml,
+      selections: savedSelections,
+      fiabilite: savedFiabilite,
+      scoreOps: savedScoreOps
+    });
+    if (!demo) {
+      playerStore.enregistrerScore(chapterData.id, rapport.score);
+      playerStore.ajouterJetons(rapport.jetons);
+      effacer();
+    }
+    return rapport;
+  }
 
   function render() {
     const episode = runner.currentEpisode || null;
@@ -123,15 +216,51 @@ function startMission({ chapterId }) {
 
     renderDashboard(dashboardEl, resources, { chapter: chapterData });
     renderAstra(astraEl, astra.lastLine);
-    renderEpisode(episodeEl, runner, { onNext: handleNext, busy, resources, astra, cml });
+    renderEpisode(episodeEl, runner, {
+      onNext: handleNext,
+      busy,
+      resources,
+      astra,
+      cml,
+      bilan: episode?.type === 'bilan' ? ensureRapport() : null,
+      onRejouer: () => startMission({ chapterId, restore: false }),
+      onSuivante: (nextId) => startMission({ chapterId: nextId, restore: false }),
+      onQuitter: openHub
+    });
 
     if (episode?.id !== lastEpisodeId) {
       lastEpisodeId = episode?.id ?? null;
       window.dispatchEvent(new CustomEvent('episode-change', {
         detail: { episode, index: runner.index }
       }));
+      if (episode?.type !== 'bilan') autoSave();
+      // Tutoriel contextuel
+      if (episode?.type === 'briefing') tutorialStep('immediate');
+      else if (episode?.type === 'atelier') tutorialStep('atelier');
+      else if (episode?.type === 'lancement') tutorialStep('lancement');
     }
   }
+
+  const onAtelier = ({ detail }) => {
+    savedSelections = detail?.selections ?? {};
+    autoSave();
+  };
+  const onEssais = ({ detail }) => {
+    savedFiabilite = detail?.fiabilite ?? null;
+    autoSave();
+  };
+  const onOperations = ({ detail }) => {
+    savedScoreOps = detail?.scoreOps ?? null;
+    autoSave();
+  };
+  window.addEventListener('atelier-valide', onAtelier);
+  window.addEventListener('essais-termines', onEssais);
+  window.addEventListener('operations-terminees', onOperations);
+  missionCleanup = () => {
+    window.removeEventListener('atelier-valide', onAtelier);
+    window.removeEventListener('essais-termines', onEssais);
+    window.removeEventListener('operations-terminees', onOperations);
+  };
 
   async function handleNext() {
     if (busy) return;
@@ -155,34 +284,31 @@ function startMission({ chapterId }) {
     }
 
     runner.next();
-
-    if (runner.isFinished) {
-      const score = computeScore({
-        objectifsReussis:      1,
-        valeurScientifique:    0.6,
-        efficaciteRessources:  1 - resources.ratio('budget'),
-        qualiteDecisions:      0.7,
-        delaisRespectes:       1
-      });
-      const rapport = genererRapport({
-        chapterId:            chapterData.id,
-        score,
-        resourcesSnapshot:    resources.snapshot(),
-        decisionsCles:        ['Choix du lanceur en covoiturage', 'Instrument unique pour tenir la masse'],
-        missionsReellesProches: ['CubeSat éducatif en orbite basse']
-      });
-      playerStore.enregistrerScore(chapterData.id, score);
-      console.log('Rapport post-mission', rapport);
-      // TODO Sprint 4 : afficher l'écran Bilan (bilan-view.js)
-    }
   }
 
   astra.say('accueil');
   runner.start();
   render();
 
-  // Mode démo : saute directement au lancement.
-  if (demo === 'lancement') {
+  // Mode démo : saute au lancement, ou directement au bilan.
+  if (demo === 'bilan') {
+    resources.consume('masse', 2.1);
+    resources.consume('budget', 2.4);
+    resources.consume('puissance', 4);
+    resources.consume('donnees', 2);
+    resources.consume('communications', 1.5);
+    resources.consume('duree', 6);
+    savedSelections = {
+      moteurs: 'chimique',
+      structure: 'chassis_cfrp',
+      energie: 'panneaux_gaas_1u',
+      communications: 'antenne_uhf',
+      instrument: 'capteur_temp'
+    };
+    savedFiabilite = 82;
+    savedScoreOps = 75;
+    while (!runner.isFinished && runner.currentEpisode?.type !== 'bilan') runner.next();
+  } else if (demo === 'lancement') {
     while (!runner.isFinished && runner.currentEpisode.type !== 'lancement') runner.next();
     const seek = Number(new URLSearchParams(location.search).get('t'));
     if (seek > 0) {

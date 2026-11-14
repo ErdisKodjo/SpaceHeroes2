@@ -1,7 +1,14 @@
 // Ecran de sélection du rôle — affiché avant chaque mission.
-// Permet aussi de saisir un nom de joueur.
 
 import { playerStore } from '../engine/player.js';
+import { icon } from './icons.js';
+
+const ROLE_ICONS = {
+  directeur:          'director',
+  ingenieur_vehicule: 'engineer',
+  ingenieur_systemes: 'systems',
+  responsable_science:'science'
+};
 
 export function createRoleSelect({ onConfirm } = {}) {
   const roles = playerStore.getRoles();
@@ -38,7 +45,9 @@ export function createRoleSelect({ onConfirm } = {}) {
               data-role="${r.id}"
               style="--role-color: ${r.couleur}"
               aria-pressed="${r.id === selectedId}">
-              <div class="sh-role-card-emoji">${r.emoji}</div>
+              <div class="sh-role-card-emoji">
+                ${icon(ROLE_ICONS[r.id] ?? 'user', 32, { cls: 'sh-role-card-icon' })}
+              </div>
               <div class="sh-role-card-sigle">${r.sigle}</div>
               <div class="sh-role-card-nom">${r.nom}</div>
               <div class="sh-role-card-desc">${r.description}</div>
@@ -51,7 +60,8 @@ export function createRoleSelect({ onConfirm } = {}) {
 
         <div class="sh-role-footer">
           <button type="button" class="sh-role-confirm" id="sh-role-confirm">
-            CONFIRMER ET LANCER LA MISSION →
+            CONFIRMER ET LANCER LA MISSION
+            ${icon('arrowRight', 16)}
           </button>
         </div>
       </div>

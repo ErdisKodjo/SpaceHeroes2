@@ -12,6 +12,8 @@
     "communications": 5,
     "duree": 12
   },
+  "profil": "leo_cubesat",
+  "gmat": "orbite_basse",
   "notionCle": "Masse, puissance, premier compromis",
   "ressourcesNasa": [
     "CubeSat 101 (phases du chapitre, ordres de grandeur)",

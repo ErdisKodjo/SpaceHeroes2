@@ -2,19 +2,27 @@
 // Pour les types 'atelier', 'essais' : délègue aux vues dédiées (montées sur #sh-episode-body).
 // Pour tous les autres : affiche le texte + bouton Continuer.
 
-import { createAtelierView } from './atelier-view.js';
-import { createCmlView }     from './cml-view.js';
-import { createEssaisView }  from './essais-view.js';
+import { createAtelierView }    from './atelier-view.js';
+import { createCmlView }         from './cml-view.js';
+import { createEssaisView }      from './essais-view.js';
+import { createOperationsView }  from './operations-view.js';
+import { createBilanView }       from './bilan-view.js';
 
-// Vue active montée (atelier, essais) — on la détruit quand l'épisode change.
+// Vue active montée (atelier, essais, bilan) — on la détruit quand l'épisode change.
 let _activeView = null;
 let _lastEpisodeId = null;
 
+function clearActiveView() {
+  _activeView?.dispose?.();
+  _activeView = null;
+}
+
 export function renderEpisode(container, episodeRunner, {
-  onNext, busy = false, resources, astra, cml
+  onNext, busy = false, resources, astra, cml,
+  bilan = null, onRejouer, onSuivante, onQuitter
 } = {}) {
   if (episodeRunner.isFinished) {
-    _activeView = null;
+    clearActiveView();
     _lastEpisodeId = null;
     container.innerHTML = `
       <div class="plaque-kicker">Mission close</div>
@@ -30,7 +38,7 @@ export function renderEpisode(container, episodeRunner, {
 
   // Si l'épisode a changé, détruire la vue précédente
   if (episode.id !== _lastEpisodeId) {
-    _activeView    = null;
+    clearActiveView();
     _lastEpisodeId = episode.id;
   }
 
@@ -105,8 +113,50 @@ export function renderEpisode(container, episodeRunner, {
     return;
   }
 
-  // ── Tous les autres épisodes (lancement, opérations, bilan…) ─────────────
-  _activeView = null;
+  // ── Opérations ───────────────────────────────────────────────────────────
+  if (episode.type === 'operations') {
+    container.innerHTML = `
+      <div class="plaque-kicker">Épisode ${n} / ${total} · Opérations</div>
+      <div id="sh-episode-body"></div>
+    `;
+    if (!_activeView) {
+      _activeView = createOperationsView(
+        container.querySelector('#sh-episode-body'),
+        {
+          resources,
+          astra,
+          onValider: ({ scoreOps }) => {
+            window.dispatchEvent(new CustomEvent('operations-terminees', { detail: { scoreOps } }));
+            onNext?.();
+          }
+        }
+      );
+    }
+    return;
+  }
+
+  // ── Bilan ────────────────────────────────────────────────────────────
+  if (episode.type === 'bilan' && bilan) {
+    container.innerHTML = `
+      <div class="plaque-kicker">Épisode ${n} / ${total} · Bilan</div>
+      <h2>${episode.titre}</h2>
+      <p>Le rapport de mission est affiché.</p>
+    `;
+    if (!_activeView) {
+      const ligne = bilan.astraKey ? astra?.say(bilan.astraKey) : null;
+      _activeView = createBilanView({
+        rapport: bilan,
+        astraTexte: ligne?.texte || astra?.lastLine?.texte || '',
+        onRejouer,
+        onSuivante,
+        onQuitter
+      });
+    }
+    return;
+  }
+
+  // ── Tous les autres épisodes (lancement…) ─────────────
+  clearActiveView();
   const label = busy ? 'Séquence en cours…' : (episode.bouton || 'Continuer →');
 
   container.innerHTML = `

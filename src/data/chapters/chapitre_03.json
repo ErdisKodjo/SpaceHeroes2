@@ -1,0 +1,77 @@
+{
+  "id": "chapitre_03",
+  "titre": "Retour sur la Lune",
+  "sousTitre": "Orbiteur",
+  "histoire": "Cartographier la Lune depuis une orbite basse lunaire. Le voyage commence par un transfert, pas par l'arrivée.",
+  "mission": "Un orbiteur lunaire de cartographie qui rejoint la Lune par un transfert de Hohmann et image la surface depuis environ 100 km.",
+  "profil": "lune",
+  "gmat": "transfert_lune",
+  "contraintes": {
+    "budget": 20,
+    "masse": 80,
+    "puissance": 40,
+    "donnees": 15,
+    "communications": 12,
+    "duree": 24
+  },
+  "notionCle": "Transfert de Hohmann, gravité lunaire, délai radio de 3 secondes",
+  "ressourcesNasa": [
+    "Lunar Reconnaissance Orbiter",
+    "GRAIL, mesure du champ de gravité lunaire"
+  ],
+  "episodes": [
+    {
+      "id": "briefing",
+      "type": "briefing",
+      "titre": "Le Briefing",
+      "texte": "Choisis la question scientifique : relief, glace aux pôles, ou champ de gravité. Le transfert et le délai radio en découlent.",
+      "astra": "briefing_ch3_intro",
+      "cmlVise": 1
+    },
+    {
+      "id": "atelier",
+      "type": "atelier",
+      "titre": "L'Atelier",
+      "texte": "Prévois le propergol du transfert, une liaison qui supporte le délai, et un instrument de cartographie.",
+      "astra": "atelier_ch3_intro",
+      "cmlVise": 2,
+      "familleAtelier": "moteurs"
+    },
+    {
+      "id": "essais",
+      "type": "essais",
+      "titre": "Les Essais",
+      "texte": "Le moteur de transfert, le thermique du vide, et la chaîne électrique doivent tenir avant l'injection.",
+      "astra": "essais_ch3_intro",
+      "cmlRequis": 2
+    },
+    {
+      "id": "lancement",
+      "type": "lancement",
+      "titre": "Le Lancement",
+      "texte": "Orbite de parking, puis allumage vers la Lune. La capture lunaire se joue à la fin du transfert.",
+      "astra": "lancement_ch3_intro",
+      "bouton": "Lancer !",
+      "cmlRequis": 2
+    },
+    {
+      "id": "operations",
+      "type": "operations",
+      "titre": "Les Operations",
+      "texte": "Les commandes partent avec trois secondes d'avance. Déploie les instruments une fois en orbite lunaire.",
+      "astra": "operations_ch3_intro"
+    },
+    {
+      "id": "bilan",
+      "type": "bilan",
+      "titre": "Le Bilan",
+      "texte": "Rapport de mission, score, médaille et analyse d'ASTRA.",
+      "astra": null
+    }
+  ],
+  "evenementAleatoire": {
+    "id": "correction_trajectoire",
+    "texte": "Une correction de trajectoire est nécessaire en cours de transfert. Elle consomme une partie de la marge de durée.",
+    "effet": { "duree": -2 }
+  }
+}

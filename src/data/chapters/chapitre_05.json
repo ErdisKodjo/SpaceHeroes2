@@ -1,0 +1,77 @@
+{
+  "id": "chapitre_05",
+  "titre": "Le Gardien",
+  "sousTitre": "Point L1",
+  "histoire": "Entre le Soleil et la Terre, un point d'équilibre permet de voir venir les tempêtes solaires. L'équilibre est instable : l'orbite en halo demande des corrections.",
+  "mission": "Un satellite de surveillance solaire au point de Lagrange L1, sur une orbite en halo, qui prévient la Terre avant l'arrivée du vent solaire.",
+  "profil": "l1",
+  "gmat": "point_lagrange",
+  "contraintes": {
+    "budget": 30,
+    "masse": 120,
+    "puissance": 50,
+    "donnees": 25,
+    "communications": 20,
+    "duree": 30
+  },
+  "notionCle": "Point de Lagrange L1, orbite en halo, corrections de trajectoire",
+  "ressourcesNasa": [
+    "SOHO et le point L1 Soleil-Terre",
+    "DSCOVR, sentinelle du vent solaire"
+  ],
+  "episodes": [
+    {
+      "id": "briefing",
+      "type": "briefing",
+      "titre": "Le Briefing",
+      "texte": "Définis ce que le Gardien doit voir avant la Terre : plasma, champ magnétique, ou image du disque solaire.",
+      "astra": "briefing_ch5_intro",
+      "cmlVise": 1
+    },
+    {
+      "id": "atelier",
+      "type": "atelier",
+      "titre": "L'Atelier",
+      "texte": "Hors de la magnétosphère, le blindage, la puissance et le débit d'alerte priment sur la masse seule.",
+      "astra": "atelier_ch5_intro",
+      "cmlVise": 2,
+      "familleAtelier": "structure"
+    },
+    {
+      "id": "essais",
+      "type": "essais",
+      "titre": "Les Essais",
+      "texte": "Radiations, thermique et tenue électrique : le halo ne se répare pas au sol.",
+      "astra": "essais_ch5_intro",
+      "cmlRequis": 2
+    },
+    {
+      "id": "lancement",
+      "type": "lancement",
+      "titre": "Le Lancement",
+      "texte": "Insertion vers L1, puis premières corrections pour accrocher l'orbite en halo.",
+      "astra": "lancement_ch5_intro",
+      "bouton": "Lancer !",
+      "cmlRequis": 2
+    },
+    {
+      "id": "operations",
+      "type": "operations",
+      "titre": "Les Operations",
+      "texte": "Maintiens le halo et transmets l'alerte tant que la liaison vers la Terre tient.",
+      "astra": "operations_ch5_intro"
+    },
+    {
+      "id": "bilan",
+      "type": "bilan",
+      "titre": "Le Bilan",
+      "texte": "Rapport de mission, score, médaille et analyse d'ASTRA.",
+      "astra": null
+    }
+  ],
+  "evenementAleatoire": {
+    "id": "perturbation_halo",
+    "texte": "Une perturbation gravitationnelle décale le halo. Une correction anticipée réduit la marge de durée.",
+    "effet": { "duree": -1 }
+  }
+}

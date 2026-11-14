@@ -5,24 +5,26 @@
 // Épreuve 2 — Thermique  : choisir le bon matériau d'isolation parmi 3 options.
 // Épreuve 3 — Électrique : reconnaître la bonne combinaison de composants compatibles.
 
+import { icon } from './icons.js';
+
 const EPREUVES = [
   {
     id: 'vibrations',
-    emoji: '📳',
+    iconName: 'vibration',
     titre: 'Test vibrations',
     description: 'Maintiens la jauge dans la zone verte pendant 3 secondes.',
     points: 34
   },
   {
     id: 'thermique',
-    emoji: '🌡️',
+    iconName: 'thermal',
     titre: 'Test thermique',
     description: 'Choisis le bon matériau d\'isolation pour l\'environnement spatial.',
     points: 33
   },
   {
     id: 'electrique',
-    emoji: '⚡',
+    iconName: 'electric',
     titre: 'Test électrique',
     description: 'Identifie la combinaison de composants sans conflit de tension.',
     points: 33
@@ -265,11 +267,11 @@ export function createEssaisView(container, { astra, onValider } = {}) {
           <div class="sh-essais-progres">
             ${EPREUVES.map((e, i) => `
               <span class="sh-essais-step ${i < epreuveIndex ? 'is-done' : i === epreuveIndex ? 'is-active' : ''}">
-                ${i < epreuveIndex ? '✓' : e.emoji}
+                ${i < epreuveIndex ? icon('check', 14) : icon(e.iconName, 18)}
               </span>
             `).join('')}
           </div>
-          <h2 class="sh-essais-titre">${ep.emoji} ${ep.titre}</h2>
+          <h2 class="sh-essais-titre">${icon(ep.iconName, 20)} ${ep.titre}</h2>
           <p class="sh-essais-desc">${ep.description}</p>
         </div>
         <div class="sh-essais-epreuve" id="sh-essais-epreuve"></div>

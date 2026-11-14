@@ -1,0 +1,16 @@
+{
+  "type": "orbite_mars",
+  "statut": "placeholder_formule",
+  "note": "Orbite basse martienne circulaire à 300 km. Période calculée avec le rayon équatorial de Mars (3 396 km) et mu = 42 828 km^3/s^2 : T ≈ 113,7 min. Le délai radio Terre-Mars varie d'environ 4 min à l'opposition à plus de 20 min quand Mars est loin ; la valeur retenue pour le chapitre est le cas long. Table provisoire, à remplacer par une sortie GMAT.",
+  "parametres": {
+    "altitudeKm": 300,
+    "rayonMarsKm": 3396,
+    "muMars": 42828,
+    "excentricite": 0.01
+  },
+  "resultats": {
+    "periodeMinutes": 113.7,
+    "delaiRadioMinutes": 20,
+    "fenetreLancementMois": 26
+  }
+}

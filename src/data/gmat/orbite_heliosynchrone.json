@@ -1,0 +1,18 @@
+{
+  "type": "orbite_heliosynchrone",
+  "statut": "placeholder_formule",
+  "note": "Orbite héliosynchrone typique : 700 km, inclinaison 98,7 degrés, nœud descendant vers 10 h 30 heure solaire locale. Période calculée par T = 2*PI*sqrt(a^3/mu), a = 7078 km. La précession du nœud qui maintient l'heure solaire n'est pas recalculée ici. Table provisoire, à remplacer par une sortie GMAT.",
+  "parametres": {
+    "altitudeKm": 700,
+    "rayonTerreKm": 6378,
+    "muTerre": 398600,
+    "inclinaisonDeg": 98.7,
+    "heureSolaireLocale": "10:30",
+    "excentricite": 0.001
+  },
+  "resultats": {
+    "periodeMinutes": 98.8,
+    "passagesParJourSurUneStation": 2,
+    "dureeContactMoyenneMinutes": 12
+  }
+}
