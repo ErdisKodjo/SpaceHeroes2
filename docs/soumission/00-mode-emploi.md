@@ -2,6 +2,11 @@
 
 Ce dossier prépare la page de projet. Il ne remplace pas le site officiel : les textes se collent là-bas, dans les champs prévus.
 
+Les fichiers à déposer ou à lire tels quels :
+
+- `Space_Heroes_Project_Submission.docx` — le dossier Word, avec le logo. Les sections 1, 2, 3 et 4 correspondent aux champs du site.
+- `Space_Heroes_Project_Demo.pptx` — les sept diapositives, avec le logo sur chaque page et le texte à dire dans les notes du présentateur.
+
 Source des règles : `docs/SOUMISSION PROJET_APPORTS DES MENTORS_CRITERES DE SELECTION PAR LES JURES.pdf`.
 
 ## 1. Règles qui ne se négocient pas
