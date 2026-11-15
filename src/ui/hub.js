@@ -6,6 +6,7 @@ import { playerStore } from '../engine/player.js';
 import { createRoleSelect } from './role-select.js';
 import { createSettings } from './settings.js';
 import { icon, medalIcon } from './icons.js';
+import { pick, t, tf } from '../i18n.js';
 
 const CHAPTER_ICONS = {
   chapitre_01: 'satellite',
@@ -22,9 +23,13 @@ const CHAPTERS = [
     id: 'chapitre_01',
     num: '01',
     titre: 'Le premier signal',
+    titreEn: 'The first signal',
     sousTitre: 'CubeSat · Orbite basse',
+    sousTitreEn: 'CubeSat · Low Earth orbit',
     description: 'Lance ton tout premier satellite. ASTRA t\'accompagne pas à pas.',
+    descriptionEn: 'Launch your first satellite. ASTRA walks you through it.',
     destination: 'Terre basse',
+    destinationEn: 'Low Earth',
     emoji: '🛰️',
     locked: false
   },
@@ -32,9 +37,13 @@ const CHAPTERS = [
     id: 'chapitre_02',
     num: '02',
     titre: 'L\'œil du cyclone',
+    titreEn: 'Eye of the storm',
     sousTitre: 'Météo · Héliosynchrone',
+    sousTitreEn: 'Weather · Sun-synchronous',
     description: 'Un satellite météorologique en orbite polaire pour surveiller les tempêtes.',
+    descriptionEn: 'A weather satellite in polar orbit to watch the storms.',
     destination: 'Orbite polaire',
+    destinationEn: 'Polar orbit',
     emoji: '🌪️',
     locked: true
   },
@@ -42,9 +51,13 @@ const CHAPTERS = [
     id: 'chapitre_03',
     num: '03',
     titre: 'Retour sur la Lune',
+    titreEn: 'Return to the Moon',
     sousTitre: 'Orbiteur · Lune',
+    sousTitreEn: 'Orbiter · Moon',
     description: 'Cartographie la surface lunaire depuis une orbite de 100 km.',
+    descriptionEn: 'Map the lunar surface from a 100 km orbit.',
     destination: 'Lune',
+    destinationEn: 'Moon',
     emoji: '🌕',
     locked: true
   },
@@ -52,8 +65,11 @@ const CHAPTERS = [
     id: 'chapitre_04',
     num: '04',
     titre: 'Signal de Mars',
+    titreEn: 'Signal from Mars',
     sousTitre: 'Sonde · Mars',
+    sousTitreEn: 'Probe · Mars',
     description: 'Une fenêtre de lancement tous les 26 mois. Ne la rate pas.',
+    descriptionEn: 'A launch window every 26 months. Do not miss it.',
     destination: 'Mars',
     emoji: '🔴',
     locked: true
@@ -62,9 +78,13 @@ const CHAPTERS = [
     id: 'chapitre_05',
     num: '05',
     titre: 'Le Gardien',
+    titreEn: 'The Guardian',
     sousTitre: 'Halo orbit · L1',
+    sousTitreEn: 'Halo orbit · L1',
     description: 'Surveille les tempêtes solaires depuis le point de Lagrange L1.',
+    descriptionEn: 'Watch solar storms from the Sun-Earth L1 point.',
     destination: 'L1 soleil-Terre',
+    destinationEn: 'Sun-Earth L1',
     emoji: '☀️',
     locked: true
   }
@@ -85,17 +105,17 @@ function buildHTML(savedGame) {
         class="sh-hub-card ${ch.locked ? 'is-locked' : ''}"
         data-chapter="${ch.id}"
         ${ch.locked ? 'aria-disabled="true"' : ''}
-        title="${ch.locked ? 'Terminez le chapitre précédent pour débloquer' : ch.titre}">
+        title="${ch.locked ? t('Terminez le chapitre précédent pour débloquer', 'Finish the previous chapter to unlock') : pick(ch, 'titre')}">
         <div class="sh-hub-card-num">
           ${ch.locked ? icon('lock', 14) : ch.num}
         </div>
         <div class="sh-hub-card-emoji">
-          ${ch.locked ? '' : icon(CHAPTER_ICONS[ch.id] ?? 'satellite', 28, { label: ch.titre })}
+          ${ch.locked ? '' : icon(CHAPTER_ICONS[ch.id] ?? 'satellite', 28, { label: pick(ch, 'titre') })}
         </div>
-        <div class="sh-hub-card-titre">${ch.titre}</div>
-        <div class="sh-hub-card-sub">${ch.sousTitre}</div>
-        <div class="sh-hub-card-dest">${icon('compass', 11)} ${ch.destination}</div>
-        ${best !== null ? `<div class="sh-hub-card-best">${medalHtml} ${best} pts</div>` : ''}
+        <div class="sh-hub-card-titre">${pick(ch, 'titre')}</div>
+        <div class="sh-hub-card-sub">${pick(ch, 'sousTitre')}</div>
+        <div class="sh-hub-card-dest">${icon('compass', 11)} ${pick(ch, 'destination')}</div>
+        ${best !== null ? `<div class="sh-hub-card-best">${medalHtml} ${best} ${t('pts', 'pts')}</div>` : ''}
       </button>
     `;
   }).join('');
@@ -116,7 +136,7 @@ function buildHTML(savedGame) {
             </span>
             <span class="sh-hub-nom">${nom}</span>
             <button type="button" class="sh-hub-btn-icon" id="sh-hub-settings"
-              title="Paramètres" aria-label="Ouvrir les paramètres">
+              title="${t('Paramètres', 'Settings')}" aria-label="${t('Ouvrir les paramètres', 'Open settings')}">
               ${icon('settings', 16)}
             </button>
           </div>
@@ -129,16 +149,19 @@ function buildHTML(savedGame) {
           <div class="sh-hub-astra">
             <div class="sh-hub-astra-dot"></div>
             <p class="sh-hub-astra-text">
-              Bienvenue, <strong>${nom}</strong>. Choisissez votre prochaine mission.
-              L'univers attend.
+              ${tf(
+                'Bienvenue, <strong>{nom}</strong>. Choisissez votre prochaine mission. L\'univers attend.',
+                'Welcome, <strong>{nom}</strong>. Choose your next mission. The universe is waiting.',
+                { nom }
+              )}
             </p>
           </div>
 
           ${savedGame ? `
           <div class="sh-hub-save-banner">
-            <span>${icon('save', 14)} Partie en cours · sauvegardée il y a ${savedGame.ageMin} min</span>
+            <span>${icon('save', 14)} ${tf('Partie en cours · sauvegardée il y a {min} min', 'Game in progress · saved {min} min ago', { min: savedGame.ageMin })}</span>
             <button type="button" class="sh-hub-btn-continue" id="sh-hub-continue">
-              CONTINUER ${icon('arrowRight', 14)}
+              ${t('CONTINUER', 'CONTINUE')} ${icon('arrowRight', 14)}
             </button>
           </div>
           ` : ''}
@@ -153,7 +176,7 @@ function buildHTML(savedGame) {
         <!-- PIED -->
         <footer class="sh-hub-footer">
           <button type="button" class="sh-hub-btn-role" id="sh-hub-change-role">
-            Changer de rôle
+            ${t('Changer de rôle', 'Change role')}
           </button>
         </footer>
 
@@ -183,7 +206,7 @@ export function createHub({ onStartMission, savedGame = null } = {}) {
 
     // Paramètres
     container.querySelector('#sh-hub-settings').addEventListener('click', () => {
-      createSettings({ onClose: render });
+      createSettings({ onClose: render, onSaved: render });
     });
 
     // Continuer une partie sauvegardée

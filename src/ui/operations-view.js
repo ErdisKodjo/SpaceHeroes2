@@ -10,6 +10,7 @@
 
 import { settingsStore } from '../engine/settings-store.js';
 import { icon } from '../ui/icons.js';
+import { t } from '../i18n.js';
 
 // ─── Données : stations au sol ────────────────────────────────────────────
 
@@ -27,33 +28,39 @@ const EVENEMENTS = [
     id: 'panne_batterie',
     iconName: 'battery',
     titre: 'Panne batterie',
+    titreEn: 'Battery fault',
     description: 'La batterie principale montre une chute de tension anormale.',
+    descriptionEn: 'The main battery shows an abnormal voltage drop.',
     options: [
-      { label: 'Basculer sur la batterie de secours',   correct: true,  explication: 'Bon réflexe. La redondance sauve la mission.' },
-      { label: 'Augmenter la puissance des panneaux',   correct: false, explication: 'Impossible en éclipse. Les panneaux ne produisent rien.' },
-      { label: 'Éteindre l\'instrument scientifique',   correct: true,  explication: 'Délestage correct : priorité aux systèmes critiques.' }
+      { label: 'Basculer sur la batterie de secours', labelEn: 'Switch to the backup battery', correct: true, explication: 'Bon réflexe. La redondance sauve la mission.', explicationEn: 'Good call. Redundancy saves the mission.' },
+      { label: 'Augmenter la puissance des panneaux', labelEn: 'Increase array power', correct: false, explication: 'Impossible en éclipse. Les panneaux ne produisent rien.', explicationEn: 'Impossible in eclipse. The arrays produce nothing.' },
+      { label: 'Éteindre l\'instrument scientifique', labelEn: 'Switch off the science instrument', correct: true, explication: 'Délestage correct : priorité aux systèmes critiques.', explicationEn: 'Correct load shed: critical systems come first.' }
     ]
   },
   {
     id: 'perte_signal',
     iconName: 'signal',
     titre: 'Perte de signal',
+    titreEn: 'Loss of signal',
     description: 'Le signal radio vers la Terre s\'est interrompu depuis 4 min.',
+    descriptionEn: 'The radio link to Earth has been down for 4 min.',
     options: [
-      { label: 'Réorienter l\'antenne vers la station', correct: true,  explication: 'Correct. Le pointage manuel rétablit la liaison.' },
-      { label: 'Augmenter la puissance d\'émission',    correct: false, explication: 'La puissance maximale est déjà atteinte. Le problème est géométrique.' },
-      { label: 'Attendre le prochain passage',          correct: false, explication: 'Trop long. 95 min d\'attente feraient dépasser la limite de données.' }
+      { label: 'Réorienter l\'antenne vers la station', labelEn: 'Repoint the antenna at the station', correct: true, explication: 'Correct. Le pointage manuel rétablit la liaison.', explicationEn: 'Correct. Manual pointing restores the link.' },
+      { label: 'Augmenter la puissance d\'émission', labelEn: 'Increase transmit power', correct: false, explication: 'La puissance maximale est déjà atteinte. Le problème est géométrique.', explicationEn: 'Maximum power is already in use. The problem is geometry.' },
+      { label: 'Attendre le prochain passage', labelEn: 'Wait for the next pass', correct: false, explication: 'Trop long. 95 min d\'attente feraient dépasser la limite de données.', explicationEn: 'Too long. A 95 min wait would blow the data limit.' }
     ]
   },
   {
     id: 'debris',
     iconName: 'warning',
     titre: 'Alerte débris',
+    titreEn: 'Debris alert',
     description: 'Un fragment de satellite désorbité approche à moins de 2 km.',
+    descriptionEn: 'A fragment from a decaying satellite is closing inside 2 km.',
     options: [
-      { label: 'Manœuvre d\'évitement (Δv +0.3 m/s)',  correct: true,  explication: 'Manœuvre standard. Le carburant consommé est négligeable.' },
-      { label: 'Ne rien faire, probabilité faible',      correct: false, explication: 'La probabilité de collision est de 1/1000, ce qui est trop élevé selon les normes.' },
-      { label: 'Mettre le satellite en mode sécurité',  correct: true,  explication: 'Mode sécurité correct en attendant l\'évaluation au sol.' }
+      { label: 'Manœuvre d\'évitement (Δv +0.3 m/s)', labelEn: 'Avoidance burn (Δv +0.3 m/s)', correct: true, explication: 'Manœuvre standard. Le carburant consommé est négligeable.', explicationEn: 'Standard manoeuvre. The propellant used is negligible.' },
+      { label: 'Ne rien faire, probabilité faible', labelEn: 'Do nothing, the odds are low', correct: false, explication: 'La probabilité de collision est de 1/1000, ce qui est trop élevé selon les normes.', explicationEn: 'The collision probability is 1/1000, which is too high by the standards.' },
+      { label: 'Mettre le satellite en mode sécurité', labelEn: 'Put the satellite in safe mode', correct: true, explication: 'Mode sécurité correct en attendant l\'évaluation au sol.', explicationEn: 'Safe mode is correct while the ground assesses it.' }
     ]
   }
 ];
@@ -83,9 +90,9 @@ export function createOperationsView(container, { resources, astra, orbit, onVal
   let scoreOps  = 0;       // 0–100
 
   const INSTRUMENTS = [
-    { id: 'comm',       label: 'Antenne comm',      ordre: 1, iconName: 'antenna'    },
-    { id: 'energie',    label: 'Panneaux solaires',  ordre: 2, iconName: 'solar'      },
-    { id: 'instrument', label: 'Instrument science', ordre: 3, iconName: 'microscope' }
+    { id: 'comm',       label: 'Antenne comm',      labelEn: 'Comm antenna', ordre: 1, iconName: 'antenna'    },
+    { id: 'energie',    label: 'Panneaux solaires',  labelEn: 'Solar arrays', ordre: 2, iconName: 'solar'      },
+    { id: 'instrument', label: 'Instrument science', labelEn: 'Science instrument', ordre: 3, iconName: 'microscope' }
   ];
   const ORDRE_CORRECT = [1, 2, 3];
   let ordreJoueur = [];
@@ -95,11 +102,10 @@ export function createOperationsView(container, { resources, astra, orbit, onVal
   function renderContact() {
     container.innerHTML = `
       <div class="sh-ops">
-        <div class="sh-ops-kicker">Opérations · Étape 1 / 4</div>
-        <h2 class="sh-ops-titre">${icon('signal', 18)} Premier contact radio</h2>
+        <div class="sh-ops-kicker">${t('Opérations · Étape 1 / 4', 'Operations · Step 1 / 4')}</div>
+        <h2 class="sh-ops-titre">${icon('signal', 18)} ${t('Premier contact radio', 'First radio contact')}</h2>
         <p class="sh-ops-desc">
-          Le CubeSat vient d'entrer en orbite. Choisis la station au sol
-          dont l'angle d'élévation est le plus favorable pour établir le contact.
+          ${t('Le CubeSat vient d\'entrer en orbite. Choisis la station au sol dont l\'angle d\'élévation est le plus favorable pour établir le contact.', 'The CubeSat has just reached orbit. Choose the ground station with the best elevation angle to make contact.')}
         </p>
 
         <div class="sh-ops-stations">
@@ -115,13 +121,12 @@ export function createOperationsView(container, { resources, astra, orbit, onVal
         </div>
 
         <div class="sh-ops-hint">
-          💡 Le signal met ~${orbitData().delaiMs} ms aller-retour.
-          Tu as ${orbitData().dureeFenetreMin} min de fenêtre de contact.
+          💡 ${t(`Le signal met ~${orbitData().delaiMs} ms aller-retour. Tu as ${orbitData().dureeFenetreMin} min de fenêtre de contact.`, `Round-trip signal is ~${orbitData().delaiMs} ms. You have a ${orbitData().dureeFenetreMin} min contact window.`)}
         </div>
 
         <button type="button" id="sh-ops-next"
           class="sh-ops-btn" ${!stationSelectee ? 'disabled' : ''}>
-          ÉTABLIR LE CONTACT →
+          ${t('ÉTABLIR LE CONTACT →', 'MAKE CONTACT →')}
         </button>
       </div>
     `;
@@ -140,7 +145,7 @@ export function createOperationsView(container, { resources, astra, orbit, onVal
     container.querySelector('#sh-ops-next')?.addEventListener('click', () => {
       if (!stationSelectee) return;
       scoreOps += 25;
-      astra?.say('operations_ch1_intro');
+      astra?.say('operations_contact');
       etape = 1;
       render();
     });
@@ -153,11 +158,11 @@ export function createOperationsView(container, { resources, astra, orbit, onVal
 
     container.innerHTML = `
       <div class="sh-ops">
-        <div class="sh-ops-kicker">Opérations · Étape 2 / 4</div>
-        <h2 class="sh-ops-titre">${icon('satellite', 18)} Déploiement des instruments</h2>
+        <div class="sh-ops-kicker">${t('Opérations · Étape 2 / 4', 'Operations · Step 2 / 4')}</div>
+        <h2 class="sh-ops-titre">${icon('satellite', 18)} ${t('Déploiement des instruments', 'Instrument deployment')}</h2>
         <p class="sh-ops-desc">
-          Active les systèmes dans le bon ordre :
-          <strong>communications → énergie → instrument scientifique</strong>.
+          ${t('Active les systèmes dans le bon ordre :', 'Power the systems up in this order:')}
+          <strong>${t('communications → énergie → instrument scientifique', 'communications → power → science instrument')}</strong>.
         </p>
 
         <div class="sh-ops-instruments">
@@ -170,7 +175,7 @@ export function createOperationsView(container, { resources, astra, orbit, onVal
                 data-ordre="${ins.ordre}"
                 ${isActive ? 'disabled' : ''}>
                 <span class="sh-ops-instr-emoji">${icon(ins.iconName, 18)}</span>
-                <span class="sh-ops-instr-label">${ins.label}</span>
+                <span class="sh-ops-instr-label">${t(ins.label, ins.labelEn)}</span>
                 ${isActive ? `<span class="sh-ops-instr-num">#${posJoueur}</span>` : ''}
               </button>
             `;
@@ -180,14 +185,14 @@ export function createOperationsView(container, { resources, astra, orbit, onVal
         ${tousActives ? `
           <div class="sh-ops-eval ${ordreCorrect() ? 'is-ok' : 'is-warn'}">
             ${ordreCorrect()
-              ? `${icon('check', 14)} Séquence correcte. Tous les systèmes sont opérationnels.`
-              : `${icon('warning', 14)} Séquence incorrecte. Les panneaux auraient dû être déployés avant l'instrument.`}
+              ? `${icon('check', 14)} ${t('Séquence correcte. Tous les systèmes sont opérationnels.', 'Correct sequence. All systems are up.')}`
+              : `${icon('warning', 14)} ${t('Séquence incorrecte. Les panneaux auraient dû être déployés avant l\'instrument.', 'Wrong sequence. The arrays should have been deployed before the instrument.')}`}
           </div>
         ` : ''}
 
         <button type="button" id="sh-ops-next"
           class="sh-ops-btn" ${!tousActives ? 'disabled' : ''}>
-          CONFIRMER LE DÉPLOIEMENT →
+          ${t('CONFIRMER LE DÉPLOIEMENT →', 'CONFIRM DEPLOYMENT →')}
         </button>
       </div>
     `;
@@ -230,27 +235,26 @@ export function createOperationsView(container, { resources, astra, orbit, onVal
 
     container.innerHTML = `
       <div class="sh-ops">
-        <div class="sh-ops-kicker">Opérations · Étape 3 / 4</div>
-        <h2 class="sh-ops-titre">${icon('chart', 18)} Collecte de données</h2>
+        <div class="sh-ops-kicker">${t('Opérations · Étape 3 / 4', 'Operations · Step 3 / 4')}</div>
+        <h2 class="sh-ops-titre">${icon('chart', 18)} ${t('Collecte de données', 'Data collection')}</h2>
         <p class="sh-ops-desc">
-          L'instrument transmet ses mesures. Surveille les ressources
-          et clique sur <strong>TRANSMETTRE</strong> quand la fenêtre de contact est ouverte.
+          ${t('L\'instrument transmet ses mesures. Surveille les ressources et clique sur TRANSMETTRE quand la fenêtre de contact est ouverte.', 'The instrument is sending its measurements. Watch the resources and click TRANSMIT while the contact window is open.')}
         </p>
 
         <div class="sh-ops-ressources">
           <div class="sh-ops-res">
-            <span class="sh-ops-res-label">Données restantes</span>
+            <span class="sh-ops-res-label">${t('Données restantes', 'Data remaining')}</span>
             <span class="sh-ops-res-val ${donneesRest < 1 ? 'is-crit' : ''}">${donneesRest.toFixed(1)} / ${donneesMax}</span>
           </div>
           <div class="sh-ops-res">
-            <span class="sh-ops-res-label">Communications restantes</span>
+            <span class="sh-ops-res-label">${t('Communications restantes', 'Links remaining')}</span>
             <span class="sh-ops-res-val ${commRest < 1 ? 'is-crit' : ''}">${commRest.toFixed(1)} / ${commMax}</span>
           </div>
         </div>
 
         <div class="sh-ops-collecte-track">
           <div class="sh-ops-collecte-label">
-            <span>Transmission</span>
+            <span>${t('Transmission', 'Downlink')}</span>
             <span>${pctDonnees} %</span>
           </div>
           <div class="sh-ops-collecte-bar-track">
@@ -261,11 +265,11 @@ export function createOperationsView(container, { resources, astra, orbit, onVal
         <div class="sh-ops-actions">
           <button type="button" id="sh-ops-transmettre" class="sh-ops-btn-secondary"
             ${collecteProgress >= 100 ? 'disabled' : ''}>
-            ${icon('signal', 14)} TRANSMETTRE (${100 - Math.floor(collecteProgress)} % restants)
+            ${icon('signal', 14)} ${t('TRANSMETTRE', 'TRANSMIT')} (${t(`${100 - Math.floor(collecteProgress)} % restants`, `${100 - Math.floor(collecteProgress)}% left`)})
           </button>
           <button type="button" id="sh-ops-next" class="sh-ops-btn"
             ${collecteProgress < 100 ? 'disabled' : ''}>
-            DONNÉES TRANSMISES →
+            ${t('DONNÉES TRANSMISES →', 'DATA DOWNLINKED →')}
           </button>
         </div>
       </div>
@@ -299,14 +303,14 @@ export function createOperationsView(container, { resources, astra, orbit, onVal
 
     container.innerHTML = `
       <div class="sh-ops sh-ops--evenement">
-        <div class="sh-ops-kicker">${icon('warning', 14)} ÉVÉNEMENT IMPRÉVU</div>
-        <h2 class="sh-ops-titre">${icon(evenement.iconName, 18)} ${evenement.titre}</h2>
-        <p class="sh-ops-desc">${evenement.description}</p>
+        <div class="sh-ops-kicker">${icon('warning', 14)} ${t('ÉVÉNEMENT IMPRÉVU', 'UNPLANNED EVENT')}</div>
+        <h2 class="sh-ops-titre">${icon(evenement.iconName, 18)} ${t(evenement.titre, evenement.titreEn)}</h2>
+        <p class="sh-ops-desc">${t(evenement.description, evenement.descriptionEn)}</p>
 
         <div class="sh-ops-ev-options">
           ${evenement.options.map((opt, i) => `
             <button type="button" class="sh-ops-ev-opt" data-idx="${i}">
-              ${opt.label}
+              ${t(opt.label, opt.labelEn)}
             </button>
           `).join('')}
         </div>
@@ -314,7 +318,7 @@ export function createOperationsView(container, { resources, astra, orbit, onVal
         <div class="sh-ops-ev-feedback" id="sh-ops-ev-fb"></div>
 
         <button type="button" id="sh-ops-next" class="sh-ops-btn" style="display:none">
-          CONTINUER →
+          ${t('CONTINUER →', 'CONTINUE →')}
         </button>
       </div>
     `;
@@ -329,7 +333,7 @@ export function createOperationsView(container, { resources, astra, orbit, onVal
         btn.classList.add(opt.correct ? 'is-correct' : 'is-wrong');
 
         const fb = container.querySelector('#sh-ops-ev-fb');
-        fb.textContent = opt.explication;
+        fb.textContent = t(opt.explication, opt.explicationEn);
         fb.className   = `sh-ops-ev-feedback ${opt.correct ? 'is-ok' : 'is-err'}`;
 
         if (opt.correct) {
@@ -352,25 +356,25 @@ export function createOperationsView(container, { resources, astra, orbit, onVal
   // ── Étape 4 : Bilan des opérations ───────────────────────────────────────
 
   function renderBilan() {
-    const grade = scoreOps >= 80 ? { label: 'Excellent',    cls: 'is-ok',  iconName: 'trophy'  }
-                : scoreOps >= 50 ? { label: 'Satisfaisant', cls: 'is-mid', iconName: 'medal'   }
-                :                  { label: 'Difficile',    cls: 'is-err', iconName: 'warning' };
+    const grade = scoreOps >= 80 ? { label: t('Excellent', 'Excellent'),    cls: 'is-ok',  iconName: 'trophy'  }
+                : scoreOps >= 50 ? { label: t('Satisfaisant', 'Satisfactory'), cls: 'is-mid', iconName: 'medal'   }
+                :                  { label: t('Difficile', 'Rough'),    cls: 'is-err', iconName: 'warning' };
 
     container.innerHTML = `
       <div class="sh-ops sh-ops--bilan">
-        <div class="sh-ops-kicker">Bilan des opérations</div>
+        <div class="sh-ops-kicker">${t('Bilan des opérations', 'Operations debrief')}</div>
         <div class="sh-ops-bilan-score ${grade.cls}">
-          ${icon(grade.iconName, 20)} Score opérations : <strong>${scoreOps} / 100</strong>
+          ${icon(grade.iconName, 20)} ${t('Score opérations', 'Operations score')} : <strong>${scoreOps} / 100</strong>
         </div>
         <div class="sh-ops-bilan-grade">${grade.label}</div>
         <ul class="sh-ops-bilan-liste">
-          <li>${icon(stationSelectee ? 'check' : 'close', 13)} Contact radio : ${stationSelectee ? (STATIONS.find(s => s.id === stationSelectee)?.nom ?? '') : 'Non établi'}</li>
-          <li>${icon(ordreCorrect() ? 'check' : 'warning', 13)} Déploiement : ${ordreCorrect() ? 'Séquence correcte' : 'Séquence incorrecte'}</li>
-          <li>${icon(collecteProgress >= 100 ? 'check' : 'warning', 13)} Données transmises : ${collecteProgress >= 100 ? '100 %' : `${Math.floor(collecteProgress)} %`}</li>
-          <li>${icon(evenement ? (scoreOps >= 75 ? 'check' : 'warning') : 'info', 13)} Événement imprévu : ${evenement ? (scoreOps >= 75 ? 'Résolu' : 'Résolu partiellement') : 'Aucun événement'}</li>
+          <li>${icon(stationSelectee ? 'check' : 'close', 13)} ${t('Contact radio', 'Radio contact')} : ${stationSelectee ? (STATIONS.find(s => s.id === stationSelectee)?.nom ?? '') : t('Non établi', 'Not established')}</li>
+          <li>${icon(ordreCorrect() ? 'check' : 'warning', 13)} ${t('Déploiement', 'Deployment')} : ${ordreCorrect() ? t('Séquence correcte', 'Correct sequence') : t('Séquence incorrecte', 'Wrong sequence')}</li>
+          <li>${icon(collecteProgress >= 100 ? 'check' : 'warning', 13)} ${t('Données transmises', 'Data downlinked')} : ${collecteProgress >= 100 ? '100 %' : `${Math.floor(collecteProgress)} %`}</li>
+          <li>${icon(evenement ? (scoreOps >= 75 ? 'check' : 'warning') : 'info', 13)} ${t('Événement imprévu', 'Unplanned event')} : ${evenement ? (scoreOps >= 75 ? t('Résolu', 'Resolved') : t('Résolu partiellement', 'Partly resolved')) : t('Aucun événement', 'No event')}</li>
         </ul>
         <button type="button" id="sh-ops-terminer" class="sh-ops-btn">
-          CLORE LA MISSION → BILAN FINAL
+          ${t('CLORE LA MISSION → BILAN FINAL', 'CLOSE THE MISSION → FINAL DEBRIEF')}
         </button>
       </div>
     `;

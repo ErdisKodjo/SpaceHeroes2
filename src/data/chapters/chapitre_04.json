@@ -57,7 +57,7 @@
     {
       "id": "operations",
       "type": "operations",
-      "titre": "Les Operations",
+      "titre": "Les Opérations",
       "texte": "Tu n'es plus en direct. Chaque commande est une séquence, et la réponse met une vingtaine de minutes.",
       "astra": "operations_ch4_intro"
     },

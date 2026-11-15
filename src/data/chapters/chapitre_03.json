@@ -57,7 +57,7 @@
     {
       "id": "operations",
       "type": "operations",
-      "titre": "Les Operations",
+      "titre": "Les Opérations",
       "texte": "Les commandes partent avec trois secondes d'avance. Déploie les instruments une fois en orbite lunaire.",
       "astra": "operations_ch3_intro"
     },

@@ -21,7 +21,8 @@ import { createGameAudio } from './audio/sfx.js';
 import { createHub } from './ui/hub.js';
 import { applyDocumentSettings } from './ui/settings.js';
 import { createSplash } from './ui/splash.js';
-import { tutorialStep, resetTutorial } from './ui/tooltip.js';
+import { tutorialStep, dismissTutorial } from './ui/tooltip.js';
+import { t } from './i18n.js';
 
 // Applique les réglages visuels (taille police, daltonien, contrastes…) dès le démarrage.
 applyDocumentSettings();
@@ -33,26 +34,36 @@ const episodeEl  = document.getElementById('episode');
 const astraEl    = document.getElementById('astra');
 const vue3dEl    = document.getElementById('vue3d');
 
-// La scène 3D tourne toujours en fond (Terre + étoiles) — même pendant le hub.
-const vue3d = mountScene(vue3dEl);
-const audio = createGameAudio();
+// Déclaré avant le splash : le mode démo saute l'écran de chargement.
+const demo = new URLSearchParams(location.search).get('demo');
 
-// Splash screen au démarrage — se ferme quand les 4 textures NASA sont chargées.
+// Le splash s'abonne avant la scène, sinon les textures déjà en cache
+// peuvent finir de charger avant que l'écouteur existe.
 if (!demo) {
   const splash = createSplash();
-  // earth.js émet 'texture-loaded' à chaque texture chargée
   let texCount = 0;
   window.addEventListener('texture-loaded', () => { splash.onProgress(++texCount); });
 }
 
+// La scène 3D tourne toujours en fond (Terre + étoiles) — même pendant le hub.
+const vue3d = mountScene(vue3dEl);
+const audio = createGameAudio();
+
 // Bouton son
 const audioBtn = document.getElementById('btn-audio');
 function paintAudioButton() {
-  audioBtn.textContent = audio.muted ? 'MUET' : 'SON';
+  audioBtn.textContent = audio.muted ? t('MUET', 'MUTE') : t('SON', 'SOUND');
+  audioBtn.title = audio.muted ? t('Activer le son', 'Turn sound on') : t('Couper le son', 'Mute');
   audioBtn.setAttribute('aria-pressed', String(!audio.muted));
   audioBtn.classList.toggle('is-muted', audio.muted);
 }
+function applyChrome() {
+  const hint = document.getElementById('cam-hint');
+  if (hint) hint.textContent = t('Glisser · WASD · molette pour explorer', 'Drag · WASD · scroll to explore');
+  paintAudioButton();
+}
 paintAudioButton();
+applyChrome();
 audioBtn.addEventListener('click', () => {
   audio.unlock();
   audio.toggle();
@@ -79,12 +90,17 @@ window.addEventListener('vis-announcer', ({ detail }) => {
 });
 
 // Réapplique les réglages visuels à chaque changement dans les Paramètres.
-window.addEventListener('settings-change', () => applyDocumentSettings());
+window.addEventListener('settings-change', () => {
+  applyDocumentSettings();
+  applyChrome();
+});
 
 // Célébration 3D quand le CubeSat atteint l'orbite.
+// L'astuce « explorer la vue » attend la fin du bandeau, pour ne pas le couvrir.
 window.addEventListener('orbite-atteinte', () => {
   vue3d.celebrate?.();
-  tutorialStep('orbite');
+  dismissTutorial();
+  setTimeout(() => tutorialStep('orbite'), 3200);
 });
 
 // ─── HUB QG ───────────────────────────────────────────────────────────────
@@ -98,9 +114,6 @@ function hideGameUI() {
 function showGameUI() {
   appEl.classList.remove('is-hub');
 }
-
-// Afficher le hub au démarrage (sauf si mode démo).
-const demo = new URLSearchParams(location.search).get('demo');
 
 let hubApi = null;
 let missionCleanup = () => {};

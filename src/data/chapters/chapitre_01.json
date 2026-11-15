@@ -25,7 +25,7 @@
       "id": "briefing",
       "type": "briefing",
       "titre": "Le Briefing",
-      "texte": "Definis l'objectif et les exigences de la mission, recois le budget.",
+      "texte": "Définis l'objectif scientifique, ce qui rend la mission unique, la fenêtre, la classe de budget et un premier croquis. ASTRA évalue le CML 1.",
       "astra": "briefing_ch1_intro",
       "cmlVise": 1
     },
@@ -33,7 +33,7 @@
       "id": "atelier",
       "type": "atelier",
       "titre": "L'Atelier",
-      "texte": "Concois le vaisseau (structure, energie, communications, instrument), dans la limite de 4 kg.",
+      "texte": "Conçois le vaisseau dans les cinq familles — moteur, structure, énergie, communications, instrument — dans la limite de 4 kg.",
       "astra": "atelier_ch1_intro",
       "cmlVise": 2,
       "familleAtelier": "moteurs"
@@ -42,7 +42,7 @@
       "id": "essais",
       "type": "essais",
       "titre": "Les Essais",
-      "texte": "Teste le vaisseau (vibrations, vide, thermique), corrige les defauts.",
+      "texte": "Trois épreuves : vibrations, isolation thermique et compatibilité électrique.",
       "astra": "essais_ch1_intro",
       "cmlRequis": 2
     },
@@ -50,7 +50,7 @@
       "id": "lancement",
       "type": "lancement",
       "titre": "Le Lancement",
-      "texte": "Choisis lanceur et orbite, verifie la compatibilite, lance.",
+      "texte": "Le CubeSat part en covoiturage vers l'orbite basse. Lance le compte à rebours.",
       "astra": "lancement_ch1_intro",
       "bouton": "Lancer !",
       "cmlRequis": 2
@@ -58,21 +58,21 @@
     {
       "id": "operations",
       "type": "operations",
-      "titre": "Les Operations",
-      "texte": "Pilote la mission : premier contact radio, gestion des ressources en temps reel.",
+      "titre": "Les Opérations",
+      "texte": "Pilote la mission : contact radio, déploiement, puis gestion des ressources.",
       "astra": "operations_ch1_intro"
     },
     {
       "id": "bilan",
       "type": "bilan",
       "titre": "Le Bilan",
-      "texte": "Rapport de mission, score, medaille et analyse d'ASTRA.",
+      "texte": "Rapport de mission : score, médaille, ressources et trois décisions. Tu peux l'exporter en PDF.",
       "astra": null
     }
   ],
   "evenementAleatoire": {
     "id": "fenetre_decalee",
-    "texte": "La fenetre de lancement est decalee de 2 semaines.",
+    "texte": "La fenêtre de lancement est décalée de 2 semaines.",
     "effet": { "duree": -2 }
   }
 }

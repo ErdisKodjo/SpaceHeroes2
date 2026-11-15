@@ -134,7 +134,10 @@ function loadInto(loader, file, { srgb, anisotropy }, onReady) {
       window.dispatchEvent(new CustomEvent('texture-loaded', { detail: { file } }));
     },
     undefined,
-    () => console.warn(`[vis] Texture introuvable : ${file} (couleur de repli utilisee)`)
+    () => {
+      console.warn(`[vis] Texture introuvable : ${file} (couleur de repli utilisee)`);
+      window.dispatchEvent(new CustomEvent('texture-loaded', { detail: { file, failed: true } }));
+    }
   );
 }
 

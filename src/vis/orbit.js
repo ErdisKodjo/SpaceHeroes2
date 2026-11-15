@@ -101,7 +101,8 @@ export function createOrbit({
       periapsisKm: aKm * (1 - ecc) - earthRadiusKm,
       apoapsisKm: aKm * (1 + ecc) - earthRadiusKm,
       eccentricity: ecc,
-      timeScale: scale
+      timeScale: scale,
+      phase: meanAnomaly
     };
   }
 

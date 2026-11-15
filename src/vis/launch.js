@@ -15,6 +15,7 @@ import { createCubeSat } from './cubesat.js';
 import { createOrbit } from './orbit.js';
 import { createParticlePool } from './particles.js';
 import orbitData from '../data/gmat/orbite_basse.json';
+import { t } from '../i18n.js';
 
 const { altitudeKm: ALT_KM, rayonTerreKm: R_KM, muTerre: MU, excentricite: ECC = 0 } = orbitData.parametres;
 const ORBIT_RADIUS = 1 + ALT_KM / R_KM;
@@ -325,21 +326,21 @@ export function createLaunchSequence({ scene, camera, earth, container, sunDirec
 
   // --- Moments cles (declenches une seule fois, dans l'ordre). ---
   const cues = [
-    { at: 0, run: () => overlay.caption('Séquence de lancement', 'Tous les systèmes sont au vert') },
-    { at: 5, run: () => overlay.caption('T-5 · Mise en pression', 'Les réservoirs passent en pression de vol') },
-    { at: T_IGNITION, run: () => overlay.caption('Allumage', 'Les moteurs montent en poussée') },
+    { at: 0, run: () => overlay.caption(t('Séquence de lancement', 'Launch sequence'), t('Tous les systèmes sont au vert', 'All systems are green')) },
+    { at: 5, run: () => overlay.caption(t('T-5 · Mise en pression', 'T-5 · Pressurisation'), t('Les réservoirs passent en pression de vol', 'Tanks reach flight pressure')) },
+    { at: T_IGNITION, run: () => overlay.caption(t('Allumage', 'Ignition'), t('Les moteurs montent en poussée', 'Engines come up to thrust')) },
     {
       at: T_LIFTOFF,
       run: () => {
         overlay.count('DÉCOLLAGE !', 'is-liftoff');
-        overlay.caption('Décollage', 'Le lanceur quitte le pas de tir');
+        overlay.caption(t('Décollage', 'Liftoff'), t('Le lanceur quitte le pas de tir', 'The launcher leaves the pad'));
       }
     },
     { at: T_LIFTOFF + 2.5, run: () => overlay.count('') },
     {
       at: T_LIFTOFF + ASCENT * STAGE_SEP_U,
       run: () => {
-        overlay.caption('Séparation du 1er étage', 'Le 1er étage vide retombe, le 2e étage prend le relais');
+        overlay.caption(t('Séparation du 1er étage', 'First-stage separation'), t('Le 1er étage vide retombe, le 2e étage prend le relais', 'The empty first stage falls away, the second stage takes over'));
         const debris = rocket.separateLower();
         scene.attach(debris.object);
         velocity(STAGE_SEP_U, vTmp);
@@ -351,7 +352,7 @@ export function createLaunchSequence({ scene, camera, earth, container, sunDirec
     {
       at: T_DEPLOY,
       run: () => {
-        overlay.caption('Déploiement du CubeSat', 'La coiffe s\'ouvre, ton satellite est libéré');
+        overlay.caption(t('Déploiement du CubeSat', 'CubeSat deployment'), t('La coiffe s\'ouvre, ton satellite est libéré', 'The fairing opens, your satellite is released'));
         rocket.jettisonFairing();
         const p0 = trajectory(1, new THREE.Vector3()).normalize();
         const t0 = velocity(1, new THREE.Vector3()).normalize();
@@ -379,7 +380,7 @@ export function createLaunchSequence({ scene, camera, earth, container, sunDirec
       at: T_DEPLOY + 1.6,
       run: () => {
         overlay.count('ORBITE ATTEINTE', 'is-success');
-        overlay.caption('Orbite basse terrestre', `Altitude ${ALT_KM} km · un tour en ${fmt(ORBIT_PERIOD_MIN)} min`);
+        overlay.caption(t('Orbite basse terrestre', 'Low Earth orbit'), t(`Altitude ${ALT_KM} km · un tour en ${fmt(ORBIT_PERIOD_MIN)} min`, `Altitude ${ALT_KM} km · one revolution in ${fmt(ORBIT_PERIOD_MIN)} min`));
         window.dispatchEvent(new CustomEvent('orbite-atteinte', { detail: { altitudeKm: ALT_KM } }));
       }
     },
@@ -429,7 +430,7 @@ export function createLaunchSequence({ scene, camera, earth, container, sunDirec
     earth.setSpinEnabled(false);
     earth.setCloudFade(0);
     container.classList.add('vue3d--cinema');
-    overlay.caption('Pas de tir', 'Le lanceur est en position. Vérifie tout, puis lance !');
+    overlay.caption(t('Pas de tir', 'Launch pad'), t('Le lanceur est en position. Vérifie tout, puis lance !', 'The launcher is in place. Check everything, then launch!'));
     overlay.count('');
     overlay.telemetry('');
     overlay.show();

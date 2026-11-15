@@ -57,7 +57,7 @@
     {
       "id": "operations",
       "type": "operations",
-      "titre": "Les Operations",
+      "titre": "Les Opérations",
       "texte": "Maintiens le halo et transmets l'alerte tant que la liaison vers la Terre tient.",
       "astra": "operations_ch5_intro"
     },

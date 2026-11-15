@@ -57,7 +57,7 @@
     {
       "id": "operations",
       "type": "operations",
-      "titre": "Les Operations",
+      "titre": "Les Opérations",
       "texte": "Contact radio, ouverture de l'instrument au-dessus de la zone éclairée, transmission des scènes.",
       "astra": "operations_ch2_intro"
     },

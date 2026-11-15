@@ -6,27 +6,34 @@
 // Épreuve 3 — Électrique : reconnaître la bonne combinaison de composants compatibles.
 
 import { icon } from './icons.js';
+import { t } from '../i18n.js';
 
 const EPREUVES = [
   {
     id: 'vibrations',
     iconName: 'vibration',
     titre: 'Test vibrations',
+    titreEn: 'Vibration test',
     description: 'Maintiens la jauge dans la zone verte pendant 3 secondes.',
+    descriptionEn: 'Hold the gauge in the green band for 3 seconds.',
     points: 34
   },
   {
     id: 'thermique',
     iconName: 'thermal',
     titre: 'Test thermique',
+    titreEn: 'Thermal test',
     description: 'Choisis le bon matériau d\'isolation pour l\'environnement spatial.',
+    descriptionEn: 'Choose the right insulation for the space environment.',
     points: 33
   },
   {
     id: 'electrique',
     iconName: 'electric',
     titre: 'Test électrique',
+    titreEn: 'Electrical test',
     description: 'Identifie la combinaison de composants sans conflit de tension.',
+    descriptionEn: 'Find the component combination with no voltage conflict.',
     points: 33
   }
 ];
@@ -46,16 +53,16 @@ function epreuveVibrations(onResult) {
   const root = document.createElement('div');
   root.className = 'sh-essai-vibrations';
   root.innerHTML = `
-    <div class="sh-vib-instruction">Clique rapidement et régulièrement pour maintenir la jauge dans la zone verte.</div>
+    <div class="sh-vib-instruction">${t('Clique rapidement et régulièrement pour maintenir la jauge dans la zone verte.', 'Click quickly and steadily to keep the gauge in the green band.')}</div>
     <div class="sh-vib-track">
       <div class="sh-vib-zone"></div>
       <div class="sh-vib-cursor" id="sh-vib-cursor"></div>
     </div>
     <div class="sh-vib-temps">
-      <span id="sh-vib-inzone">Dans la zone : <b>0.0 s</b> / ${TARGET} s</span>
-      <span id="sh-vib-total">Temps : <b>0.0 s</b> / ${DUREE} s</span>
+      <span id="sh-vib-inzone">${t('Dans la zone', 'In the band')} : <b>0.0 s</b> / ${TARGET} s</span>
+      <span id="sh-vib-total">${t('Temps', 'Time')} : <b>0.0 s</b> / ${DUREE} s</span>
     </div>
-    <button type="button" class="sh-essai-clic" id="sh-vib-clic">MAINTENIR !</button>
+    <button type="button" class="sh-essai-clic" id="sh-vib-clic">${t('MAINTENIR !', 'HOLD!')}</button>
   `;
 
   function loop(ts) {
@@ -83,7 +90,7 @@ function epreuveVibrations(onResult) {
     if (!done && (total >= DUREE || inZone >= TARGET)) {
       done = true;
       const succes = inZone >= TARGET;
-      showResult(root, succes, succes ? 'Jauge stabilisée ✓' : 'Instabilité détectée ✗');
+      showResult(root, succes, succes ? t('Jauge stabilisée ✓', 'Gauge stabilised ✓') : t('Instabilité détectée ✗', 'Instability detected ✗'));
       onResult(succes);
       return;
     }
@@ -102,9 +109,9 @@ function epreuveVibrations(onResult) {
 // ─── Épreuve 2 : Thermique (QCM) ────────────────────────────────────────────
 
 const THERMO_OPTIONS = [
-  { id: 'mli',      label: 'Couverture MLI multi-couches',           correct: true,  explication: 'Correct. Le MLI est le standard pour l\'isolation thermique spatiale.' },
-  { id: 'mousse',   label: 'Mousse polyuréthane',                     correct: false, explication: 'Incorrect. Le polyuréthane dégazze dans le vide et se dégrade sous les UV.' },
-  { id: 'aerogel',  label: 'Aérogel de silice (non spatial)',         correct: false, explication: 'Incorrect. L\'aérogel non spatial est fragile et non qualifié pour le vol.' }
+  { id: 'mli',      label: 'Couverture MLI multi-couches',           labelEn: 'Multi-layer MLI blanket', correct: true,  explication: 'Correct. Le MLI est le standard pour l\'isolation thermique spatiale.', explicationEn: 'Correct. MLI is the standard for spacecraft thermal insulation.' },
+  { id: 'mousse',   label: 'Mousse polyuréthane',                     labelEn: 'Polyurethane foam', correct: false, explication: 'Incorrect. Le polyuréthane dégazze dans le vide et se dégrade sous les UV.', explicationEn: 'Wrong. Polyurethane outgasses in vacuum and breaks down under UV.' },
+  { id: 'aerogel',  label: 'Aérogel de silice (non spatial)',         labelEn: 'Silica aerogel (not space-rated)', correct: false, explication: 'Incorrect. L\'aérogel non spatial est fragile et non qualifié pour le vol.', explicationEn: 'Wrong. Non-space aerogel is fragile and not qualified for flight.' }
 ];
 
 function epreuveThermique(onResult) {
@@ -112,13 +119,13 @@ function epreuveThermique(onResult) {
   root.className = 'sh-essai-qcm';
   root.innerHTML = `
     <div class="sh-qcm-question">
-      Ton CubeSat va subir des cycles thermiques de −120 °C à +120 °C en orbite.<br>
-      <strong>Quel matériau d'isolation choisis-tu pour la coque ?</strong>
+      ${t('Ton CubeSat va subir des cycles thermiques de −120 °C à +120 °C en orbite.', 'Your CubeSat will see thermal cycles from −120 °C to +120 °C in orbit.')}<br>
+      <strong>${t('Quel matériau d\'isolation choisis-tu pour la coque ?', 'Which insulation do you choose for the shell?')}</strong>
     </div>
     <div class="sh-qcm-options">
       ${THERMO_OPTIONS.map(o => `
         <button type="button" class="sh-qcm-opt" data-id="${o.id}">
-          ${o.label}
+          ${t(o.label, o.labelEn)}
         </button>
       `).join('')}
     </div>
@@ -131,10 +138,10 @@ function epreuveThermique(onResult) {
       const opt = THERMO_OPTIONS.find(o => o.id === btn.dataset.id);
       btn.classList.add(opt.correct ? 'is-correct' : 'is-wrong');
       const fb = root.querySelector('#sh-thermo-fb');
-      fb.textContent  = opt.explication;
+      fb.textContent  = t(opt.explication, opt.explicationEn);
       fb.className    = `sh-qcm-feedback ${opt.correct ? 'is-ok' : 'is-err'}`;
       setTimeout(() => {
-        showResult(root, opt.correct, opt.correct ? 'Isolation validée ✓' : 'Mauvais matériau ✗');
+        showResult(root, opt.correct, opt.correct ? t('Isolation validée ✓', 'Insulation validated ✓') : t('Mauvais matériau ✗', 'Wrong material ✗'));
         onResult(opt.correct);
       }, 1400);
     });
@@ -148,18 +155,24 @@ function epreuveThermique(onResult) {
 const ELECTRO_COMBOS = [
   {
     label: 'Batterie Li-ion 3.7 V + Panneau GaAs 5 V + Régulateur 5→3.7 V',
+    labelEn: 'Li-ion battery 3.7 V + GaAs array 5 V + 5→3.7 V regulator',
     correct: true,
-    explication: 'Correct. Le régulateur abaisse la tension du panneau pour charger la batterie sans surcharge.'
+    explication: 'Correct. Le régulateur abaisse la tension du panneau pour charger la batterie sans surcharge.',
+    explicationEn: 'Correct. The regulator drops the array voltage so the battery charges without overvoltage.'
   },
   {
     label: 'Batterie Li-ion 3.7 V + Panneau GaAs 5 V (connexion directe)',
+    labelEn: 'Li-ion battery 3.7 V + GaAs array 5 V (direct connection)',
     correct: false,
-    explication: 'Incorrect. Sans régulateur, la surtension du panneau endommage la batterie Li-ion.'
+    explication: 'Incorrect. Sans régulateur, la surtension du panneau endommage la batterie Li-ion.',
+    explicationEn: 'Wrong. Without a regulator, the array overvoltage damages the Li-ion battery.'
   },
   {
     label: 'Batterie NiMH 1.2 V + Panneau Si 3 V + Régulateur boost 3→5 V',
+    labelEn: 'NiMH battery 1.2 V + Si array 3 V + 3→5 V boost regulator',
     correct: false,
-    explication: 'Incorrect. Cette architecture n\'alimente pas l\'instrument scientifique (5 V requis).'
+    explication: 'Incorrect. Cette architecture n\'alimente pas l\'instrument scientifique (5 V requis).',
+    explicationEn: 'Wrong. This architecture does not feed the science instrument (5 V required).'
   }
 ];
 
@@ -169,13 +182,13 @@ function epreuveElectrique(onResult) {
   root.className = 'sh-essai-qcm';
   root.innerHTML = `
     <div class="sh-qcm-question">
-      L'instrument scientifique nécessite une alimentation stable à 5 V.<br>
-      <strong>Quelle combinaison est électriquement compatible ?</strong>
+      ${t('L\'instrument scientifique nécessite une alimentation stable à 5 V.', 'The science instrument needs a stable 5 V supply.')}<br>
+      <strong>${t('Quelle combinaison est électriquement compatible ?', 'Which combination is electrically compatible?')}</strong>
     </div>
     <div class="sh-qcm-options">
       ${shuffled.map((o, i) => `
         <button type="button" class="sh-qcm-opt" data-idx="${i}">
-          ${o.label}
+          ${t(o.label, o.labelEn)}
         </button>
       `).join('')}
     </div>
@@ -188,10 +201,10 @@ function epreuveElectrique(onResult) {
       const opt = shuffled[parseInt(btn.dataset.idx, 10)];
       btn.classList.add(opt.correct ? 'is-correct' : 'is-wrong');
       const fb = root.querySelector('#sh-elec-fb');
-      fb.textContent = opt.explication;
+      fb.textContent = t(opt.explication, opt.explicationEn);
       fb.className   = `sh-qcm-feedback ${opt.correct ? 'is-ok' : 'is-err'}`;
       setTimeout(() => {
-        showResult(root, opt.correct, opt.correct ? 'Câblage validé ✓' : 'Conflit de tension ✗');
+        showResult(root, opt.correct, opt.correct ? t('Câblage validé ✓', 'Wiring validated ✓') : t('Conflit de tension ✗', 'Voltage conflict ✗'));
         onResult(opt.correct);
       }, 1400);
     });
@@ -230,25 +243,25 @@ export function createEssaisView(container, { astra, onValider } = {}) {
       const ok   = pct >= 50;
       container.innerHTML = `
         <div class="sh-essais-bilan">
-          <div class="sh-essais-bilan-titre">Bilan des essais</div>
+          <div class="sh-essais-bilan-titre">${t('Bilan des essais', 'Test results')}</div>
           <div class="sh-essais-bilan-score ${ok ? 'is-ok' : 'is-err'}">
-            Fiabilité : <strong>${pct} %</strong>
+            ${t('Fiabilité', 'Reliability')} : <strong>${pct} %</strong>
           </div>
           <div class="sh-essais-bilan-detail">
             ${EPREUVES.map((e, i) => `
               <div class="sh-essais-bilan-ligne">
-                ${resultats[i] ? '✅' : '❌'} ${e.titre}
+                ${resultats[i] ? '✅' : '❌'} ${t(e.titre, e.titreEn)}
                 <span class="sh-essais-pts">${resultats[i] ? '+'+e.points : '0'} pts</span>
               </div>
             `).join('')}
           </div>
           <p class="sh-essais-astra">
             ${ok
-              ? 'Tous les systèmes sont verts. Le lancement peut être autorisé.'
-              : 'Des défauts ont été détectés. Le lancement est risqué — mais possible.'}
+              ? t('Tous les systèmes sont verts. Le lancement peut être autorisé.', 'All systems are green. Launch can be authorised.')
+              : t('Des défauts ont été détectés. Le lancement est risqué — mais possible.', 'Faults were found. Launch is risky — but still possible.')}
           </p>
           <button type="button" class="sh-essais-valider" id="sh-essais-valider">
-            CONFIRMER ET PASSER AU LANCEMENT →
+            ${t('CONFIRMER ET PASSER AU LANCEMENT →', 'CONFIRM AND GO TO LAUNCH →')}
           </button>
         </div>
       `;
@@ -263,7 +276,7 @@ export function createEssaisView(container, { astra, onValider } = {}) {
     container.innerHTML = `
       <div class="sh-essais">
         <div class="sh-essais-header">
-          <div class="sh-essais-kicker">Essais · ${epreuveIndex + 1} / ${total}</div>
+          <div class="sh-essais-kicker">${t('Essais', 'Tests')} · ${epreuveIndex + 1} / ${total}</div>
           <div class="sh-essais-progres">
             ${EPREUVES.map((e, i) => `
               <span class="sh-essais-step ${i < epreuveIndex ? 'is-done' : i === epreuveIndex ? 'is-active' : ''}">
@@ -271,8 +284,8 @@ export function createEssaisView(container, { astra, onValider } = {}) {
               </span>
             `).join('')}
           </div>
-          <h2 class="sh-essais-titre">${icon(ep.iconName, 20)} ${ep.titre}</h2>
-          <p class="sh-essais-desc">${ep.description}</p>
+          <h2 class="sh-essais-titre">${icon(ep.iconName, 20)} ${t(ep.titre, ep.titreEn)}</h2>
+          <p class="sh-essais-desc">${t(ep.description, ep.descriptionEn)}</p>
         </div>
         <div class="sh-essais-epreuve" id="sh-essais-epreuve"></div>
       </div>

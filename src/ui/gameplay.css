@@ -132,14 +132,14 @@
 
 .sh-atelier-comp-details {
   font-size: 0.7rem;
-  color: var(--hud);
+  color: #6b1218;
   margin-top: 2px;
   font-family: var(--font-hud);
 }
 
 .sh-atelier-comp-desc {
   font-size: 0.72rem;
-  color: var(--muted);
+  color: #1a1000;
   margin-top: 3px;
   line-height: 1.3;
 }

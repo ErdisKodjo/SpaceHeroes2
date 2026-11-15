@@ -9,6 +9,8 @@ import energieData      from '../data/ateliers/energie.json';
 import commsData        from '../data/ateliers/communications.json';
 import instrumentData   from '../data/ateliers/instrument.json';
 import { icon } from './icons.js';
+import { t } from '../i18n.js';
+import { compDesc, compName, familyLabel, unlockLabel } from '../i18n/content.js';
 
 const FAMILLE_ICONS = {
   moteurs:        'rocket',
@@ -42,7 +44,7 @@ function getComposants(famille) {
 }
 
 function getLabel(famille) {
-  return famille.data.label ?? famille.data.nom;
+  return familyLabel(famille.key, famille.data.label ?? famille.data.nom);
 }
 
 function getEmoji(famille) {
@@ -50,16 +52,24 @@ function getEmoji(famille) {
 }
 
 function isUnlocked(composant, chapterId = 'chapitre_01') {
-  const deb = composant.deblocage ?? composant.deblocage ?? 'au_depart';
-  if (deb === 'au_depart') return true;
-  // On compare le suffixe numérique pour savoir si le chapitre est atteint
-  const reqNum  = parseInt(deb.replace(/\D/g, ''), 10) || 99;
-  const curNum  = parseInt(chapterId.replace(/\D/g, ''), 10) || 1;
+  const deb = String(composant.deblocage ?? 'au_depart')
+    .toLowerCase()
+    .replace(/\s+/g, '_');
+  if (deb === 'au_depart' || deb === 'depart') return true;
+  const reqNum = parseInt(deb.replace(/\D/g, ''), 10);
+  if (!reqNum) return true;
+  const curNum = parseInt(String(chapterId).replace(/\D/g, ''), 10) || 1;
   return curNum >= reqNum;
 }
 
+function compCle(comp) {
+  return comp.id || comp.nom;
+}
+
 function formatMasse(kg) {
-  return kg >= 0.1 ? `${kg.toFixed(2)} kg` : `${(kg * 1000).toFixed(0)} g`;
+  const n = Number(kg);
+  if (!Number.isFinite(n)) return '—';
+  return n >= 0.1 ? `${n.toFixed(2)} kg` : `${(n * 1000).toFixed(0)} g`;
 }
 
 // ─── état interne ───────────────────────────────────────────────────────────
@@ -75,14 +85,14 @@ export function createAtelierView(container, { resources, astra, chapterId = 'ch
 
   function totalMasse() {
     return FAMILLES.reduce((sum, f) => {
-      const comp = getComposants(f).find(c => c.id === selections[f.key]);
+      const comp = getComposants(f).find(c => compCle(c) === selections[f.key]);
       return sum + (comp?.masse ?? 0);
     }, 0);
   }
 
   function totalBudget() {
     return FAMILLES.reduce((sum, f) => {
-      const comp = getComposants(f).find(c => c.id === selections[f.key]);
+      const comp = getComposants(f).find(c => compCle(c) === selections[f.key]);
       return sum + (comp?.coutK ?? 0);
     }, 0);
   }
@@ -104,9 +114,9 @@ export function createAtelierView(container, { resources, astra, chapterId = 'ch
   function statut() {
     const masse  = totalMasse();
     const maxM   = resources?.max?.masse ?? 4;
-    if (masse > maxM)  return { ok: false, msg: `Masse dépassée : ${formatMasse(masse)} / ${formatMasse(maxM)}` };
-    if (!toutesSelectionnees()) return { ok: false, msg: 'Sélectionne un composant dans chaque famille.' };
-    return { ok: true, msg: 'Conception valide. Prête pour les essais.' };
+    if (masse > maxM)  return { ok: false, msg: t(`Masse dépassée : ${formatMasse(masse)} / ${formatMasse(maxM)}`, `Mass exceeded: ${formatMasse(masse)} / ${formatMasse(maxM)}`) };
+    if (!toutesSelectionnees()) return { ok: false, msg: t('Sélectionne un composant dans chaque famille.', 'Pick one component in each family.') };
+    return { ok: true, msg: t('Conception valide. Prête pour les essais.', 'Design valid. Ready for the tests.') };
   }
 
   // ─── rendu ────────────────────────────────────────────────────────────────
@@ -132,10 +142,11 @@ export function createAtelierView(container, { resources, astra, chapterId = 'ch
     const comps   = getComposants(famille);
 
     const lignes = comps.map(comp => {
+      const cle       = compCle(comp);
       const unlocked  = isUnlocked(comp, chapterId);
-      const selected  = selections[ongletActif] === comp.id;
+      const selected  = selections[ongletActif] === cle;
       const masseTxt  = formatMasse(comp.masse);
-      const coutTxt   = `${comp.coutK} k€`;
+      const coutTxt   = Number.isFinite(comp.coutK) ? `${comp.coutK} k€` : '—';
       const details   = [masseTxt, coutTxt];
       if (comp.puissanceW !== undefined) details.push(`${comp.puissanceW} W`);
       if (comp.debitKbps  !== undefined) details.push(`${comp.debitKbps} kbps`);
@@ -144,16 +155,16 @@ export function createAtelierView(container, { resources, astra, chapterId = 'ch
       return `
         <button type="button"
           class="sh-atelier-comp ${selected ? 'is-selected' : ''} ${!unlocked ? 'is-locked' : ''}"
-          data-comp="${comp.id}" data-famille="${ongletActif}"
+          data-comp="${cle}" data-famille="${ongletActif}"
           ${!unlocked ? 'aria-disabled="true"' : ''}
-          title="${!unlocked ? `Disponible : ${comp.deblocage}` : comp.description}">
+          title="${!unlocked ? unlockLabel(comp.deblocage) : compDesc(cle, comp.description)}">
           <div class="sh-atelier-comp-top">
-            <span class="sh-atelier-comp-nom">${comp.nom}</span>
+            <span class="sh-atelier-comp-nom">${compName(cle, comp.nom)}</span>
             ${!unlocked ? `<span class="sh-atelier-comp-lock">${icon('lock', 13)}</span>` : ''}
             ${selected  ? `<span class="sh-atelier-comp-sel">${icon('check', 13)}</span>`  : ''}
           </div>
           <div class="sh-atelier-comp-details">${details.join(' · ')}</div>
-          <div class="sh-atelier-comp-desc">${comp.description}</div>
+          <div class="sh-atelier-comp-desc">${compDesc(cle, comp.description)}</div>
         </button>
       `;
     }).join('');
@@ -162,11 +173,11 @@ export function createAtelierView(container, { resources, astra, chapterId = 'ch
       <div class="sh-atelier">
         <!-- En-tête -->
         <div class="sh-atelier-header">
-          <div class="sh-atelier-kicker">Atelier · CubeSat 1U</div>
+          <div class="sh-atelier-kicker">${t('Atelier · CubeSat 1U', 'Workshop · 1U CubeSat')}</div>
           <div class="sh-atelier-jauges">
             <div class="sh-atelier-jauge">
               <div class="sh-atelier-jauge-label">
-                <span>Masse</span>
+                <span>${t('Masse', 'Mass')}</span>
                 <span class="${masse > maxM ? 'is-danger' : ''}">${formatMasse(masse)} / ${formatMasse(maxM)}</span>
               </div>
               <div class="sh-atelier-jauge-track">
@@ -176,7 +187,7 @@ export function createAtelierView(container, { resources, astra, chapterId = 'ch
             </div>
             <div class="sh-atelier-jauge">
               <div class="sh-atelier-jauge-label">
-                <span>Budget</span>
+                <span>${t('Budget', 'Budget')}</span>
                 <span>${budget} k€</span>
               </div>
               <div class="sh-atelier-jauge-track">
@@ -204,7 +215,7 @@ export function createAtelierView(container, { resources, astra, chapterId = 'ch
           </div>
           <button type="button" id="sh-atelier-valider"
             class="sh-atelier-valider" ${!st.ok ? 'disabled' : ''}>
-            VALIDER L'ATELIER →
+            ${t('VALIDER L\'ATELIER →', 'VALIDATE WORKSHOP →')}
           </button>
         </div>
       </div>
@@ -252,7 +263,7 @@ export function createAtelierView(container, { resources, astra, chapterId = 'ch
 
       // Consommer les ressources
       FAMILLES.forEach(f => {
-        const comp = getComposants(f).find(c => c.id === selections[f.key]);
+        const comp = getComposants(f).find(c => compCle(c) === selections[f.key]);
         if (!comp) return;
         resources?.consume('masse',  comp.masse  ?? 0);
         resources?.consume('budget', (comp.coutK ?? 0) / 100); // normalise en unités budget

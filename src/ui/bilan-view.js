@@ -4,12 +4,15 @@
 
 import { settingsStore } from '../engine/settings-store.js';
 import { icon, medalIcon } from './icons.js';
+import { downloadBilanPdf } from './pdf-report.js';
+import { t, tf } from '../i18n.js';
+import { missionBlurb } from '../i18n/content.js';
 
 const MEDAILLES = {
-  or:     { label: 'Médaille d\'or',    classe: 'is-or' },
-  argent: { label: 'Médaille d\'argent', classe: 'is-argent' },
-  bronze: { label: 'Médaille de bronze', classe: 'is-bronze' },
-  null:   { label: 'Sans médaille',     classe: 'is-aucune' }
+  or:     { label: [ 'Médaille d\'or', 'Gold medal' ],    classe: 'is-or' },
+  argent: { label: [ 'Médaille d\'argent', 'Silver medal' ], classe: 'is-argent' },
+  bronze: { label: [ 'Médaille de bronze', 'Bronze medal' ], classe: 'is-bronze' },
+  null:   { label: [ 'Sans médaille', 'No medal' ],     classe: 'is-aucune' }
 };
 
 function esc(value) {
@@ -47,7 +50,7 @@ function radarSvg(ressources) {
     return `<text class="sh-bilan-radar-label" x="${x}" y="${y}" text-anchor="middle" dominant-baseline="middle">${esc(r.label)}</text>`;
   }).join('');
   return `
-    <svg class="sh-bilan-radar" viewBox="0 0 220 220" role="img" aria-label="Consommation des six ressources">
+    <svg class="sh-bilan-radar" viewBox="0 0 220 220" role="img" aria-label="${t('Consommation des six ressources', 'Use of the six resources')}">
       ${grille}
       ${axes}
       <polygon class="sh-bilan-radar-data" points="${data}" />
@@ -65,7 +68,7 @@ export function createBilanView({ rapport, astraTexte, onRejouer, onSuivante, on
   const medal = MEDAILLES[rapport.medaille] || MEDAILLES.null;
   const medalHtml = medalIcon(rapport.score);
   const suivants = rapport.chapitreSuivant;
-  const labelSuivant = suivants ? 'Mission suivante' : 'Retour au QG';
+  const labelSuivant = suivants ? t('Mission suivante', 'Next mission') : t('Retour au QG', 'Back to mission control');
   const badges = rapport.badges.map((b) => `
     <li class="sh-bilan-badge ${b.obtenu ? 'is-on' : 'is-off'}">
       ${icon(b.obtenu ? 'badge' : 'lock', 16, { cls: 'sh-bilan-badge-icon' })}
@@ -88,7 +91,7 @@ export function createBilanView({ rapport, astraTexte, onRejouer, onSuivante, on
       <h3>${esc(d.titre)}</h3>
       <p class="sh-bilan-decision-choix">${esc(d.choix)}</p>
       <p>${esc(d.consequence)}</p>
-      ${d.siTuAvaisChoisi ? `<p class="sh-bilan-alt"><strong>Si tu avais choisi ${esc(d.siTuAvaisChoisi)}.</strong> ${esc(d.alors || '')}</p>` : ''}
+      ${d.siTuAvaisChoisi ? `<p class="sh-bilan-alt"><strong>${tf('Si tu avais choisi {nom}.', 'If you had chosen {nom}.', { nom: esc(d.siTuAvaisChoisi) })}</strong> ${esc(d.alors || '')}</p>` : ''}
     </article>
   `).join('');
 
@@ -99,10 +102,10 @@ export function createBilanView({ rapport, astraTexte, onRejouer, onSuivante, on
     <div class="sh-bilan-overlay">
       <div class="sh-bilan-panel">
         <header class="sh-bilan-header">
-          <p class="sh-bilan-kicker">Bilan de mission${rapport.gmatLigne ? ` · ${esc(rapport.gmatLigne)}` : ''}</p>
+          <p class="sh-bilan-kicker">${t('Bilan de mission', 'Mission debrief')}${rapport.gmatLigne ? ` · ${esc(rapport.gmatLigne)}` : ''}</p>
           <h2>${esc(rapport.titre)}</h2>
           <span class="sh-bilan-medal ${medal.classe}">
-            ${medalHtml} ${esc(medal.label)}
+            ${medalHtml} ${esc(t(medal.label[0], medal.label[1]))}
           </span>
         </header>
 
@@ -116,7 +119,7 @@ export function createBilanView({ rapport, astraTexte, onRejouer, onSuivante, on
 
         <section class="sh-bilan-grid">
           <div>
-            <h3 class="sh-bilan-section">Ressources consommées</h3>
+            <h3 class="sh-bilan-section">${t('Ressources consommées', 'Resources used')}</h3>
             ${radarSvg(rapport.ressources)}
             <ul class="sh-bilan-ressources">
               ${rapport.ressources.map((r) => `
@@ -128,29 +131,30 @@ export function createBilanView({ rapport, astraTexte, onRejouer, onSuivante, on
             </ul>
           </div>
           <div>
-            <h3 class="sh-bilan-section">Trois décisions</h3>
+            <h3 class="sh-bilan-section">${t('Trois décisions', 'Three decisions')}</h3>
             ${decisions}
           </div>
         </section>
 
         <section class="sh-bilan-nasa">
-          <h3 class="sh-bilan-section">Dans la vraie vie</h3>
+          <h3 class="sh-bilan-section">${t('Dans la vraie vie', 'In real life')}</h3>
           <p class="sh-bilan-equivalence">${esc(rapport.nasa.phrase)}</p>
-          ${ref ? `<p>${esc(ref.agence)} · ${esc(ref.annee)}. ${esc(ref.resume)}</p>` : ''}
+          ${ref ? `<p>${esc(ref.agence)} · ${esc(ref.annee)}. ${esc(missionBlurb(ref.id, ref.resume))}</p>` : ''}
           ${proches ? `<ul class="sh-bilan-proches">${proches}</ul>` : ''}
         </section>
 
         <section>
-          <h3 class="sh-bilan-section">Badges · ${rapport.jetons} jeton${rapport.jetons > 1 ? 's' : ''} d'atelier</h3>
+          <h3 class="sh-bilan-section">${t('Badges', 'Badges')} · ${rapport.jetons} ${t(rapport.jetons > 1 ? 'jetons d\'atelier' : 'jeton d\'atelier', rapport.jetons > 1 ? 'workshop tokens' : 'workshop token')}</h3>
           <ul class="sh-bilan-badges">${badges}</ul>
         </section>
 
         <blockquote class="sh-bilan-astra">${esc(astraTexte || '')}</blockquote>
 
         <div class="sh-bilan-actions">
-          <button type="button" id="sh-bilan-rejouer">Rejouer</button>
+          <button type="button" id="sh-bilan-rejouer">${t('Rejouer', 'Replay')}</button>
           <button type="button" id="sh-bilan-suivant">${esc(labelSuivant)}</button>
-          <button type="button" class="is-quiet" id="sh-bilan-qg">QG de mission</button>
+          <button type="button" id="sh-bilan-pdf">${t('Exporter le PDF', 'Export PDF')}</button>
+          <button type="button" class="is-quiet" id="sh-bilan-qg">${t('QG de mission', 'Mission control')}</button>
         </div>
       </div>
     </div>
@@ -180,6 +184,15 @@ export function createBilanView({ rapport, astraTexte, onRejouer, onSuivante, on
     else onQuitter?.();
   });
   root.querySelector('#sh-bilan-qg').addEventListener('click', () => onQuitter?.());
+  root.querySelector('#sh-bilan-pdf').addEventListener('click', async (event) => {
+    const btn = event.currentTarget;
+    btn.disabled = true;
+    try {
+      await downloadBilanPdf(rapport, astraTexte);
+    } finally {
+      btn.disabled = false;
+    }
+  });
 
   return {
     dispose() {

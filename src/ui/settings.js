@@ -1,38 +1,11 @@
-// Ecran Parametres — accessible depuis le QG (bouton ⚙️) et depuis la pause en jeu.
-// Toutes les options sont groupees en 6 sections. Chaque changement est persiste
-// immediatement via settingsStore.
+// Ecran Parametres.
+// Les options restent en brouillon jusqu'au bouton Enregistrer.
+// Fermer, Annuler ou Echap abandonne le brouillon.
 
 import { settingsStore } from '../engine/settings-store.js';
+import { t } from '../i18n.js';
 
-const DIFFICULTIES = [
-  { id: 'cadet',      label: 'Cadet',               desc: 'Marges larges, CML 1-2 pré-validés, 0 imprévu' },
-  { id: 'ingenieur',  label: 'Ingénieur',            desc: 'Marges standard, quelques imprévus' },
-  { id: 'directeur',  label: 'Directeur de mission', desc: '4 niveaux CML intégraux, imprévus fréquents' },
-  { id: 'bac_sable',  label: 'Bac à sable',          desc: 'Exploration libre, toutes technologies débloquées' }
-];
-
-const GAME_MODES = [
-  { id: 'campagne',   label: 'Campagne',   desc: 'Progression chapitre par chapitre' },
-  { id: 'defi',       label: 'Défi',       desc: 'Masse -20 %, fenêtre -30 %' },
-  { id: 'decouverte', label: 'Découverte', desc: 'Exploration sans pression de score' }
-];
-
-const COLOR_BLIND_MODES = [
-  { id: 'none',          label: 'Désactivé' },
-  { id: 'deuteranopie',  label: 'Deutéranopie' },
-  { id: 'protanopie',    label: 'Protanopie' },
-  { id: 'tritanopie',    label: 'Tritanopie' }
-];
-
-const FONT_SIZES = [
-  { id: 'normale',      label: 'Normale' },
-  { id: 'grande',       label: 'Grande' },
-  { id: 'tres_grande',  label: 'Très grande' }
-];
-
-// ---- helpers ---------------------------------------------------------------
-
-function radio(name, options, currentVal, onChange) {
+function radio(name, options, currentVal) {
   return options.map(opt => `
     <label class="sh-radio ${opt.id === currentVal ? 'is-active' : ''}">
       <input type="radio" name="${name}" value="${opt.id}"
@@ -80,198 +53,263 @@ function select(key, label, options, currentVal) {
   `;
 }
 
-// ---- rendu principal -------------------------------------------------------
+function clone(settings) {
+  return { ...settings };
+}
 
-function buildHTML(s) {
+function buildHTML(s, dirty) {
+  const difficulties = [
+    { id: 'cadet', label: t('Cadet', 'Cadet'), desc: t('Marges larges, CML 1-2 pré-validés, 0 imprévu', 'Wide margins, CML 1-2 pre-validated, no surprise') },
+    { id: 'ingenieur', label: t('Ingénieur', 'Engineer'), desc: t('Marges standard, quelques imprévus', 'Standard margins, a few surprises') },
+    { id: 'directeur', label: t('Directeur de mission', 'Mission director'), desc: t('4 niveaux CML intégraux, imprévus fréquents', 'All 4 CML levels, frequent surprises') },
+    { id: 'bac_sable', label: t('Bac à sable', 'Sandbox'), desc: t('Exploration libre, toutes technologies débloquées', 'Free exploration, every technology unlocked') }
+  ];
+  const modes = [
+    { id: 'campagne', label: t('Campagne', 'Campaign'), desc: t('Progression chapitre par chapitre', 'Chapter by chapter') },
+    { id: 'defi', label: t('Défi', 'Challenge'), desc: t('Masse -20 %, fenêtre -30 %', 'Mass −20%, window −30%') },
+    { id: 'decouverte', label: t('Découverte', 'Discovery'), desc: t('Exploration sans pression de score', 'Explore without score pressure') }
+  ];
+  const graphics = [
+    { id: 'basse', label: t('Basse', 'Low') },
+    { id: 'moyenne', label: t('Moyenne', 'Medium') },
+    { id: 'haute', label: t('Haute', 'High') },
+    { id: 'ultra', label: 'Ultra' }
+  ];
+  const colorBlind = [
+    { id: 'none', label: t('Désactivé', 'Off') },
+    { id: 'deuteranopie', label: t('Deutéranopie', 'Deuteranopia') },
+    { id: 'protanopie', label: t('Protanopie', 'Protanopia') },
+    { id: 'tritanopie', label: t('Tritanopie', 'Tritanopia') }
+  ];
+  const fonts = [
+    { id: 'normale', label: t('Normale', 'Normal') },
+    { id: 'grande', label: t('Grande', 'Large') },
+    { id: 'tres_grande', label: t('Très grande', 'Extra large') }
+  ];
+
   return `
-    <div class="sh-settings-overlay" role="dialog" aria-modal="true" aria-label="Paramètres">
+    <div class="sh-settings-overlay" role="dialog" aria-modal="true" aria-label="${t('Paramètres', 'Settings')}">
       <div class="sh-settings-panel">
 
         <div class="sh-settings-header">
-          <span class="sh-settings-title">⚙️ PARAMÈTRES</span>
-          <button type="button" class="sh-settings-close" aria-label="Fermer">✕</button>
+          <span class="sh-settings-title">${t('PARAMÈTRES', 'SETTINGS')}</span>
+          <button type="button" class="sh-settings-close" aria-label="${t('Fermer', 'Close')}">✕</button>
         </div>
 
         <div class="sh-settings-body">
 
-          <!-- SECTION MODE DE JEU -->
           <section class="sh-section">
-            <h2 class="sh-section-title">Mode de jeu</h2>
+            <h2 class="sh-section-title">${t('Mode de jeu', 'Game mode')}</h2>
 
             <div class="sh-field">
-              <div class="sh-field-label">Difficulté</div>
+              <div class="sh-field-label">${t('Difficulté', 'Difficulty')}</div>
               <div class="sh-radios" data-group="difficulty">
-                ${radio('difficulty', DIFFICULTIES, s.difficulty)}
+                ${radio('difficulty', difficulties, s.difficulty)}
               </div>
             </div>
 
             <div class="sh-field">
-              <div class="sh-field-label">Mode</div>
+              <div class="sh-field-label">${t('Mode', 'Mode')}</div>
               <div class="sh-radios" data-group="gameMode">
-                ${radio('gameMode', GAME_MODES, s.gameMode)}
+                ${radio('gameMode', modes, s.gameMode)}
               </div>
             </div>
 
-            ${toggle('tutorial',      'Tutoriel guidé',          s.tutorial)}
-            ${toggle('randomEvents',  'Événements aléatoires',   s.randomEvents)}
+            ${toggle('tutorial', t('Tutoriel guidé', 'Guided tutorial'), s.tutorial)}
+            ${toggle('randomEvents', t('Événements aléatoires', 'Random events'), s.randomEvents)}
 
             <label class="sh-select">
-              <span class="sh-select-label">Vitesse de simulation par défaut</span>
+              <span class="sh-select-label">${t('Vitesse de simulation par défaut', 'Default simulation speed')}</span>
               <select data-key="defaultTimeScale">
-                <option value="1"    ${s.defaultTimeScale===1    ? 'selected':''}>×1 — Temps réel</option>
-                <option value="100"  ${s.defaultTimeScale===100  ? 'selected':''}>×100</option>
-                <option value="1000" ${s.defaultTimeScale===1000 ? 'selected':''}>×1000</option>
+                <option value="1" ${Number(s.defaultTimeScale) === 1 ? 'selected' : ''}>${t('×1 — Temps réel', '×1 — Real time')}</option>
+                <option value="100" ${Number(s.defaultTimeScale) === 100 ? 'selected' : ''}>×100</option>
+                <option value="1000" ${Number(s.defaultTimeScale) === 1000 ? 'selected' : ''}>×1000</option>
               </select>
             </label>
           </section>
 
-          <!-- SECTION AUDIO -->
           <section class="sh-section">
-            <h2 class="sh-section-title">Audio</h2>
-            ${slider('volume',        'Volume général',    s.volume,        0, 1, 0.05)}
-            ${slider('sfxVolume',     'Effets sonores',    s.sfxVolume,     0, 1, 0.05)}
-            ${slider('ambientVolume', 'Musique d\'ambiance', s.ambientVolume, 0, 1, 0.05)}
-            ${toggle('voiceEnabled',  'Voix ASTRA',        s.voiceEnabled)}
+            <h2 class="sh-section-title">${t('Audio', 'Audio')}</h2>
+            ${slider('volume', t('Volume général', 'Master volume'), s.volume, 0, 1, 0.05)}
+            ${slider('sfxVolume', t('Effets sonores', 'Sound effects'), s.sfxVolume, 0, 1, 0.05)}
+            ${slider('ambientVolume', t('Musique d\'ambiance', 'Ambient music'), s.ambientVolume, 0, 1, 0.05)}
+            ${toggle('voiceEnabled', t('Voix ASTRA', 'ASTRA voice'), s.voiceEnabled)}
           </section>
 
-          <!-- SECTION AFFICHAGE -->
           <section class="sh-section">
-            <h2 class="sh-section-title">Affichage</h2>
+            <h2 class="sh-section-title">${t('Affichage', 'Display')}</h2>
 
             <div class="sh-field">
-              <div class="sh-field-label">Qualité graphique</div>
+              <div class="sh-field-label">${t('Qualité graphique', 'Graphics quality')}</div>
               <div class="sh-radios" data-group="graphicsQuality">
-                ${radio('graphicsQuality', [
-                  { id: 'basse',   label: 'Basse' },
-                  { id: 'moyenne', label: 'Moyenne' },
-                  { id: 'haute',   label: 'Haute' },
-                  { id: 'ultra',   label: 'Ultra' }
-                ], s.graphicsQuality)}
+                ${radio('graphicsQuality', graphics, s.graphicsQuality)}
               </div>
             </div>
 
-            ${toggle('fullscreen',    'Plein écran',          s.fullscreen)}
-            ${toggle('reduceMotion',  'Réduction de mouvement', s.reduceMotion)}
-            ${toggle('highContrast',  'Contrastes élevés',    s.highContrast)}
+            ${toggle('fullscreen', t('Plein écran', 'Fullscreen'), s.fullscreen)}
+            ${toggle('reduceMotion', t('Réduction de mouvement', 'Reduce motion'), s.reduceMotion)}
+            ${toggle('highContrast', t('Contrastes élevés', 'High contrast'), s.highContrast)}
 
-            ${select('colorBlind', 'Mode daltonien', COLOR_BLIND_MODES, s.colorBlind)}
-            ${select('fontSize',   'Taille de police', FONT_SIZES, s.fontSize)}
+            ${select('colorBlind', t('Mode daltonien', 'Color-blind mode'), colorBlind, s.colorBlind)}
+            ${select('fontSize', t('Taille de police', 'Font size'), fonts, s.fontSize)}
           </section>
 
-          <!-- SECTION ACCESSIBILITE -->
           <section class="sh-section">
-            <h2 class="sh-section-title">Accessibilité</h2>
-            ${toggle('subtitles', 'Sous-titres ASTRA', s.subtitles)}
-            ${select('readingSpeed', 'Vitesse de lecture', [
-              { id: 'normale', label: 'Normale' },
-              { id: 'lente',   label: 'Lente' }
+            <h2 class="sh-section-title">${t('Accessibilité', 'Accessibility')}</h2>
+            ${toggle('subtitles', t('Sous-titres ASTRA', 'ASTRA subtitles'), s.subtitles)}
+            ${select('readingSpeed', t('Vitesse de lecture', 'Reading speed'), [
+              { id: 'normale', label: t('Normale', 'Normal') },
+              { id: 'lente', label: t('Lente', 'Slow') }
             ], s.readingSpeed)}
           </section>
 
-          <!-- SECTION LANGUE -->
           <section class="sh-section">
-            <h2 class="sh-section-title">Langue</h2>
+            <h2 class="sh-section-title">${t('Langue', 'Language')}</h2>
             <div class="sh-radios" data-group="language">
               ${radio('language', [
                 { id: 'fr', label: 'Français' },
                 { id: 'en', label: 'English' }
               ], s.language)}
             </div>
+            <p class="sh-field-label">${t('La langue s\'applique à l\'enregistrement.', 'Language applies when you save.')}</p>
           </section>
 
-          <!-- SECTION DONNEES -->
           <section class="sh-section">
-            <h2 class="sh-section-title">Données</h2>
+            <h2 class="sh-section-title">${t('Données', 'Data')}</h2>
             <div class="sh-data-actions">
               <button type="button" class="sh-btn sh-btn--danger" data-action="reset-save">
-                🗑 Effacer la sauvegarde
+                ${t('Effacer la sauvegarde', 'Erase save')}
               </button>
               <button type="button" class="sh-btn" data-action="export-save">
-                ⬇ Exporter la progression
+                ${t('Exporter la progression', 'Export progress')}
               </button>
               <label class="sh-btn sh-btn--import">
-                ⬆ Importer une sauvegarde
+                ${t('Importer une sauvegarde', 'Import a save')}
                 <input type="file" accept=".json" style="display:none" data-action="import-save">
               </label>
             </div>
           </section>
 
-        </div><!-- /.sh-settings-body -->
-      </div><!-- /.sh-settings-panel -->
-    </div><!-- /.sh-settings-overlay -->
+        </div>
+
+        <footer class="sh-settings-footer">
+          <button type="button" class="sh-btn" data-action="cancel">${t('Annuler', 'Cancel')}</button>
+          <button type="button" class="sh-btn sh-btn--primary" data-action="save" ${dirty ? '' : 'disabled'}>
+            ${t('Enregistrer', 'Save')}
+          </button>
+        </footer>
+      </div>
+    </div>
   `;
 }
 
-// ---- logique ----------------------------------------------------------------
+function applyFullscreen(value) {
+  if (value && document.documentElement.requestFullscreen) {
+    document.documentElement.requestFullscreen().catch(() => {});
+  } else if (!value && document.fullscreenElement) {
+    document.exitFullscreen().catch(() => {});
+  }
+}
 
-export function createSettings({ onClose } = {}) {
+export function createSettings({ onClose, onSaved } = {}) {
   const container = document.createElement('div');
   container.id = 'sh-settings-root';
   document.body.appendChild(container);
 
+  let saved = clone(settingsStore.getAll());
+  let draft = clone(saved);
+
+  function isDirty() {
+    return Object.keys(saved).some((key) => draft[key] !== saved[key]);
+  }
+
   function refresh() {
-    container.innerHTML = buildHTML(settingsStore.getAll());
+    const body = container.querySelector('.sh-settings-body');
+    const scroll = body ? body.scrollTop : 0;
+    container.innerHTML = buildHTML(draft, isDirty());
     bindEvents();
+    const nextBody = container.querySelector('.sh-settings-body');
+    if (nextBody) nextBody.scrollTop = scroll;
+  }
+
+  function close() {
+    document.removeEventListener('keydown', onKey);
+    container.remove();
+    onClose?.();
+  }
+
+  function commit() {
+    if (!isDirty()) return;
+    const prev = saved;
+    settingsStore.replaceAll(draft);
+    saved = clone(settingsStore.getAll());
+    draft = clone(saved);
+    if (Boolean(prev.fullscreen) !== Boolean(saved.fullscreen)) {
+      applyFullscreen(Boolean(saved.fullscreen));
+    }
+    refresh();
+    onSaved?.();
   }
 
   function bindEvents() {
-    // Fermeture
-    container.querySelector('.sh-settings-close')
-      .addEventListener('click', close);
-    container.querySelector('.sh-settings-overlay')
-      .addEventListener('click', e => { if (e.target === e.currentTarget) close(); });
+    container.querySelector('.sh-settings-close').addEventListener('click', close);
+    container.querySelector('.sh-settings-overlay').addEventListener('click', (e) => {
+      if (e.target === e.currentTarget) close();
+    });
+    container.querySelector('[data-action="cancel"]').addEventListener('click', close);
+    container.querySelector('[data-action="save"]').addEventListener('click', commit);
 
-    // Radios
-    container.querySelectorAll('input[type="radio"]').forEach(input => {
+    container.querySelectorAll('input[type="radio"]').forEach((input) => {
       input.addEventListener('change', () => {
-        const val = input.name === 'defaultTimeScale' ? Number(input.value) : input.value;
-        settingsStore.set(input.name, val);
-        // Mettre a jour la classe active dans le groupe
+        draft[input.name] = input.name === 'defaultTimeScale' ? Number(input.value) : input.value;
         const group = input.closest('.sh-radios');
-        group?.querySelectorAll('.sh-radio').forEach(l => l.classList.remove('is-active'));
+        group?.querySelectorAll('.sh-radio').forEach((label) => label.classList.remove('is-active'));
         input.closest('.sh-radio')?.classList.add('is-active');
+        container.querySelector('[data-action="save"]').disabled = !isDirty();
       });
     });
 
-    // Toggles
-    container.querySelectorAll('.sh-toggle-btn').forEach(btn => {
+    container.querySelectorAll('.sh-toggle-btn').forEach((btn) => {
       btn.addEventListener('click', () => {
         const key = btn.dataset.key;
-        const newVal = !settingsStore.get(key);
-        settingsStore.set(key, newVal);
-        btn.classList.toggle('is-on', newVal);
-        btn.setAttribute('aria-checked', String(newVal));
-        applyImmediate(key, newVal);
+        draft[key] = !draft[key];
+        btn.classList.toggle('is-on', draft[key]);
+        btn.setAttribute('aria-checked', String(draft[key]));
+        container.querySelector('[data-action="save"]').disabled = !isDirty();
       });
     });
 
-    // Sliders
-    container.querySelectorAll('input[type="range"]').forEach(input => {
+    container.querySelectorAll('input[type="range"]').forEach((input) => {
       const display = container.querySelector(`[data-for="${input.dataset.key}"]`);
       input.addEventListener('input', () => {
         const val = parseFloat(input.value);
-        settingsStore.set(input.dataset.key, val);
+        draft[input.dataset.key] = val;
         if (display) display.textContent = `${Math.round(val * 100)}%`;
-        applyImmediate(input.dataset.key, val);
+        container.querySelector('[data-action="save"]').disabled = !isDirty();
       });
     });
 
-    // Selects
-    container.querySelectorAll('select[data-key]').forEach(sel => {
+    container.querySelectorAll('select[data-key]').forEach((sel) => {
       sel.addEventListener('change', () => {
-        const val = sel.dataset.key === 'defaultTimeScale' ? Number(sel.value) : sel.value;
-        settingsStore.set(sel.dataset.key, val);
-        applyImmediate(sel.dataset.key, val);
+        draft[sel.dataset.key] = sel.dataset.key === 'defaultTimeScale'
+          ? Number(sel.value)
+          : sel.value;
+        container.querySelector('[data-action="save"]').disabled = !isDirty();
       });
     });
 
-    // Actions données
     container.querySelector('[data-action="reset-save"]')?.addEventListener('click', () => {
-      if (confirm('Effacer toute la progression ? Cette action est irréversible.')) {
-        localStorage.removeItem('sh-save');
-        settingsStore.reset();
-        refresh();
-      }
+      const ok = confirm(t(
+        'Effacer toute la progression ? Cette action est irréversible.',
+        'Erase all progress? This cannot be undone.'
+      ));
+      if (!ok) return;
+      localStorage.removeItem('sh-save');
+      settingsStore.reset();
+      saved = clone(settingsStore.getAll());
+      draft = clone(saved);
+      refresh();
+      onSaved?.();
     });
 
     container.querySelector('[data-action="export-save"]')?.addEventListener('click', () => {
@@ -284,74 +322,55 @@ export function createSettings({ onClose } = {}) {
       a.href = URL.createObjectURL(blob);
       a.download = 'spaceheroes-save.json';
       a.click();
+      URL.revokeObjectURL(a.href);
     });
 
-    container.querySelector('[data-action="import-save"]')?.addEventListener('change', e => {
+    container.querySelector('[data-action="import-save"]')?.addEventListener('change', (e) => {
       const file = e.target.files?.[0];
       if (!file) return;
       const reader = new FileReader();
-      reader.onload = ev => {
+      reader.onload = (ev) => {
         try {
           const data = JSON.parse(ev.target.result);
           if (data.save) localStorage.setItem('sh-save', data.save);
-          if (data.settings) Object.entries(data.settings).forEach(([k, v]) => settingsStore.set(k, v));
+          if (data.settings) settingsStore.replaceAll(data.settings);
+          saved = clone(settingsStore.getAll());
+          draft = clone(saved);
           refresh();
-          alert('Sauvegarde importée avec succès.');
+          onSaved?.();
+          alert(t('Sauvegarde importée avec succès.', 'Save imported.'));
         } catch {
-          alert('Fichier invalide.');
+          alert(t('Fichier invalide.', 'Invalid file.'));
         }
       };
       reader.readAsText(file);
     });
   }
 
-  // Applique certains réglages immédiatement sans rechargement de page
-  function applyImmediate(key, value) {
-    if (key === 'reduceMotion' || key === 'highContrast' || key === 'colorBlind' || key === 'fontSize') {
-      applyDocumentSettings();
-    }
-    if (key === 'fullscreen') {
-      if (value && document.documentElement.requestFullscreen) {
-        document.documentElement.requestFullscreen().catch(() => {});
-      } else if (!value && document.fullscreenElement) {
-        document.exitFullscreen().catch(() => {});
-      }
-    }
+  function onKey(e) {
+    if (e.key === 'Escape') close();
   }
 
-  function close() {
-    container.remove();
-    onClose?.();
-  }
-
+  document.addEventListener('keydown', onKey);
   refresh();
-  // Fermeture clavier Escape
-  const onKey = e => { if (e.key === 'Escape') close(); };
-  document.addEventListener('keydown', onKey, { once: true });
 
   return { close };
 }
 
-// Applique les réglages visuels sur <html> au démarrage et à chaque changement
 export function applyDocumentSettings() {
   const s = settingsStore.getAll();
   const html = document.documentElement;
 
-  // Taille de police
+  html.lang = s.language === 'en' ? 'en' : 'fr';
   html.dataset.fontSize = s.fontSize;
-
-  // Contrastes élevés
   html.classList.toggle('high-contrast', s.highContrast);
-
-  // Réduction de mouvement
   html.classList.toggle('reduce-motion', s.reduceMotion);
 
-  // Mode daltonien : filtre SVG sur <body>
   const FILTERS = {
-    none:         '',
+    none: '',
     deuteranopie: 'url(#sh-deuteranopia)',
-    protanopie:   'url(#sh-protanopia)',
-    tritanopie:   'url(#sh-tritanopia)'
+    protanopie: 'url(#sh-protanopia)',
+    tritanopie: 'url(#sh-tritanopia)'
   };
   document.body.style.filter = FILTERS[s.colorBlind] || '';
 }

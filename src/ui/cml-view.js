@@ -1,5 +1,6 @@
-import { settingsStore } from '../engine/settings-store.js';
 import { icon, statusDot } from './icons.js';
+import { t } from '../i18n.js';
+import { cmlCriterion, cmlTalk } from '../i18n/content.js';
 // Affiche les 20 critères regroupés par niveau (1-4).
 // ASTRA interroge le joueur critère par critère ; le joueur ne coche jamais lui-même.
 
@@ -128,10 +129,10 @@ const CML_DIALOGUES = {
 };
 
 const NIVEAUX = [
-  { id: 1, label: 'CML 1', titre: 'Idée' },
-  { id: 2, label: 'CML 2', titre: 'Faisabilité' },
-  { id: 3, label: 'CML 3', titre: 'Trade Studies' },
-  { id: 4, label: 'CML 4', titre: 'Conception précise' },
+  { id: 1, label: 'CML 1', titre: 'Idée', titreEn: 'Idea' },
+  { id: 2, label: 'CML 2', titre: 'Faisabilité', titreEn: 'Feasibility' },
+  { id: 3, label: 'CML 3', titre: 'Études de compromis', titreEn: 'Trade studies' },
+  { id: 4, label: 'CML 4', titre: 'Conception précise', titreEn: 'Detailed design' },
 ];
 
 function statutBadge(statut) {
@@ -155,11 +156,11 @@ export function createCmlView(container, { cml, astra, onNiveauValide } = {}) {
         <div class="cml-critere ${critereCourantId === c.id ? 'is-active' : ''}"
           data-id="${c.id}">
           ${statutBadge(c.statut)}
-          <span class="cml-critere-texte">${c.texte}</span>
+          <span class="cml-critere-texte">${cmlCriterion(c.id, c.texte)}</span>
           <button type="button" class="cml-btn-eval"
             data-id="${c.id}"
-            title="Faire évaluer par ASTRA">
-            ${icon('telescope', 13)} ÉVALUER
+            title="${t('Faire évaluer par ASTRA', 'Ask ASTRA to evaluate')}">
+            ${icon('telescope', 13)} ${t('ÉVALUER', 'EVALUATE')}
           </button>
         </div>
       `).join('');
@@ -167,7 +168,7 @@ export function createCmlView(container, { cml, astra, onNiveauValide } = {}) {
       return `
         <div class="cml-niveau ${valide ? 'is-valide' : ''}">
           <div class="cml-niveau-header">
-            <span class="cml-niveau-label">${niv.level === 1 ? '🔴' : niv.level === 2 ? '🟠' : niv.level === 3 ? '🟡' : '🟢'} ${NIVEAUX[niv.level-1].label} — ${NIVEAUX[niv.level-1].titre}</span>
+            <span class="cml-niveau-label">${niv.level === 1 ? '🔴' : niv.level === 2 ? '🟠' : niv.level === 3 ? '🟡' : '🟢'} ${NIVEAUX[niv.level-1].label} — ${t(NIVEAUX[niv.level-1].titre, NIVEAUX[niv.level-1].titreEn)}</span>
             <span class="cml-niveau-pct ${valide ? 'is-ok' : ''}">${percent}% ${valide ? '✓' : ''}</span>
           </div>
           <div class="cml-niveau-bar-track">
@@ -187,17 +188,17 @@ export function createCmlView(container, { cml, astra, onNiveauValide } = {}) {
         <div class="cml-dialogue">
           <div class="cml-dialogue-question">
             <span class="cml-dialogue-astra">ASTRA</span>
-            ${dial.question ?? '…'}
+            ${cmlTalk(critereCourantId, 'question', dial.question ?? '…')}
           </div>
           <div class="cml-dialogue-actions">
-            <button type="button" class="cml-rep" data-rep="rouge">❌ Pas encore</button>
-            <button type="button" class="cml-rep" data-rep="jaune">⚠️ Partiellement</button>
-            <button type="button" class="cml-rep" data-rep="vert">✅ Oui, c'est fait</button>
+            <button type="button" class="cml-rep" data-rep="rouge">${t('❌ Pas encore', '❌ Not yet')}</button>
+            <button type="button" class="cml-rep" data-rep="jaune">${t('⚠️ Partiellement', '⚠️ Partly')}</button>
+            <button type="button" class="cml-rep" data-rep="vert">${t('✅ Oui, c\'est fait', '✅ Yes, done')}</button>
           </div>
           ${statC?.statut !== 'rouge' ? `
             <div class="cml-dialogue-feedback">
-              ${statC?.statut === 'vert'  ? (dial.vert  ?? '') : ''}
-              ${statC?.statut === 'jaune' ? (dial.jaune ?? '') : ''}
+              ${statC?.statut === 'vert'  ? cmlTalk(critereCourantId, 'vert', dial.vert ?? '') : ''}
+              ${statC?.statut === 'jaune' ? cmlTalk(critereCourantId, 'jaune', dial.jaune ?? '') : ''}
             </div>` : ''}
         </div>
       `;
@@ -206,8 +207,8 @@ export function createCmlView(container, { cml, astra, onNiveauValide } = {}) {
     container.innerHTML = `
       <div class="sh-cml">
         <div class="sh-cml-header">
-          <div class="sh-cml-kicker">Validation CML — Checklist mission</div>
-          <p class="sh-cml-sub">ASTRA évalue chaque critère. 80 % de critères verts = niveau validé.</p>
+          <div class="sh-cml-kicker">${t('Validation CML — Checklist mission', 'CML review — Mission checklist')}</div>
+          <p class="sh-cml-sub">${t('ASTRA évalue chaque critère. 80 % de critères verts = niveau validé.', 'ASTRA scores each criterion. 80% green criteria = level validated.')}</p>
         </div>
         <div class="sh-cml-body">
           <div class="sh-cml-niveaux">${niveauxHTML}</div>
@@ -229,7 +230,7 @@ export function createCmlView(container, { cml, astra, onNiveauValide } = {}) {
         render();
         // ASTRA annonce la question
         const dial = CML_DIALOGUES[critereCourantId];
-        if (dial) astra?.say('atelier_test');
+        if (dial) astra?.sayCustom(cmlTalk(critereCourantId, 'question', dial.question), 'info');
       });
     });
 
@@ -239,6 +240,7 @@ export function createCmlView(container, { cml, astra, onNiveauValide } = {}) {
         if (!critereCourantId || reponseEnCours) return;
         reponseEnCours = true;
 
+        const deja = new Set(cml.snapshot().filter((n) => n.valide).map((n) => n.level));
         const rep    = btn.dataset.rep; // 'rouge' | 'jaune' | 'vert'
         const dial   = CML_DIALOGUES[critereCourantId] ?? {};
 
@@ -247,15 +249,22 @@ export function createCmlView(container, { cml, astra, onNiveauValide } = {}) {
         // Pour jaune : on force manuellement (evaluerCritereCml ne connaît que vert/rouge)
         if (rep === 'jaune') cml.setStatus(critereCourantId, 'jaune');
 
-        // Réplique ASTRA selon la réponse
-        const texte = dial[rep] ?? (rep === 'vert' ? 'Critère validé.' : 'Critère à retravailler.');
-        astra?.say('atelier_test'); // déclenche la radio
-
-        // Vérifier si un niveau vient d'être validé
-        const niveauApres = cml.snapshot();
-        niveauApres.forEach(niv => {
-          if (niv.valide) onNiveauValide?.(niv.level);
+        const texte = cmlTalk(
+          critereCourantId,
+          rep,
+          dial[rep] ?? (rep === 'vert'
+            ? t('Critère validé.', 'Criterion validated.')
+            : t('Critère à retravailler.', 'Criterion needs more work.'))
+        );
+        let announced = false;
+        cml.snapshot().forEach((niv) => {
+          if (niv.valide && !deja.has(niv.level)) {
+            astra?.say(`cml_niveau${niv.level}_valide`);
+            announced = true;
+            onNiveauValide?.(niv.level);
+          }
         });
+        if (!announced) astra?.sayCustom(texte, rep === 'vert' ? 'succes' : 'alerte');
 
         // Refermer le dialogue après un court délai
         setTimeout(() => {

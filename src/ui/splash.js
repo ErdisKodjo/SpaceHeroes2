@@ -8,34 +8,16 @@
 //   splash.dismiss()                   ← forcer la disparition
 //   await splash.ready                 ← Promise résolue quand le splash est retiré
 
-const STEPS = [
-  'Chargement de la surface terrestre…',
-  'Chargement des lumières nocturnes…',
-  'Chargement du relief océanique…',
-  'Chargement de la couverture nuageuse…'
-];
+import { t } from '../i18n.js';
 
-const LOGO_SVG = `
-<svg class="sh-splash-logo-svg" viewBox="0 0 120 48" fill="none"
-  xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-  <!-- Orbite elliptique -->
-  <ellipse cx="60" cy="24" rx="52" ry="18"
-    stroke="rgba(124,240,255,0.35)" stroke-width="1" fill="none"
-    stroke-dasharray="4 3"/>
-  <!-- Globe terrestre stylisé -->
-  <circle cx="60" cy="24" r="11" stroke="#7cf0ff" stroke-width="1.5" fill="none"/>
-  <path d="M49 24a26 11 0 0 0 22 0" stroke="#7cf0ff" stroke-width="1" fill="none" opacity="0.5"/>
-  <path d="M49 24a26 11 0 0 1 22 0" stroke="#7cf0ff" stroke-width="1" fill="none" opacity="0.5"/>
-  <line x1="60" y1="13" x2="60" y2="35" stroke="#7cf0ff" stroke-width="1" opacity="0.5"/>
-  <!-- CubeSat qui orbite -->
-  <rect class="sh-splash-cubesat" x="106" y="20" width="6" height="6"
-    rx="1" stroke="#7cf0ff" stroke-width="1.5" fill="rgba(124,240,255,0.15)"/>
-  <!-- Lignes solaires du CubeSat -->
-  <line class="sh-splash-cubesat" x1="103" y1="23" x2="106" y2="23"
-    stroke="#7cf0ff" stroke-width="1"/>
-  <line class="sh-splash-cubesat" x1="112" y1="23" x2="115" y2="23"
-    stroke="#7cf0ff" stroke-width="1"/>
-</svg>`;
+function steps() {
+  return [
+    t('Chargement de la surface terrestre…', 'Loading the Earth surface…'),
+    t('Chargement des lumières nocturnes…', 'Loading the night lights…'),
+    t('Chargement du relief océanique…', 'Loading the ocean relief…'),
+    t('Chargement de la couverture nuageuse…', 'Loading the cloud cover…')
+  ];
+}
 
 export function createSplash() {
   let resolveReady;
@@ -51,7 +33,7 @@ export function createSplash() {
   root.id = 'sh-splash';
   root.setAttribute('role', 'status');
   root.setAttribute('aria-live', 'polite');
-  root.setAttribute('aria-label', 'Chargement de Space Heroes');
+  root.setAttribute('aria-label', t('Chargement de Space Heroes', 'Loading Space Heroes'));
 
   root.innerHTML = `
     <div class="sh-splash-bg"></div>
@@ -65,13 +47,12 @@ export function createSplash() {
       }).join('')}
     </div>
     <div class="sh-splash-content">
-      <div class="sh-splash-logo" aria-hidden="true">
-        ${LOGO_SVG}
+      <div class="sh-splash-logo">
+        <img src="/logo.png" alt="Space Heroes" width="819" height="819">
       </div>
       <div class="sh-splash-brand">
         <span class="sh-splash-kicker">NASA SPACE APPS CHALLENGE</span>
-        <h1 class="sh-splash-title">SPACE HEROES</h1>
-        <span class="sh-splash-sub">Conception de mission spatiale</span>
+        <span class="sh-splash-sub">${t('Conception de mission spatiale', 'Spacecraft mission design')}</span>
       </div>
       <div class="sh-splash-loader">
         <div class="sh-splash-bar-track" role="progressbar"
@@ -79,7 +60,7 @@ export function createSplash() {
           <div class="sh-splash-bar-fill" id="sh-splash-bar"></div>
           <div class="sh-splash-bar-glow" id="sh-splash-glow"></div>
         </div>
-        <p class="sh-splash-step" id="sh-splash-step">Initialisation…</p>
+        <p class="sh-splash-step" id="sh-splash-step">${t('Initialisation…', 'Starting…')}</p>
         <p class="sh-splash-pct" id="sh-splash-pct">0 %</p>
       </div>
     </div>
@@ -101,7 +82,7 @@ export function createSplash() {
 
     if (bar)   bar.style.width   = `${pct}%`;
     if (glow)  glow.style.left   = `${pct}%`;
-    if (step)  step.textContent  = STEPS[Math.min(loaded, STEPS.length - 1)];
+    if (step)  step.textContent  = steps()[Math.min(loaded, steps().length - 1)];
     if (pctEl) pctEl.textContent = `${pct} %`;
     if (role)  role.setAttribute('aria-valuenow', String(loaded));
 

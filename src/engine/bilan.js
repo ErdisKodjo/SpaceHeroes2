@@ -6,6 +6,10 @@ import { computeScore, medaille, genererRapport } from './score.js';
 import { RESOURCE_KEYS } from './resources.js';
 import { chapitreSuivant } from '../data/catalogue.js';
 import missionsReelles from '../data/missions_reelles.json';
+import { t } from '../i18n.js';
+import {
+  altThen, badgeCopy, chapterText, compDesc, compName, decisionCopy, eventText
+} from '../i18n/content.js';
 
 import moteursData from '../data/ateliers/moteurs.json';
 import structureData from '../data/ateliers/structure.json';
@@ -93,6 +97,36 @@ const LIBELLES_RESSOURCES = {
   duree: 'Durée'
 };
 
+const RES_EN = {
+  budget: 'Budget',
+  masse: 'Mass',
+  puissance: 'Power',
+  donnees: 'Data',
+  communications: 'Links',
+  duree: 'Duration'
+};
+
+const FAM_EN = {
+  instrument: 'Instrument',
+  energie: 'Power',
+  communications: 'Communications',
+  structure: 'Structure',
+  moteurs: 'Propulsion'
+};
+
+function resourceLabel(key) {
+  return t(LIBELLES_RESSOURCES[key] || key, RES_EN[key] || key);
+}
+
+function familleLabel(key) {
+  return t(LIBELLES_FAMILLES[key] || key, FAM_EN[key] || key);
+}
+
+function compDescLocalized(comp) {
+  const fr = comp.description || 'Ce choix fixe une partie des marges de la mission.';
+  return compDesc(comp.id, fr);
+}
+
 const DECISIONS_CHAPITRE = {
   chapitre_01: {
     titre: 'Orbite imposée',
@@ -140,17 +174,17 @@ function trouverComposant(id) {
 }
 
 function nomComposant(comp) {
-  if (!comp) return 'Aucun choix';
-  return NOMS_COURTS[comp.id] || comp.nom;
+  if (!comp) return t('Aucun choix', 'No choice');
+  return compName(comp.id, NOMS_COURTS[comp.id] || comp.nom);
 }
 
 function ligneGmat(chapter) {
   const table = GMAT[chapter.gmat];
   if (!table) return null;
   const r = table.resultats || {};
-  if (r.periodeMinutes) return `Période ${r.periodeMinutes} min`;
-  if (r.dureeTransfertJours) return `Transfert ${r.dureeTransfertJours} jours`;
-  if (r.periodeHaloJours) return `Halo ${r.periodeHaloJours} jours`;
+  if (r.periodeMinutes) return t(`Période ${r.periodeMinutes} min`, `Period ${r.periodeMinutes} min`);
+  if (r.dureeTransfertJours) return t(`Transfert ${r.dureeTransfertJours} jours`, `Transfer ${r.dureeTransfertJours} days`);
+  if (r.periodeHaloJours) return t(`Halo ${r.periodeHaloJours} jours`, `Halo ${r.periodeHaloJours} days`);
   return null;
 }
 
@@ -189,11 +223,11 @@ function decisionsDepuis(selections) {
     const alt = CONTREFACTURES[comp.id];
     const autre = alt ? trouverComposant(alt.autreId) : null;
     lignes.push({
-      titre: LIBELLES_FAMILLES[famille] || famille,
+      titre: familleLabel(famille),
       choix: nomComposant(comp),
-      consequence: comp.description || 'Ce choix fixe une partie des marges de la mission.',
+      consequence: compDescLocalized(comp),
       siTuAvaisChoisi: autre ? nomComposant(autre) : null,
-      alors: alt?.texte || null
+      alors: alt ? altThen(comp.id, alt.texte) : null
     });
   }
   return lignes;
@@ -204,20 +238,26 @@ function completerDecisions(lignes, chapter) {
   const out = [...lignes];
   if (secours && out.length < 3) {
     out.push({
-      titre: secours.titre,
-      choix: secours.choix,
-      consequence: secours.consequence,
+      titre: decisionCopy(chapter.id, 'titre', secours.titre),
+      choix: decisionCopy(chapter.id, 'choix', secours.choix),
+      consequence: decisionCopy(chapter.id, 'consequence', secours.consequence),
       siTuAvaisChoisi: null,
       alors: chapter.evenementAleatoire
-        ? `L'imprévu du chapitre (« ${chapter.evenementAleatoire.texte} ») aurait pesé de la même façon, quelle que soit la pièce choisie à l'atelier.`
+        ? t(
+          `L'imprévu du chapitre (« ${eventText(chapter)} ») aurait pesé de la même façon, quelle que soit la pièce choisie à l'atelier.`,
+          `The chapter surprise (“${eventText(chapter)}”) would have weighed the same way, whichever part was chosen in the workshop.`
+        )
         : null
     });
   }
   while (out.length < 3) {
     out.push({
-      titre: 'Marge',
-      choix: 'Poursuite avec les marges restantes',
-      consequence: 'Sans choix d\'atelier enregistré, le bilan s\'appuie sur les ressources et les opérations.',
+      titre: t('Marge', 'Margin'),
+      choix: t('Poursuite avec les marges restantes', 'Continue with the remaining margins'),
+      consequence: t(
+        'Sans choix d\'atelier enregistré, le bilan s\'appuie sur les ressources et les opérations.',
+        'With no workshop choice saved, the debrief rests on resources and operations.'
+      ),
       siTuAvaisChoisi: null,
       alors: null
     });
@@ -232,39 +272,39 @@ function badgesPour({ chapter, resources, cml, fiabilite, scoreOps }) {
   return [
     {
       id: 'econome',
-      nom: 'Économe spatial',
+      nom: badgeCopy('econome', 'nom', 'Économe spatial'),
       obtenu: masse > 0 && masse < 0.6,
-      texte: 'Masse utilisée sous 60 % de la limite.'
+      texte: badgeCopy('econome', 'texte', 'Masse utilisée sous 60 % de la limite.')
     },
     {
       id: 'scientifique',
-      nom: 'Scientifique rigoureux',
+      nom: badgeCopy('scientifique', 'nom', 'Scientifique rigoureux'),
       obtenu: Boolean(cml?.isLevelValidated(4)),
-      texte: 'Niveau CML 4 validé.'
+      texte: badgeCopy('scientifique', 'texte', 'Niveau CML 4 validé.')
     },
     {
       id: 'polaire',
-      nom: 'Maître de l\'orbite polaire',
+      nom: badgeCopy('polaire', 'nom', 'Maître de l\'orbite polaire'),
       obtenu: polaire && budget < 0.85 && budget >= 0,
-      texte: 'Orbite héliosynchrone, budget tenu.'
+      texte: badgeCopy('polaire', 'texte', 'Orbite héliosynchrone, budget tenu.')
     },
     {
       id: 'banc',
-      nom: 'Banc d\'essai',
+      nom: badgeCopy('banc', 'nom', 'Banc d\'essai'),
       obtenu: (fiabilite ?? 0) >= 80,
-      texte: 'Fiabilité des essais d\'au moins 80 %.'
+      texte: badgeCopy('banc', 'texte', 'Fiabilité des essais d\'au moins 80 %.')
     },
     {
       id: 'contact',
-      nom: 'Contact établi',
+      nom: badgeCopy('contact', 'nom', 'Contact établi'),
       obtenu: (scoreOps ?? 0) >= 75,
-      texte: 'Opérations menées avec un score d\'au moins 75.'
+      texte: badgeCopy('contact', 'texte', 'Opérations menées avec un score d\'au moins 75.')
     },
     {
       id: 'signal',
-      nom: 'Premier signal',
+      nom: badgeCopy('signal', 'nom', 'Premier signal'),
       obtenu: chapter.id === 'chapitre_01',
-      texte: 'Première mission menée jusqu\'au bilan.'
+      texte: badgeCopy('signal', 'texte', 'Première mission menée jusqu\'au bilan.')
     }
   ];
 }
@@ -293,18 +333,21 @@ function missionNasa(chapter, score) {
     proches,
     equivalence: score,
     phrase: reference
-      ? `Ton score équivaut à ${score} % de la mission ${reference.nom}.`
-      : 'Aucune mission de référence pour ce profil.'
+      ? t(
+        `Ton score équivaut à ${score} % de la mission ${reference.nom}.`,
+        `Your score matches ${score}% of the ${reference.nom} mission.`
+      )
+      : t('Aucune mission de référence pour ce profil.', 'No reference mission for this profile.')
   };
 }
 
 function partsAffichees(ratios, score) {
   const poids = [
-    ['Objectifs', 35],
-    ['Science', 20],
-    ['Ressources', 20],
-    ['Décisions', 15],
-    ['Délais', 10]
+    [t('Objectifs', 'Objectives'), 35],
+    [t('Science', 'Science'), 20],
+    [t('Ressources', 'Resources'), 20],
+    [t('Décisions', 'Decisions'), 15],
+    [t('Délais', 'Schedule'), 10]
   ];
   const pts = ratios.map((ratio, i) => Math.round(ratio * poids[i][1]));
   const drift = score - pts.reduce((a, b) => a + b, 0);
@@ -349,13 +392,13 @@ export function evaluerMission({
   return {
     ...rapport,
     medaille: medal,
-    titre: chapter.titre,
+    titre: chapterText(chapter, 'titre'),
     profil: chapter.profil,
     gmatLigne: ligneGmat(chapter),
     parts: partsAffichees(ratios, score),
     ressources: resources.snapshot().map((r) => ({
       ...r,
-      label: LIBELLES_RESSOURCES[r.key] || r.key
+      label: resourceLabel(r.key)
     })),
     decisions,
     nasa,

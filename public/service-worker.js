@@ -1,11 +1,15 @@
-const CACHE_NAME = 'space-heroes-v1';
+const CACHE_NAME = 'space-heroes-v2';
 
 self.addEventListener('install', (event) => {
   self.skipWaiting();
 });
 
 self.addEventListener('activate', (event) => {
-  event.waitUntil(self.clients.claim());
+  event.waitUntil(
+    caches.keys()
+      .then((keys) => Promise.all(keys.filter((key) => key !== CACHE_NAME).map((key) => caches.delete(key))))
+      .then(() => self.clients.claim())
+  );
 });
 
 // Stratégie minimale : réseau d'abord, repli sur le cache si hors-ligne.

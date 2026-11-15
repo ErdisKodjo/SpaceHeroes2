@@ -2,6 +2,8 @@
 
 import { playerStore } from '../engine/player.js';
 import { icon } from './icons.js';
+import { t } from '../i18n.js';
+import { roleText } from '../i18n/content.js';
 
 const ROLE_ICONS = {
   directeur:          'director',
@@ -17,7 +19,7 @@ export function createRoleSelect({ onConfirm } = {}) {
   overlay.id = 'sh-role-overlay';
   overlay.setAttribute('role', 'dialog');
   overlay.setAttribute('aria-modal', 'true');
-  overlay.setAttribute('aria-label', 'Sélection du rôle');
+  overlay.setAttribute('aria-label', t('Sélection du rôle', 'Role selection'));
   document.body.appendChild(overlay);
 
   let selectedId = playerStore.roleId;
@@ -27,14 +29,14 @@ export function createRoleSelect({ onConfirm } = {}) {
       <div class="sh-role-panel">
         <div class="sh-role-header">
           <div class="sh-role-kicker">NASA SPACE HEROES</div>
-          <h1 class="sh-role-title">Choisissez votre rôle</h1>
-          <p class="sh-role-sub">En solo, ASTRA assure les trois autres postes.</p>
+          <h1 class="sh-role-title">${t('Choisissez votre rôle', 'Choose your role')}</h1>
+          <p class="sh-role-sub">${t('En solo, ASTRA assure les trois autres postes.', 'Solo, ASTRA covers the other three seats.')}</p>
         </div>
 
         <div class="sh-role-name-row">
-          <label class="sh-role-name-label" for="sh-player-name">Nom du commandant</label>
+          <label class="sh-role-name-label" for="sh-player-name">${t('Nom du commandant', 'Commander name')}</label>
           <input id="sh-player-name" class="sh-role-name-input" type="text"
-            maxlength="24" placeholder="Commandant…"
+            maxlength="24" placeholder="${t('Commandant…', 'Commander…')}"
             value="${playerStore.nom}">
         </div>
 
@@ -49,10 +51,10 @@ export function createRoleSelect({ onConfirm } = {}) {
                 ${icon(ROLE_ICONS[r.id] ?? 'user', 32, { cls: 'sh-role-card-icon' })}
               </div>
               <div class="sh-role-card-sigle">${r.sigle}</div>
-              <div class="sh-role-card-nom">${r.nom}</div>
-              <div class="sh-role-card-desc">${r.description}</div>
+              <div class="sh-role-card-nom">${roleText(r, 'nom')}</div>
+              <div class="sh-role-card-desc">${roleText(r, 'description')}</div>
               <div class="sh-role-card-bonus">
-                <span class="sh-role-card-comp">${r.competence}</span>
+                <span class="sh-role-card-comp">${roleText(r, 'competence')}</span>
               </div>
             </button>
           `).join('')}
@@ -60,7 +62,7 @@ export function createRoleSelect({ onConfirm } = {}) {
 
         <div class="sh-role-footer">
           <button type="button" class="sh-role-confirm" id="sh-role-confirm">
-            CONFIRMER ET LANCER LA MISSION
+            ${t('CONFIRMER ET LANCER LA MISSION', 'CONFIRM AND START THE MISSION')}
             ${icon('arrowRight', 16)}
           </button>
         </div>

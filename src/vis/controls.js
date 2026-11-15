@@ -5,6 +5,7 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { icon } from '../ui/icons.js';
+import { t } from '../i18n.js';
 
 const KEY_LEFT  = new Set(['KeyA', 'ArrowLeft']);
 const KEY_RIGHT = new Set(['KeyD', 'ArrowRight']);
@@ -21,45 +22,48 @@ function showTelemetry(cubesatObject, orbitObj) {
   if (_telemetryPopup) { _telemetryPopup.remove(); _telemetryPopup = null; }
 
   const tel = orbitObj?.telemetry?.() ?? null;
-  const battery  = tel ? Math.max(0, Math.min(100, 60 + Math.sin(tel.theta ?? 0) * 25)) : 72;
-  const signal   = tel ? (-90 + (10 * Math.sin((tel.theta ?? 0) * 1.3))).toFixed(1) : '-88.4';
-  const tempC    = tel ? (Math.round(-20 + Math.sin((tel.theta ?? 0) * 0.7) * 60)) : 18;
-  const nextMin  = tel ? Math.max(0, Math.round(tel.periodMin - (tel.theta / (2 * Math.PI)) * tel.periodMin)) : 42;
+  const phase = tel?.phase ?? 0;
+  const battery  = tel ? Math.max(5, Math.min(100, 78 + Math.sin(phase) * 18)) : 72;
+  const signal   = tel ? (-92 + 14 * Math.sin(phase * 1.3)).toFixed(1) : '-88.4';
+  const tempC    = tel ? Math.round(8 + Math.sin(phase * 0.7) * 42) : 18;
+  const nextMin  = tel
+    ? Math.max(1, Math.round((1 - (phase / (Math.PI * 2)) % 1) * tel.periodMin * 0.15))
+    : 12;
 
   const pop = document.createElement('div');
   pop.className = 'sh-cubesat-popup';
   pop.innerHTML = `
     <div class="sh-cubesat-popup-header">
       ${icon('satellite', 15)}
-      <span>CubeSat 1U — Télémétrie</span>
-      <button type="button" class="sh-cubesat-popup-close" aria-label="Fermer">
+      <span>${t('CubeSat 1U — Télémétrie', '1U CubeSat — Telemetry')}</span>
+      <button type="button" class="sh-cubesat-popup-close" aria-label="${t('Fermer', 'Close')}">
         ${icon('close', 13)}
       </button>
     </div>
     <ul class="sh-cubesat-popup-rows">
       <li>
         ${icon('battery', 14)}
-        <span>Batterie</span>
+        <span>${t('Batterie', 'Battery')}</span>
         <strong class="${battery < 20 ? 'is-crit' : battery < 50 ? 'is-warn' : ''}">${Math.round(battery)} %</strong>
       </li>
       <li>
         ${icon('signal', 14)}
-        <span>Signal</span>
+        <span>${t('Signal', 'Signal')}</span>
         <strong>${signal} dBm</strong>
       </li>
       <li>
         ${icon('thermometer', 14)}
-        <span>Température</span>
+        <span>${t('Température', 'Temperature')}</span>
         <strong class="${Math.abs(tempC) > 70 ? 'is-warn' : ''}">${tempC > 0 ? '+' : ''}${tempC} °C</strong>
       </li>
       <li>
         ${icon('signal', 14)}
-        <span>Prochain contact</span>
-        <strong>T-${nextMin} min</strong>
+        <span>${t('Prochain contact', 'Next contact')}</span>
+        <strong>${t('dans', 'in')} ${nextMin} min</strong>
       </li>
       ${tel ? `<li>
         ${icon('orbit', 14)}
-        <span>Altitude</span>
+        <span>${t('Altitude', 'Altitude')}</span>
         <strong>${Math.round(tel.altitudeKm ?? 550)} km</strong>
       </li>` : ''}
     </ul>
@@ -102,8 +106,6 @@ export function createPlayerControls({ camera, domElement, isBlocked }) {
   const held        = new Set();
   const offset      = new THREE.Vector3();
   const spherical   = new THREE.Spherical();
-  const raycaster   = new THREE.Raycaster();
-  const pointer     = new THREE.Vector2();
 
   let onFirstInput  = null;
   let cubesatRef    = null;   // THREE.Object3D du CubeSat (injecté depuis scene.js)
@@ -134,23 +136,25 @@ export function createPlayerControls({ camera, domElement, isBlocked }) {
 
   function onPointerUp(e) {
     domElement.style.cursor = 'grab';
-
-    // Raycasting seulement si c'était un vrai clic (pas un drag)
-    if (!pointerMoved && !isBlocked() && cubesatRef) {
-      const rect = domElement.getBoundingClientRect();
-      pointer.x  = ((e.clientX - rect.left) / rect.width)  * 2 - 1;
-      pointer.y  = -((e.clientY - rect.top)  / rect.height) * 2 + 1;
-      raycaster.setFromCamera(pointer, camera);
-
-      // On teste le groupe CubeSat et tous ses enfants
-      const hits = raycaster.intersectObject(cubesatRef, true);
-      if (hits.length > 0) {
-        showTelemetry(cubesatRef, orbitRef);
-      }
-    }
-
+    const down = pointerDownAt;
+    const moved = pointerMoved;
     pointerDownAt = null;
-    pointerMoved  = false;
+    pointerMoved = false;
+
+    // Le CubeSat fait quelques pixels à l'écran : on le vise en pixels,
+    // pas sur sa géométrie (quelques millièmes d'unité monde).
+    if (!down || moved || isBlocked() || !cubesatRef) return;
+    const rect = domElement.getBoundingClientRect();
+    const world = new THREE.Vector3();
+    cubesatRef.getWorldPosition(world);
+    world.project(camera);
+    if (world.z > 1) return;
+    const sx = (world.x * 0.5 + 0.5) * rect.width;
+    const sy = (-world.y * 0.5 + 0.5) * rect.height;
+    const px = e.clientX - rect.left;
+    const py = e.clientY - rect.top;
+    const dist = Math.hypot(px - sx, py - sy);
+    if (dist <= 36) showTelemetry(cubesatRef, orbitRef);
   }
 
   function onKeyDown(event) {

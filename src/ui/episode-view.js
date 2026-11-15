@@ -7,6 +7,22 @@ import { createCmlView }         from './cml-view.js';
 import { createEssaisView }      from './essais-view.js';
 import { createOperationsView }  from './operations-view.js';
 import { createBilanView }       from './bilan-view.js';
+import { t } from '../i18n.js';
+import { episodeText } from '../i18n/content.js';
+
+const TYPE_LABEL = {
+  briefing: ['Briefing', 'Briefing'],
+  atelier: ['Atelier', 'Workshop'],
+  essais: ['Essais', 'Tests'],
+  lancement: ['Lancement', 'Launch'],
+  operations: ['Opérations', 'Operations'],
+  bilan: ['Bilan', 'Debrief']
+};
+
+function typeLabel(type) {
+  const pair = TYPE_LABEL[type];
+  return pair ? t(pair[0], pair[1]) : type;
+}
 
 // Vue active montée (atelier, essais, bilan) — on la détruit quand l'épisode change.
 let _activeView = null;
@@ -25,14 +41,19 @@ export function renderEpisode(container, episodeRunner, {
     clearActiveView();
     _lastEpisodeId = null;
     container.innerHTML = `
-      <div class="plaque-kicker">Mission close</div>
-      <h2>Chapitre terminé</h2>
-      <p>Le rapport post-mission a été généré.</p>
+      <div class="plaque-kicker">${t('Mission close', 'Mission closed')}</div>
+      <h2>${t('Chapitre terminé', 'Chapter complete')}</h2>
+      <p>${t('Le rapport post-mission a été généré.', 'The post-mission report has been generated.')}</p>
     `;
     return;
   }
 
   const episode = episodeRunner.currentEpisode;
+  const shown = {
+    titre: episodeText(episodeRunner.chapter.id, episode, 'titre'),
+    texte: episodeText(episodeRunner.chapter.id, episode, 'texte'),
+    bouton: episode.bouton ? episodeText(episodeRunner.chapter.id, episode, 'bouton') : ''
+  };
   const n       = String(episodeRunner.index + 1).padStart(2, '0');
   const total   = String(episodeRunner.chapter.episodes.length).padStart(2, '0');
 
@@ -45,7 +66,7 @@ export function renderEpisode(container, episodeRunner, {
   // ── Atelier ──────────────────────────────────────────────────────────────
   if (episode.type === 'atelier') {
     container.innerHTML = `
-      <div class="plaque-kicker">Épisode ${n} / ${total} · Atelier</div>
+      <div class="plaque-kicker">${t('Épisode', 'Episode')} ${n} / ${total} · ${typeLabel('atelier')}</div>
       <div id="sh-episode-body"></div>
     `;
     if (!_activeView) {
@@ -69,12 +90,12 @@ export function renderEpisode(container, episodeRunner, {
   if (episode.type === 'briefing') {
     const niv1 = cml?.snapshot()?.[0];
     const pct  = niv1 ? Math.round(niv1.ratioVert * 100) : 0;
-    const label = busy ? 'Séquence en cours…' : (episode.bouton || 'Continuer →');
+    const label = busy ? t('Séquence en cours…', 'Sequence in progress…') : (shown.bouton || t('Continuer →', 'Continue →'));
 
     container.innerHTML = `
-      <div class="plaque-kicker">Épisode ${n} / ${total} · Briefing</div>
-      <h2>${episode.titre}</h2>
-      <p>${episode.texte}</p>
+      <div class="plaque-kicker">${t('Épisode', 'Episode')} ${n} / ${total} · ${typeLabel('briefing')}</div>
+      <h2>${shown.titre}</h2>
+      <p>${shown.texte}</p>
       <div id="sh-episode-body"></div>
       <button id="btn-continuer" class="cta" ${busy ? 'disabled' : ''}>${label}</button>
     `;
@@ -95,7 +116,7 @@ export function renderEpisode(container, episodeRunner, {
   // ── Essais ───────────────────────────────────────────────────────────────
   if (episode.type === 'essais') {
     container.innerHTML = `
-      <div class="plaque-kicker">Épisode ${n} / ${total} · Essais</div>
+      <div class="plaque-kicker">${t('Épisode', 'Episode')} ${n} / ${total} · ${typeLabel('essais')}</div>
       <div id="sh-episode-body"></div>
     `;
     if (!_activeView) {
@@ -116,7 +137,7 @@ export function renderEpisode(container, episodeRunner, {
   // ── Opérations ───────────────────────────────────────────────────────────
   if (episode.type === 'operations') {
     container.innerHTML = `
-      <div class="plaque-kicker">Épisode ${n} / ${total} · Opérations</div>
+      <div class="plaque-kicker">${t('Épisode', 'Episode')} ${n} / ${total} · ${typeLabel('operations')}</div>
       <div id="sh-episode-body"></div>
     `;
     if (!_activeView) {
@@ -138,9 +159,9 @@ export function renderEpisode(container, episodeRunner, {
   // ── Bilan ────────────────────────────────────────────────────────────
   if (episode.type === 'bilan' && bilan) {
     container.innerHTML = `
-      <div class="plaque-kicker">Épisode ${n} / ${total} · Bilan</div>
-      <h2>${episode.titre}</h2>
-      <p>Le rapport de mission est affiché.</p>
+      <div class="plaque-kicker">${t('Épisode', 'Episode')} ${n} / ${total} · ${typeLabel('bilan')}</div>
+      <h2>${shown.titre}</h2>
+      <p>${t('Le rapport de mission est affiché.', 'The mission report is on screen.')}</p>
     `;
     if (!_activeView) {
       const ligne = bilan.astraKey ? astra?.say(bilan.astraKey) : null;
@@ -157,12 +178,12 @@ export function renderEpisode(container, episodeRunner, {
 
   // ── Tous les autres épisodes (lancement…) ─────────────
   clearActiveView();
-  const label = busy ? 'Séquence en cours…' : (episode.bouton || 'Continuer →');
+  const label = busy ? t('Séquence en cours…', 'Sequence in progress…') : (shown.bouton || t('Continuer →', 'Continue →'));
 
   container.innerHTML = `
-    <div class="plaque-kicker">Épisode ${n} / ${total} · ${episode.type}</div>
-    <h2>${episode.titre}</h2>
-    <p>${episode.texte}</p>
+    <div class="plaque-kicker">${t('Épisode', 'Episode')} ${n} / ${total} · ${typeLabel(episode.type)}</div>
+    <h2>${shown.titre}</h2>
+    <p>${shown.texte}</p>
     <button id="btn-continuer" class="cta" ${busy ? 'disabled' : ''}>${label}</button>
   `;
 

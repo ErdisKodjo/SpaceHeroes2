@@ -1,194 +1,257 @@
 {
   "accueil": {
     "categorie": "accueil",
-    "texte": "Bienvenue, passionnes de sciences et de conquete spatiale ! Vous etes sur le point de vivre une aventure reservee, jusqu'ici, a une poignee d'etres humains. Moi, c'est ASTRA, et je serai votre guide, de la premiere ligne du plan de mission jusqu'a la derniere transmission de votre vaisseau."
+    "texte": "Bienvenue au QG. Ici ASTRA. Une mission suit toujours le même fil : briefing et checklist CML, atelier des cinq familles, trois essais, lancement, opérations, puis le bilan. Je reste en ligne à chaque étape.",
+    "texteEn": "Welcome to mission control. This is ASTRA. A mission always follows the same thread: briefing and CML checklist, the five-family workshop, three tests, launch, operations, then the debrief. I stay on the line at every step."
   },
   "briefing_ch1_intro": {
     "categorie": "narration",
-    "texte": "Votre equipe universitaire s'apprete a lancer son tout premier satellite. Pas de panique : on va y aller etape par etape."
+    "texte": "Premier satellite, orbite basse, masse plafonnée à 4 kg. Au briefing, on pose l'objectif, ce qui rend la mission unique, la fenêtre, la classe de budget et un croquis. Quatre critères verts sur cinq valident le CML 1.",
+    "texteEn": "First satellite, low Earth orbit, mass capped at 4 kg. In the briefing we set the objective, what makes the mission unique, the window, the budget class and a sketch. Four green criteria out of five validate CML 1."
   },
   "atelier_ch1_intro": {
     "categorie": "narration",
-    "texte": "Voici l'Atelier : choisis tes composants dans chaque famille. Attention, ton CubeSat ne peut pas depasser 4 kg."
+    "texte": "Atelier : un composant par famille — moteur, structure, énergie, communications, instrument. La masse totale ne doit pas dépasser 4 kg. Ensuite seulement, les essais.",
+    "texteEn": "Workshop: one component per family — propulsion, structure, power, communications, instrument. Total mass must stay within 4 kg. Only then come the tests."
   },
   "essais_ch1_intro": {
     "categorie": "narration",
-    "texte": "Avant de lancer quoi que ce soit, on teste. Un defaut trouve ici coute bien moins cher qu'un defaut trouve en orbite."
+    "texte": "Trois épreuves avant le compte à rebours : vibrations, isolation thermique, compatibilité électrique. Pas de test vide séparé, et rien ne se fabrique ici.",
+    "texteEn": "Three trials before the countdown: vibration, thermal insulation, electrical compatibility. There is no separate vacuum test, and nothing is manufactured on this screen."
   },
   "lancement_ch1_intro": {
     "categorie": "narration",
-    "texte": "Ton CubeSat embarque en covoiturage avec d'autres satellites. Verifions que tout est compatible avant le compte a rebours."
+    "texte": "Le CubeSat part en covoiturage vers l'orbite basse. Le CML 2 est signalé s'il n'est pas au vert, mais le compte à rebours n'est pas verrouillé.",
+    "texteEn": "The CubeSat rideshares to low Earth orbit. CML 2 is flagged if it is not green, but the countdown is not locked."
   },
   "operations_ch1_intro": {
     "categorie": "narration",
-    "texte": "Ton satellite est en orbite. Reste a etablir le premier contact radio."
+    "texte": "En orbite : contact radio, puis déploiement dans l'ordre communications, énergie, instrument, transmission des données, et parfois une anomalie.",
+    "texteEn": "On orbit: radio contact, then deployment in order — communications, power, instrument — data downlink, and sometimes an anomaly."
+  },
+  "operations_contact": {
+    "categorie": "narration",
+    "texte": "Station verrouillée. Ordre de déploiement : communications, puis énergie, puis l'instrument scientifique. Transmets pendant la fenêtre de contact.",
+    "texteEn": "Station locked. Deployment order: communications, then power, then the science instrument. Downlink during the contact window."
   },
   "succes_1": {
     "categorie": "succes",
-    "texte": "Orbite atteinte ! Et avec de la marge sur le carburant, vos equipes au sol peuvent respirer."
+    "texte": "Étape validée. Cette configuration tient dans les marges affichées.",
+    "texteEn": "Step validated. This setup fits the margins on the gauges."
   },
   "succes_2": {
     "categorie": "succes",
-    "texte": "Excellent choix. Cette configuration optimise bien le compromis masse-performance."
+    "texte": "Bon compromis masse, puissance et budget. C'est exactement le choix que l'atelier demande.",
+    "texteEn": "A sound trade between mass, power and budget. That is the choice the workshop is asking for."
   },
   "succes_3": {
     "categorie": "succes",
-    "texte": "Critere valide. Continue sur cette lancee, tu construis une mission solide."
+    "texte": "Critère au vert. Un niveau CML passe quand au moins 80 % de ses cinq critères sont verts.",
+    "texteEn": "Criterion is green. A CML level passes when at least 80% of its five criteria are green."
   },
   "alerte_1": {
     "categorie": "alerte",
-    "texte": "Attention, une de tes marges est proche d'etre depassee."
+    "texte": "Une jauge du bandeau approche de sa limite. Budget, masse, puissance, données, liaisons ou durée.",
+    "texteEn": "A gauge in the bar is nearing its limit. Budget, mass, power, data, links or duration."
   },
   "alerte_2": {
     "categorie": "alerte",
-    "texte": "Cette combinaison de composants cree un conflit de ressources. Verifie la masse totale."
+    "texte": "La sélection ne passe pas : masse au-dessus du plafond ou famille encore vide. Ajuste avant de valider l'atelier.",
+    "texteEn": "The selection does not pass: mass over the cap, or a family still empty. Adjust before validating the workshop."
   },
   "alerte_3": {
     "categorie": "alerte",
-    "texte": "Le niveau CML requis n'est pas encore atteint. Continue l'evaluation avant de passer a la suite."
+    "texte": "Le niveau CML visé n'est pas encore validé. Tu peux continuer. Le bilan comptera les critères restés rouges ou jaunes.",
+    "texteEn": "The target CML level is not validated yet. You may continue. The debrief will count criteria left red or amber."
   },
   "echec_1": {
     "categorie": "echec",
-    "texte": "La mission est perdue, mais regardons ensemble ce qui s'est passe : ce n'est pas une punition, c'est une lecon."
+    "texte": "La mission est rentrée courte. Le bilan détaille le score, les six ressources et trois décisions. On rejoue à partir de là.",
+    "texteEn": "The mission came up short. The debrief details the score, the six resources and three decisions. We replay from there."
   },
   "atelier_test": {
     "categorie": "atelier",
-    "texte": "Avec ce niveau de fiabilite, cette piece risque de lacher en vol. Tu veux la tester avant de la fabriquer ?"
+    "texte": "Regarde la masse, le coût et, selon la famille, la puissance ou le débit. Un seul composant par famille, puis on valide.",
+    "texteEn": "Check mass, cost and, depending on the family, power or data rate. One component per family, then validate."
   },
   "atelier_masse": {
     "categorie": "atelier",
-    "texte": "Attention : la masse totale depasse la limite. Choisir un composant plus leger ou retirer une piece."
+    "texte": "La masse totale dépasse la limite du chapitre. Prends un composant plus léger ou retire une sélection.",
+    "texteEn": "Total mass is over this chapter's limit. Pick a lighter component or clear a selection."
   },
   "atelier_budget": {
     "categorie": "atelier",
-    "texte": "Le budget est serre. Peux-tu obtenir le meme resultat avec un composant moins couteux ?"
+    "texte": "Le budget de l'atelier est tendu. Le même rôle peut souvent être tenu par un composant moins cher.",
+    "texteEn": "The workshop budget is tight. The same role can often be filled by a cheaper component."
   },
   "atelier_complet": {
     "categorie": "atelier",
-    "texte": "Toutes les familles sont configurees. La conception est prete pour les essais."
+    "texte": "Les cinq familles sont choisies et la masse tient. L'atelier peut être validé : l'épisode suivant, ce sont les trois essais.",
+    "texteEn": "All five families are chosen and the mass holds. The workshop can be validated: the next episode is the three tests."
   },
   "essais_vibrations_ok": {
     "categorie": "succes",
-    "texte": "Test vibrations reussi. La structure tient bien face aux charges du lancement."
+    "texte": "Vibrations tenues. La jauge est restée assez longtemps dans la zone verte.",
+    "texteEn": "Vibration held. The gauge stayed in the green band long enough."
   },
   "essais_vibrations_ko": {
     "categorie": "alerte",
-    "texte": "Instabilite detectee en vibrations. Un renfort structural serait prudent."
+    "texte": "La jauge est sortie de la zone verte. La structure encaisse mal les charges du décollage.",
+    "texteEn": "The gauge left the green band. The structure takes the liftoff loads poorly."
   },
   "essais_thermique_ok": {
     "categorie": "succes",
-    "texte": "Isolation thermique validee. Le satellite survivra aux cycles de temperature en orbite."
+    "texte": "Isolation validée. La couverture MLI est le bon choix pour les cycles de −120 °C à +120 °C.",
+    "texteEn": "Insulation validated. MLI blanket is the right choice for cycles from −120 °C to +120 °C."
   },
   "essais_electrique_ok": {
     "categorie": "succes",
-    "texte": "Compatibilite electrique confirmee. Pas de conflit de tension detecte."
+    "texte": "Chaîne électrique compatible. Le régulateur protège la batterie Li-ion et tient les 5 V de l'instrument.",
+    "texteEn": "Electrical chain is compatible. The regulator protects the Li-ion battery and holds the instrument's 5 V."
   },
   "cml_niveau1_valide": {
     "categorie": "succes",
-    "texte": "Niveau CML 1 valide. L'idee de mission est solide. On peut passer a la faisabilite."
+    "texte": "CML 1 validé, niveau Idée. Objectif, unicité, fenêtre, classe de budget et croquis sont assez verts.",
+    "texteEn": "CML 1 validated, Idea level. Objective, uniqueness, window, budget class and sketch are green enough."
   },
   "cml_niveau2_valide": {
     "categorie": "succes",
-    "texte": "Niveau CML 2 valide. La faisabilite est etablie. L'Atelier peut maintenant etre finalise."
+    "texte": "CML 2 validé, niveau Faisabilité. Exigences, ordres de grandeur, risques, lanceur candidat et technologies sont posés.",
+    "texteEn": "CML 2 validated, Feasibility level. Requirements, orders of magnitude, risks, a candidate launcher and the technologies are in place."
   },
-  "cml_lancement_bloque": {
+  "cml_niveau3_valide": {
+    "categorie": "succes",
+    "texte": "CML 3 validé, études de compromis. Deux architectures comparées, marges estimées, option retenue justifiée.",
+    "texteEn": "CML 3 validated, trade studies. Two architectures compared, margins estimated, the chosen option justified."
+  },
+  "cml_niveau4_valide": {
+    "categorie": "succes",
+    "texte": "CML 4 validé, conception précise. Équipements, coût avec réserve, marges, plan d'essais et risques classés sont au vert.",
+    "texteEn": "CML 4 validated, detailed design. Equipment, cost with reserve, margins, the test plan and ranked risks are green."
+  },
+  "cml_niveau_manquant": {
     "categorie": "alerte",
-    "texte": "Le lancement est bloque. Les criteres CML requis ne sont pas encore valides. Retourne a la checklist."
+    "texte": "Le CML {niveau} n'est pas validé : il faut 80 % de critères verts. Rien ne bloque l'épisode. Le bilan s'en souviendra.",
+    "texteEn": "CML {niveau} is not validated: it needs 80% green criteria. The episode is not blocked. The debrief will remember."
   },
   "briefing_ch2_intro": {
     "categorie": "narration",
-    "texte": "Cette fois, le satellite doit revoir le meme endroit de la Terre a la meme heure. C'est le principe de l'orbite heliosynchrone : la lumiere du Soleil reste comparable d'un passage a l'autre."
+    "texte": "Cette mission revoit le même lieu à la même heure solaire. C'est l'orbite héliosynchrone : la lumière reste comparable d'un passage à l'autre.",
+    "texteEn": "This mission revisits the same place at the same local solar time. That is a Sun-synchronous orbit: the light stays comparable from one pass to the next."
   },
   "atelier_ch2_intro": {
     "categorie": "narration",
-    "texte": "Un imageur meteorologique a besoin d'une vue degagee et d'assez de debit pour renvoyer les images avant le passage suivant."
+    "texte": "L'imageur a besoin d'une structure stable, de puissance, et d'un débit qui vide la mémoire avant le passage suivant. Même atelier : cinq familles, une pièce chacune.",
+    "texteEn": "The imager needs a stable structure, power, and a data rate that empties memory before the next pass. Same workshop: five families, one part each."
   },
   "essais_ch2_intro": {
     "categorie": "narration",
-    "texte": "En orbite polaire, le satellite enchaine les eclipses. Verifie le thermique et l'alimentation avant le lancement."
+    "texte": "Orbite polaire, éclipses rapprochées. On rejoue les trois épreuves : vibrations, thermique, électrique.",
+    "texteEn": "Polar orbit, frequent eclipses. We run the same three trials: vibration, thermal, electrical."
   },
   "lancement_ch2_intro": {
     "categorie": "narration",
-    "texte": "L'inclinaison visee est proche de 98 degres. Une erreur ici, et les passages ne tombent plus a heure fixe."
+    "texte": "Injection vers 700 km, inclinaison proche de 98 degrés. Une erreur d'inclinaison et l'heure solaire des passages dérive.",
+    "texteEn": "Injection near 700 km, inclination close to 98 degrees. Miss the inclination and the solar time of the passes drifts."
   },
   "operations_ch2_intro": {
     "categorie": "narration",
-    "texte": "Premier passage au-dessus de l'ocean. Etablis le contact, puis ouvre l'instrument pendant que la scene est encore eclairee."
+    "texte": "Même séquence d'opérations : contact, déploiement, transmission. Ouvre l'instrument pendant que la scène est encore éclairée.",
+    "texteEn": "Same operations sequence: contact, deployment, downlink. Open the instrument while the scene is still lit."
   },
   "briefing_ch3_intro": {
     "categorie": "narration",
-    "texte": "Direction la Lune. Le transfert demande un coup de moteur precis, puis trois jours de silence relatif : le signal met deja quelques secondes a revenir."
+    "texte": "Direction la Lune. Le transfert demande un allumage précis, puis un délai radio d'environ trois secondes aller-retour.",
+    "texteEn": "Bound for the Moon. The transfer needs a precise burn, then a radio delay of about three seconds round trip."
   },
   "atelier_ch3_intro": {
     "categorie": "narration",
-    "texte": "Loin de la Terre, la masse d'ergols et le debit radio comptent autant que l'instrument. Chaque kilogramme se paie en delta-v."
+    "texte": "Loin de la Terre, les ergols du transfert et le débit radio comptent autant que l'instrument. Chaque kilogramme se paie en delta-v.",
+    "texteEn": "Far from Earth, transfer propellant and radio rate matter as much as the instrument. Every kilogram is paid in delta-v."
   },
   "essais_ch3_intro": {
     "categorie": "narration",
-    "texte": "Le vide lunaire est sans appel. Un defaut thermique ou electrique ne se corrige pas une fois en route."
+    "texte": "Le vide lunaire ne se corrige pas en route. Thermique et électrique doivent être bons avant l'injection.",
+    "texteEn": "The lunar vacuum cannot be fixed en route. Thermal and electrical have to be right before injection."
   },
   "lancement_ch3_intro": {
     "categorie": "narration",
-    "texte": "Injection en orbite de parking, puis allumage vers la Lune. La fenetre est courte."
+    "texte": "Orbite de parking, puis allumage vers la Lune. La fenêtre est courte.",
+    "texteEn": "Parking orbit, then the burn toward the Moon. The window is short."
   },
   "operations_ch3_intro": {
     "categorie": "narration",
-    "texte": "Le delai radio est d'environ trois secondes. Donne tes ordres en anticipant : la sonde a deja avance quand la reponse arrive."
+    "texte": "Le délai est d'environ trois secondes. Les commandes partent en anticipant : la sonde a déjà bougé quand la réponse arrive.",
+    "texteEn": "The delay is about three seconds. Commands go out early: the probe has already moved when the reply arrives."
   },
   "briefing_ch4_intro": {
     "categorie": "narration",
-    "texte": "Mars ne s'aligne bien avec la Terre que tous les 26 mois. Rater cette fenetre, c'est attendre la suivante."
+    "texte": "Mars ne s'aligne bien avec la Terre que tous les 26 mois. Rater cette fenêtre, c'est attendre la suivante.",
+    "texteEn": "Mars lines up well with Earth only every 26 months. Miss this window and you wait for the next one."
   },
   "atelier_ch4_intro": {
     "categorie": "narration",
-    "texte": "A cette distance, les panneaux solaires faiblissent. Un RTG garantit des watts constants, mais il est lourd et cher."
+    "texte": "À cette distance les panneaux faiblissent. Le RTG donne des watts constants, mais il est lourd et cher. Il se débloque à ce chapitre.",
+    "texteEn": "At this distance the arrays weaken. An RTG gives steady watts, but it is heavy and costly. It unlocks in this chapter."
   },
   "essais_ch4_intro": {
     "categorie": "narration",
-    "texte": "La croisiere dure des mois. Ce qui tient une heure sur le banc doit tenir tout le trajet."
+    "texte": "La croisière dure des mois. Ce qui tient les trois essais au banc doit tenir tout le trajet.",
+    "texteEn": "The cruise lasts months. What passes the three bench tests has to last the whole trip."
   },
   "lancement_ch4_intro": {
     "categorie": "narration",
-    "texte": "Fenetre ouverte. Apres l'injection, plus personne ne rattrape la sonde avant Mars."
+    "texte": "Fenêtre ouverte. Après l'injection, personne ne rattrape la sonde avant Mars.",
+    "texteEn": "Window open. After injection, nobody catches the probe before Mars."
   },
   "operations_ch4_intro": {
     "categorie": "narration",
-    "texte": "Le signal met une vingtaine de minutes a l'aller. Tu ne pilotes pas en direct : tu envoies une sequence, puis tu attends."
+    "texte": "Le signal met une vingtaine de minutes à l'aller. Tu n'es pas en direct : tu envoies une séquence, puis tu attends.",
+    "texteEn": "The signal takes about twenty minutes one way. You are not live: you send a sequence, then you wait."
   },
   "briefing_ch5_intro": {
     "categorie": "narration",
-    "texte": "Le point de Lagrange L1, entre le Soleil et la Terre, est un balcon sur le vent solaire. L'orbite en halo n'y reste pas toute seule."
+    "texte": "Le point de Lagrange L1, entre le Soleil et la Terre, observe le vent solaire en avance. L'orbite en halo ne s'y tient pas toute seule.",
+    "texteEn": "Lagrange point L1, between the Sun and Earth, watches the solar wind ahead of us. A halo orbit does not hold itself there."
   },
   "atelier_ch5_intro": {
     "categorie": "narration",
-    "texte": "Il faut de la puissance pour les instruments et du debit pour prevenir la Terre avant qu'une tempete solaire n'arrive."
+    "texte": "Hors magnétosphère, le blindage n'est plus optionnel. Il faut de la puissance pour les instruments et du débit pour prévenir la Terre.",
+    "texteEn": "Outside the magnetosphere, shielding is no longer optional. You need power for the instruments and rate to warn Earth."
   },
   "essais_ch5_intro": {
     "categorie": "narration",
-    "texte": "Hors de la magnetosphere, le blindage et la thermique ne sont plus optionnels."
+    "texte": "Radiations, thermique, chaîne électrique. Le halo ne se répare pas au sol une fois parti.",
+    "texteEn": "Radiation, thermal, electrical chain. Once you leave, the halo is not repaired on the ground."
   },
   "lancement_ch5_intro": {
     "categorie": "narration",
-    "texte": "Insertion vers L1. Ensuite, de petites corrections maintiennent le halo."
+    "texte": "Insertion vers L1. Ensuite, de petites corrections maintiennent le halo.",
+    "texteEn": "Insertion toward L1. After that, small corrections keep the halo."
   },
   "operations_ch5_intro": {
     "categorie": "narration",
-    "texte": "Tu es en avant de la Terre. Ce que tu mesures maintenant, les magnetospheristes le verront une heure plus tard."
+    "texte": "Tu es en avant de la Terre. Ce que tu mesures maintenant, on le verra ici environ une heure plus tard.",
+    "texteEn": "You are upstream of Earth. What you measure now will be seen here about an hour later."
   },
   "bilan_or": {
     "categorie": "succes",
-    "texte": "Mission accomplie, et avec de la marge. Ce rapport peut servir de reference a l'equipe suivante."
+    "texte": "Médaille d'or. Le rapport donne le score sur 100, les six ressources, trois décisions et la mission NASA de référence. Tu peux l'exporter en PDF.",
+    "texteEn": "Gold medal. The report gives the score out of 100, the six resources, three decisions and the reference NASA mission. You can export it as a PDF."
   },
   "bilan_argent": {
     "categorie": "succes",
-    "texte": "La mission a tenu ses objectifs. Quelques arbitrages auraient encore elargi la marge."
+    "texte": "Médaille d'argent. Les objectifs tiennent. Le rapport montre encore où une marge aurait pu être plus large. L'export PDF reprend le même bilan.",
+    "texteEn": "Silver medal. The objectives hold. The report still shows where a margin could have been wider. The PDF export carries the same debrief."
   },
   "bilan_bronze": {
     "categorie": "narration",
-    "texte": "Le satellite a fait le travail essentiel. Le rapport montre ou la conception etait juste, et ou elle etait tendue."
+    "texte": "Médaille de bronze. L'essentiel est fait. Le rapport sépare ce qui était juste de ce qui était tendu, ressource par ressource.",
+    "texteEn": "Bronze medal. The essential work is done. The report separates what was sound from what was tight, resource by resource."
   },
   "bilan_aucun": {
     "categorie": "echec",
-    "texte": "La mission est rentree, mais les marges n'ont pas suivi. Regardons les decisions une par une : c'est la que se trouve la prochaine reussite."
+    "texte": "Pas de médaille. Le rapport reste utile : score, jauges, trois décisions, comparaison NASA. C'est là qu'est la prochaine réussite.",
+    "texteEn": "No medal. The report is still useful: score, gauges, three decisions, the NASA comparison. That is where the next success is."
   }
 }

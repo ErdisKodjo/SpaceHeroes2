@@ -5,6 +5,7 @@
 
 import { settingsStore } from '../engine/settings-store.js';
 import { icon } from './icons.js';
+import { t } from '../i18n.js';
 
 const KEY = 'sh-tutorial-done';
 
@@ -14,7 +15,9 @@ const ETAPES = [
     ancre: '#dashboard',
     position: 'bottom',
     titre: 'Tes 6 ressources',
-    texte: 'Budget, masse, puissance, données, communications, durée. Chaque décision dans l\'Atelier les modifie en temps réel. Dépasser une jauge coûte des points.',
+    titreEn: 'Your 6 resources',
+    texte: 'Budget, masse, puissance, données, communications, durée. Chaque décision dans l\'Atelier les modifie. Dépasser une jauge coûte des points au bilan.',
+    texteEn: 'Budget, mass, power, data, communications, duration. Each workshop choice changes them. Exceeding a gauge costs points on the debrief.',
     trigger: 'immediate'   // affiché dès l'entrée en jeu
   },
   {
@@ -22,7 +25,9 @@ const ETAPES = [
     ancre: '#episode',
     position: 'left',
     titre: 'L\'Atelier',
-    texte: 'Choisis un composant par famille. Le CubeSat 3D en fond se construit à mesure que tu sélectionnes. Surveille la masse totale avant de valider.',
+    titreEn: 'The workshop',
+    texte: 'Choisis un composant par famille. Le CubeSat 3D en fond se construit à mesure. Surveille la masse totale avant de valider.',
+    texteEn: 'Pick one component per family. The 3D CubeSat builds up as you choose. Watch total mass before you validate.',
     trigger: 'atelier'     // épisode atelier
   },
   {
@@ -30,7 +35,9 @@ const ETAPES = [
     ancre: '#episode',
     position: 'left',
     titre: 'Avant de lancer',
-    texte: 'ASTRA vérifiera les critères CML avant d\'autoriser le compte à rebours. Si une marge est trop serrée, elle t\'arrêtera.',
+    titreEn: 'Before launch',
+    texte: 'Si le CML demandé n\'est pas à 80 % de vert, ASTRA le signale. Le compte à rebours reste disponible, et le bilan en tiendra compte.',
+    texteEn: 'If the required CML is not 80% green, ASTRA says so. The countdown stays available, and the debrief will count it.',
     trigger: 'lancement'   // épisode lancement
   },
   {
@@ -38,7 +45,9 @@ const ETAPES = [
     ancre: '#vue3d',
     position: 'top',
     titre: 'Explorer la vue 3D',
-    texte: 'Clique et glisse pour faire pivoter la Terre. Molette ou Q/E pour zoomer. Clique sur le CubeSat pour voir sa télémétrie en temps réel.',
+    titreEn: 'Explore the 3D view',
+    texte: 'Clique et glisse pour faire pivoter la Terre. Molette ou Q/E pour zoomer. Clique sur le CubeSat pour voir sa télémétrie.',
+    texteEn: 'Click and drag to turn the Earth. Scroll or Q/E to zoom. Click the CubeSat to read its telemetry.',
     trigger: 'orbite'      // après orbite atteinte
   }
 ];
@@ -65,7 +74,11 @@ function resetAll() {
 let _activeTooltip = null;
 
 function showTooltip(etape) {
-  if (_activeTooltip) _activeTooltip.remove();
+  if (_activeTooltip) {
+    clearTimeout(_activeTooltip._timer);
+    _activeTooltip.remove();
+    _activeTooltip = null;
+  }
   if (!settingsStore.get('tutorial')) return;
   if (etapeDone(etape.id)) return;
 
@@ -78,16 +91,16 @@ function showTooltip(etape) {
   tip.innerHTML = `
     <div class="sh-tooltip-inner">
       <div class="sh-tooltip-header">
-        <span class="sh-tooltip-titre">${etape.titre}</span>
-        <button type="button" class="sh-tooltip-close" aria-label="Fermer">
+        <span class="sh-tooltip-titre">${t(etape.titre, etape.titreEn)}</span>
+        <button type="button" class="sh-tooltip-close" aria-label="${t('Fermer', 'Close')}">
           ${icon('close', 14)}
         </button>
       </div>
-      <p class="sh-tooltip-texte">${etape.texte}</p>
+      <p class="sh-tooltip-texte">${t(etape.texte, etape.texteEn)}</p>
       <div class="sh-tooltip-footer">
-        <span class="sh-tooltip-step">${icon('info', 13)} Astuce</span>
+        <span class="sh-tooltip-step">${icon('info', 13)} ${t('Astuce', 'Tip')}</span>
         <button type="button" class="sh-tooltip-ok">
-          Compris ${icon('check', 14)}
+          ${t('Compris', 'Got it')} ${icon('check', 14)}
         </button>
       </div>
     </div>
@@ -129,17 +142,29 @@ function showTooltip(etape) {
   });
 
   function close() {
+    clearTimeout(tip._timer);
     markDone(etape.id);
+    if (_activeTooltip !== tip) return;
     tip.classList.add('is-out');
-    setTimeout(() => { tip.remove(); _activeTooltip = null; }, 300);
+    setTimeout(() => {
+      tip.remove();
+      if (_activeTooltip === tip) _activeTooltip = null;
+    }, 300);
   }
 
   tip.querySelector('.sh-tooltip-close').addEventListener('click', close);
   tip.querySelector('.sh-tooltip-ok').addEventListener('click', close);
 
   // Fermeture automatique après 12 s
-  const autoClose = setTimeout(close, 12000);
-  tip.querySelector('.sh-tooltip-close').addEventListener('click', () => clearTimeout(autoClose), { once: true });
+  tip._timer = setTimeout(close, 12000);
+}
+
+/** Retire l'astuce affichée, sans la marquer comme lue. */
+export function dismissTutorial() {
+  if (!_activeTooltip) return;
+  clearTimeout(_activeTooltip._timer);
+  _activeTooltip.remove();
+  _activeTooltip = null;
 }
 
 /** Appelé depuis main.js à chaque changement d'épisode et à l'événement orbite-atteinte. */

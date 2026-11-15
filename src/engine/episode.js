@@ -30,7 +30,7 @@ export class EpisodeRunner {
     if (episode.astra) this.astra.say(episode.astra);
     // Si l'episode exige un niveau CML pour etre accessible, on le signale (pas de blocage dur pour le prototype).
     if (episode.cmlRequis && !this.cml.isLevelValidated(episode.cmlRequis)) {
-      this.astra.sayRandomFrom('alerte');
+      this.astra.say('cml_niveau_manquant', { niveau: episode.cmlRequis });
     }
     this.onChange(this.snapshot());
   }

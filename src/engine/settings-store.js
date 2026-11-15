@@ -35,6 +35,11 @@ export const settingsStore = {
     save(_settings);
     window.dispatchEvent(new CustomEvent('settings-change', { detail: { key, value } }));
   },
+  replaceAll(next) {
+    _settings = { ...defaults, ...next };
+    save(_settings);
+    window.dispatchEvent(new CustomEvent('settings-change', { detail: { key: '*', value: { ..._settings } } }));
+  },
   getAll() {
     return { ..._settings };
   },

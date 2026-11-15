@@ -1,27 +1,40 @@
 {
   "nom": "moteurs",
+  "label": "Moteurs",
   "axes": ["poussee", "efficacite", "legerete", "fiabilite"],
   "technologies": [
     {
-      "nom": "chimique",
+      "id": "chimique",
+      "nom": "Moteur chimique",
+      "masse": 0.18,
+      "coutK": 12,
+      "deblocage": "au_depart",
+      "description": "Poussée immédiate. Le bon choix pour un CubeSat qui doit rejoindre son orbite vite.",
       "plafonds": { "poussee": 6, "efficacite": 3 },
       "electriciteRequise": "aucune",
-      "coutBaseJetons": 20,
-      "deblocage": "au depart"
+      "coutBaseJetons": 20
     },
     {
-      "nom": "cryogenique",
+      "id": "cryogenique",
+      "nom": "Moteur cryogénique",
+      "masse": 0.42,
+      "coutK": 48,
+      "deblocage": "chapitre_05",
+      "description": "Plus efficace que le chimique. Les ergols très froids compliquent le stockage.",
       "plafonds": { "poussee": 5, "efficacite": 4 },
       "electriciteRequise": "aucune",
-      "coutBaseJetons": 35,
-      "deblocage": "chapitre 5"
+      "coutBaseJetons": 35
     },
     {
-      "nom": "ionique",
+      "id": "ionique",
+      "nom": "Moteur ionique",
+      "masse": 0.28,
+      "coutK": 62,
+      "deblocage": "chapitre_05",
+      "description": "Très économe en ergols. La spirale vers la cible prend des mois et demande beaucoup d'électricité.",
       "plafonds": { "poussee": 2, "efficacite": 6 },
       "electriciteRequise": "elevee",
-      "coutBaseJetons": 45,
-      "deblocage": "chapitre 9"
+      "coutBaseJetons": 45
     }
   ]
 }

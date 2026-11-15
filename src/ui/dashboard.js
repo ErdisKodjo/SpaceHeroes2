@@ -1,17 +1,19 @@
 import { computeSegmentStatus, SEGMENTS } from '../engine/segments.js';
+import { t } from '../i18n.js';
+import { chapterText } from '../i18n/content.js';
 
 const LABELS = {
-  budget: 'Budget',
-  masse: 'Masse',
-  puissance: 'Puissance',
-  donnees: 'Données',
-  communications: 'Comms',
-  duree: 'Durée'
+  budget: ['Budget', 'Budget'],
+  masse: ['Masse', 'Mass'],
+  puissance: ['Puissance', 'Power'],
+  donnees: ['Données', 'Data'],
+  communications: ['Comms', 'Comms'],
+  duree: ['Durée', 'Duration']
 };
 
 const UNITS = {
   masse: 'kg',
-  duree: 'sem'
+  duree: ['sem', 'wk']
 };
 
 export function renderDashboard(container, resourceManager, { chapter } = {}) {
@@ -20,11 +22,12 @@ export function renderDashboard(container, resourceManager, { chapter } = {}) {
     .map((r) => {
       const remaining = Math.max(0, r.remaining);
       const pct = r.max > 0 ? Math.max(0, Math.min(100, (remaining / r.max) * 100)) : 0;
-      const unit = UNITS[r.key] ? ` ${UNITS[r.key]}` : '';
+      const unitRaw = UNITS[r.key];
+      const unit = Array.isArray(unitRaw) ? ` ${t(unitRaw[0], unitRaw[1])}` : (unitRaw ? ` ${unitRaw}` : '');
       return `
       <div class="hud-bar ${r.status}">
         <div class="hud-bar-meta">
-          <span>${LABELS[r.key] ?? r.key}</span>
+          <span>${LABELS[r.key] ? t(LABELS[r.key][0], LABELS[r.key][1]) : r.key}</span>
           <span>${remaining}${unit}</span>
         </div>
         <div class="hud-bar-track"><div class="hud-bar-fill" style="width:${pct}%"></div></div>
@@ -37,14 +40,14 @@ export function renderDashboard(container, resourceManager, { chapter } = {}) {
     (s) => `<span class="segment-pastille ${segmentStatus[s]}">${s}</span>`
   ).join('');
 
-  const titre = chapter?.titre ?? 'Space Heroes';
+  const titre = chapter ? chapterText(chapter, 'titre') : 'Space Heroes';
   const code = (chapter?.id || 'ch').replace('chapitre_', 'CH.');
 
   container.innerHTML = `
     <div class="hud-brand">
       <div class="hud-brand-kicker">Space Heroes</div>
       <div class="hud-brand-title">${titre}</div>
-      <div class="hud-brand-sub">${code} · ${chapter?.sousTitre ?? 'Mission'}</div>
+      <div class="hud-brand-sub">${code} · ${chapter ? chapterText(chapter, 'sousTitre') : t('Mission', 'Mission')}</div>
     </div>
     <div class="hud-bars">${jauges}</div>
     <div class="hud-segments">${segments}</div>
