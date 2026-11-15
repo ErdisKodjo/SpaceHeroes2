@@ -48,7 +48,7 @@ export function createSplash() {
     </div>
     <div class="sh-splash-content">
       <div class="sh-splash-logo">
-        <img src="/logo.png" alt="Space Heroes" width="819" height="819">
+        <img src="${import.meta.env.BASE_URL}logo.png" alt="Space Heroes" width="819" height="819">
       </div>
       <div class="sh-splash-brand">
         <span class="sh-splash-kicker">NASA SPACE APPS CHALLENGE</span>
