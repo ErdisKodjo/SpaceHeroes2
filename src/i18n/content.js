@@ -118,7 +118,7 @@ const COMP_DESC = {
   chassis_titane: 'Exceptional strength, light, expensive. 2U side face, 100 × 227.0 mm, 0.0227 m².',
   chassis_cfrp: 'The lightest, but fragile to impacts and costly. 3U side face, 100 × 340.5 mm, 0.03405 m². At 1.33 kg, 200 km on day 114.8.',
   mli: 'Multi-layer blanket, essential in the space environment.',
-  blindage_rad: 'Protects electronics from the Van Allen belts.',
+  blindage_rad: 'Protects electronics from the Van Allen belts. SPENVIS models that radiation.',
   panneaux_gaas_1u: 'Gallium-arsenide cells, high efficiency (28%).',
   panneaux_si_2u: 'Silicon, cheaper but heavier.',
   batterie_liion: 'Standard storage, rechargeable in eclipse.',

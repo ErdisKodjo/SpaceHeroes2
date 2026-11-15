@@ -9,6 +9,13 @@ import { createTableLobby } from './table-lobby.js';
 import { createSettings } from './settings.js';
 import { icon, medalIcon } from './icons.js';
 import { pick, t, tf } from '../i18n.js';
+import { settingsStore } from '../engine/settings-store.js';
+import {
+  jourJulien,
+  longitudeLune,
+  positionEcliptique,
+  traceOrbite
+} from '../vis/planetaire.js';
 
 const CHAPTER_ICONS = {
   chapitre_01: 'satellite',
@@ -174,33 +181,114 @@ function esc(value) {
   }[c]));
 }
 
-function buildCarte(etats) {
+const MOIS = [
+  ['janvier', 'January'], ['février', 'February'], ['mars', 'March'],
+  ['avril', 'April'], ['mai', 'May'], ['juin', 'June'],
+  ['juillet', 'July'], ['août', 'August'], ['septembre', 'September'],
+  ['octobre', 'October'], ['novembre', 'November'], ['décembre', 'December']
+];
+
+const ECHELLE = 62;
+const VUE = { x: -200, y: -155, w: 400, h: 310 };
+
+function versJour(date) {
+  return jourJulien(
+    date.getUTCFullYear(),
+    date.getUTCMonth() + 1,
+    date.getUTCDate() + (date.getUTCHours() + date.getUTCMinutes() / 60) / 24
+  );
+}
+
+function libelleDate(date) {
+  const mois = MOIS[date.getUTCMonth()];
+  return t(
+    `${date.getUTCDate()} ${mois[0]} ${date.getUTCFullYear()}`,
+    `${mois[1]} ${date.getUTCDate()}, ${date.getUTCFullYear()}`
+  );
+}
+
+function ecran(au) {
+  return { x: au.x * ECHELLE, y: -au.y * ECHELLE };
+}
+
+function trace(points) {
+  return points.map((p) => {
+    const e = ecran(p);
+    return `${e.x.toFixed(2)},${e.y.toFixed(2)}`;
+  }).join(' ');
+}
+
+function schemaLigne(etats) {
   const parId = new Map(etats.map((ch) => [ch.id, ch]));
   const terre = ['chapitre_01', 'chapitre_02', 'chapitre_06', 'chapitre_07', 'chapitre_08']
     .map((id) => boutonLieu(parId.get(id), LIEUX_TERRE[id]))
     .join('');
   return `
-    <section class="sh-hub-carte" aria-label="${t('Carte du système solaire', 'Solar system map')}">
-      <p class="sh-hub-carte-note">${t('Schéma, pas à l\'échelle. Un lieu ouvert lance le chapitre.', 'Schematic, not to scale. An open place starts the chapter.')}</p>
-      <div class="sh-hub-carte-ligne">
-        <span class="sh-hub-astre is-soleil">${t('Soleil', 'Sun')}</span>
-        <span class="sh-hub-carte-trait"></span>
-        ${boutonLieu(parId.get('chapitre_05'), t('L1', 'L1'))}
-        <span class="sh-hub-carte-trait"></span>
-        <div class="sh-hub-terre">
-          <span class="sh-hub-astre is-terre">${t('Terre', 'Earth')}</span>
-          <div class="sh-hub-terre-lieux">${terre}</div>
-        </div>
-        <span class="sh-hub-carte-trait"></span>
-        ${boutonLieu(parId.get('chapitre_03'), t('Lune', 'Moon'))}
-        <span class="sh-hub-carte-trait"></span>
-        ${boutonLieu(parId.get('chapitre_04'), t('Mars', 'Mars'))}
+    <p class="sh-hub-carte-note">${t('Schéma, pas à l\'échelle. Un lieu ouvert lance le chapitre.', 'Schematic, not to scale. An open place starts the chapter.')}</p>
+    <div class="sh-hub-carte-ligne">
+      <span class="sh-hub-astre is-soleil">${t('Soleil', 'Sun')}</span>
+      <span class="sh-hub-carte-trait"></span>
+      ${boutonLieu(parId.get('chapitre_05'), t('L1', 'L1'))}
+      <span class="sh-hub-carte-trait"></span>
+      <div class="sh-hub-terre">
+        <span class="sh-hub-astre is-terre">${t('Terre', 'Earth')}</span>
+        <div class="sh-hub-terre-lieux">${terre}</div>
       </div>
+      <span class="sh-hub-carte-trait"></span>
+      ${boutonLieu(parId.get('chapitre_03'), t('Lune', 'Moon'))}
+      <span class="sh-hub-carte-trait"></span>
+      ${boutonLieu(parId.get('chapitre_04'), t('Mars', 'Mars'))}
+    </div>
+  `;
+}
+
+function schemaPlanetaire(etats) {
+  const parId = new Map(etats.map((ch) => [ch.id, ch]));
+  const terre = ['chapitre_01', 'chapitre_02', 'chapitre_06', 'chapitre_07', 'chapitre_08']
+    .map((id) => boutonLieu(parId.get(id), LIEUX_TERRE[id]))
+    .join('');
+  const mobile = (id, nom) => boutonLieu(parId.get(id), nom)
+    .replace('sh-hub-lieu ', 'sh-hub-lieu sh-hub-lieu-vol ');
+  return `
+    <p class="sh-hub-carte-note">${t(
+      'Terre et Mars suivent les éléments JPL 1800–2050. La Lune part de la nouvelle lune du 8 janvier 2008 et avance d\'un mois sidéral. Lune et L1 sont écartés : à cette échelle ils seraient sur la Terre. Un lieu ouvert lance le chapitre.',
+      'Earth and Mars follow the JPL elements for 1800–2050. The Moon starts at the 8 January 2008 new moon and advances by one sidereal month. The Moon and L1 are pulled out: at this scale they would sit on the Earth. An open place starts the chapter.'
+    )}</p>
+    <div class="sh-hub-planetaire" id="sh-planetaire">
+      <svg viewBox="${VUE.x} ${VUE.y} ${VUE.w} ${VUE.h}" aria-hidden="true">
+        <polyline id="sh-orbite-terre" class="sh-orbite is-terre"></polyline>
+        <polyline id="sh-orbite-mars" class="sh-orbite is-mars"></polyline>
+        <circle class="sh-corps is-soleil" cx="0" cy="0" r="5"></circle>
+        <circle id="sh-corps-terre" class="sh-corps is-terre" r="3.4"></circle>
+        <circle id="sh-corps-lune" class="sh-corps is-lune" r="1.7"></circle>
+        <circle id="sh-corps-mars" class="sh-corps is-mars" r="2.6"></circle>
+      </svg>
+      ${mobile('chapitre_05', t('L1', 'L1'))}
+      ${mobile('chapitre_03', t('Lune', 'Moon'))}
+      ${mobile('chapitre_04', t('Mars', 'Mars'))}
+    </div>
+    <p class="sh-hub-planetaire-date" id="sh-planetaire-date"></p>
+    <div class="sh-hub-terre">
+      <span class="sh-hub-astre is-terre">${t('Autour de la Terre', 'Around Earth')}</span>
+      <div class="sh-hub-terre-lieux">${terre}</div>
+    </div>
+  `;
+}
+
+function buildCarte(etats, planetaire) {
+  return `
+    <section class="sh-hub-carte" aria-label="${t('Carte du système solaire', 'Solar system map')}">
+      <div class="sh-hub-carte-barre">
+        <button type="button" class="sh-hub-vue-carte" id="sh-hub-vue-carte" aria-pressed="${planetaire ? 'true' : 'false'}">
+          ${planetaire ? t('Schéma', 'Schematic') : t('Planétaire', 'Orrery')}
+        </button>
+      </div>
+      ${planetaire ? schemaPlanetaire(etats) : schemaLigne(etats)}
     </section>
   `;
 }
 
-function buildHTML(savedGame) {
+function buildHTML(savedGame, planetaire) {
   const role = playerStore.role;
   const nom  = playerStore.nom;
   const etats = CHAPTERS.map(etatChapitre);
@@ -274,7 +362,7 @@ function buildHTML(savedGame) {
           </div>
           ` : ''}
 
-          ${buildCarte(etats)}
+          ${buildCarte(etats, planetaire)}
 
           <!-- Cartes chapitres -->
           <div class="sh-hub-cards">
@@ -302,13 +390,91 @@ export function createHub({ onStartMission, savedGame = null } = {}) {
   const container = document.createElement('div');
   container.id = 'sh-hub-root';
   document.body.appendChild(container);
+  let battement = 0;
+  let instant = new Date();
+  let planetaire = false;
+
+  function arreterPlanetaire() {
+    if (battement) clearInterval(battement);
+    battement = 0;
+  }
+
+  function poserPlanetaire() {
+    const scene = container.querySelector('#sh-planetaire');
+    if (!scene) return;
+    const jd = versJour(instant);
+    const terre = ecran(positionEcliptique('terre', jd));
+    const mars = ecran(positionEcliptique('mars', jd));
+    const lon = longitudeLune(jd);
+    const lune = {
+      x: terre.x + Math.cos(lon) * 18,
+      y: terre.y - Math.sin(lon) * 18
+    };
+    const versSoleil = Math.hypot(terre.x, terre.y) || 1;
+    const l1 = {
+      x: terre.x - (terre.x / versSoleil) * 22,
+      y: terre.y - (terre.y / versSoleil) * 22
+    };
+    const orbiteTerre = container.querySelector('#sh-orbite-terre');
+    const orbiteMars = container.querySelector('#sh-orbite-mars');
+    if (orbiteTerre) orbiteTerre.setAttribute('points', trace(traceOrbite('terre', jd)));
+    if (orbiteMars) orbiteMars.setAttribute('points', trace(traceOrbite('mars', jd)));
+    const corps = {
+      chapitre_03: lune,
+      chapitre_04: mars,
+      chapitre_05: l1
+    };
+    scene.querySelectorAll('.sh-hub-lieu-vol').forEach((btn) => {
+      const p = corps[btn.dataset.chapter];
+      if (!p) return;
+      btn.style.left = `${((p.x - VUE.x) / VUE.w) * 100}%`;
+      btn.style.top = `${((p.y - VUE.y) / VUE.h) * 100}%`;
+    });
+    const point = (id, p) => {
+      const el = container.querySelector(id);
+      if (!el) return;
+      el.setAttribute('cx', p.x.toFixed(2));
+      el.setAttribute('cy', p.y.toFixed(2));
+    };
+    point('#sh-corps-terre', terre);
+    point('#sh-corps-lune', lune);
+    point('#sh-corps-mars', mars);
+    const date = container.querySelector('#sh-planetaire-date');
+    if (date) {
+      date.textContent = settingsStore.get('reduceMotion')
+        ? libelleDate(instant)
+        : t(
+          `${libelleDate(instant)} · un jour toutes les 0,8 s`,
+          `${libelleDate(instant)} · one day every 0.8 s`
+        );
+    }
+  }
+
+  function lancerPlanetaire() {
+    if (!planetaire) return;
+    poserPlanetaire();
+    if (!settingsStore.get('reduceMotion')) {
+      battement = setInterval(() => {
+        instant = new Date(instant.getTime() + 86400000);
+        poserPlanetaire();
+      }, 800);
+    }
+  }
 
   function render() {
-    container.innerHTML = buildHTML(savedGame);
+    arreterPlanetaire();
+    instant = new Date();
+    container.innerHTML = buildHTML(savedGame, planetaire);
     bindEvents();
+    lancerPlanetaire();
   }
 
   function bindEvents() {
+    container.querySelector('#sh-hub-vue-carte').addEventListener('click', () => {
+      planetaire = !planetaire;
+      render();
+    });
+
     // Cartes de chapitre
     container.querySelectorAll('.sh-hub-card:not(.is-locked), .sh-hub-lieu:not(.is-locked)').forEach(btn => {
       btn.addEventListener('click', () => {
@@ -358,6 +524,9 @@ export function createHub({ onStartMission, savedGame = null } = {}) {
   render();
 
   return {
-    dispose() { container.remove(); }
+    dispose() {
+      arreterPlanetaire();
+      container.remove();
+    }
   };
 }

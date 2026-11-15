@@ -134,6 +134,7 @@ export async function downloadBilanPdf(rapport, astraTexte) {
     y = paragraph(t('Dans la vraie vie', 'In real life'), y, 12);
     doc.setFont('helvetica', 'normal');
     y = paragraph(rapport.nasa.phrase, y, 10);
+    if (rapport.nasa.outil) y = paragraph(rapport.nasa.outil, y, 10);
     const ref = rapport.nasa.reference;
     if (ref) y = paragraph(`${ref.agence} · ${ref.annee}. ${missionBlurb(ref.id, ref.resume || '')}`, y, 9, [50, 64, 88]);
     for (const proche of rapport.nasa.proches || []) {

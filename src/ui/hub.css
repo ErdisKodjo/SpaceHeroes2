@@ -159,12 +159,24 @@
   border: 1px solid rgba(124, 240, 255, 0.18);
   background: rgba(4, 10, 28, 0.55);
 }
-.sh-hub-carte-note {
-  margin: 0 0 8px;
+.sh-hub-carte-barre {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 8px;
+}
+.sh-hub-vue-carte {
+  padding: 4px 10px;
+  border: 1px solid rgba(124, 240, 255, 0.45);
+  background: transparent;
+  color: var(--hud);
   font-family: var(--font-hud);
-  font-size: 0.68rem;
-  letter-spacing: 0.04em;
-  color: var(--muted, #8aa0b8);
+  font-size: 0.66rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+.sh-hub-vue-carte[aria-pressed="true"] {
+  background: rgba(124, 240, 255, 0.12);
 }
 .sh-hub-carte-ligne {
   display: flex;
@@ -177,6 +189,46 @@
   height: 1px;
   min-width: 12px;
   background: rgba(124, 240, 255, 0.28);
+}
+.sh-hub-carte-note {
+  margin: 0 0 8px;
+  font-family: var(--font-hud);
+  font-size: 0.68rem;
+  letter-spacing: 0.04em;
+  color: var(--muted, #8aa0b8);
+}
+.sh-hub-planetaire {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 400 / 310;
+}
+.sh-hub-planetaire svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+.sh-orbite {
+  fill: none;
+  stroke-width: 1;
+}
+.sh-orbite.is-terre { stroke: rgba(61, 143, 212, 0.55); }
+.sh-orbite.is-mars { stroke: rgba(196, 107, 74, 0.45); }
+.sh-corps.is-soleil { fill: #e8b15a; }
+.sh-corps.is-terre { fill: #3d8fd4; }
+.sh-corps.is-lune { fill: #d5d8df; }
+.sh-corps.is-mars { fill: #c46b4a; }
+.sh-hub-lieu-vol {
+  position: absolute;
+  min-width: 0;
+  transform: translate(-50%, -130%);
+  z-index: 1;
+}
+.sh-hub-planetaire-date {
+  margin: 4px 0 8px;
+  font-family: var(--font-hud);
+  font-size: 0.68rem;
+  letter-spacing: 0.04em;
+  color: var(--hud);
 }
 .sh-hub-astre {
   font-family: var(--font-hud);

@@ -290,8 +290,8 @@ export function createAtelierView(container, {
     const semainesMission = mission.contraintes?.duree || 12;
     const trainee = perte == null ? '' : `
       <p class="sh-atelier-trainee">${t(
-        `Traînée, face ${faceFr} m² : −${kmFr} km en 84 jours${horsTable ? ', prolongé en 1/masse hors de 1,33 à 4 kg' : ''}. Les ${semainesMission} semaines perdent ${semFr} sem.${arret == null ? '' : ` 200 km au jour ${arret.toFixed(1).replace('.', ',')}.`}`,
-        `Drag, face ${surface} m²: −${perte.toFixed(1)} km in 84 days${horsTable ? ', extended as 1/mass outside 1.33–4 kg' : ''}. The ${semainesMission} weeks lose ${Math.round(semaines * 100) / 100} wk.${arret == null ? '' : ` 200 km on day ${arret.toFixed(1)}.`}`
+        `Traînée, face ${faceFr} m² : −${kmFr} km en 84 jours${horsTable ? ', prolongé en 1/masse hors de 1,33 à 4 kg' : ''}. Les ${semainesMission} semaines perdent ${semFr} sem.${arret == null ? '' : ` 200 km au jour ${arret.toFixed(1).replace('.', ',')}.`} Le Debris Assessment Software sert à juger la fin de vie.`,
+        `Drag, face ${surface} m²: −${perte.toFixed(1)} km in 84 days${horsTable ? ', extended as 1/mass outside 1.33–4 kg' : ''}. The ${semainesMission} weeks lose ${Math.round(semaines * 100) / 100} wk.${arret == null ? '' : ` 200 km on day ${arret.toFixed(1)}.` } The Debris Assessment Software is used to judge end of life.`
       )}</p>`;
 
     container.innerHTML = `
@@ -299,6 +299,10 @@ export function createAtelierView(container, {
         <!-- En-tête -->
         <div class="sh-atelier-header">
           <div class="sh-atelier-kicker">${t('Atelier · CubeSat 1U', 'Workshop · 1U CubeSat')} · ${playerStore.jetons} ${t(playerStore.jetons > 1 ? 'jetons' : 'jeton', playerStore.jetons === 1 ? 'token' : 'tokens')}</div>
+          <p class="sh-atelier-outil">${t(
+            'PyCubed réunit, sur une carte publique, la puissance, le calcul, la communication et le contrôle d\'attitude d\'un CubeSat.',
+            'PyCubed puts power, computing, communication and attitude control for a CubeSat on one public board.'
+          )}</p>
           <div class="sh-atelier-jauges">
             <div class="sh-atelier-jauge">
               <div class="sh-atelier-jauge-label">

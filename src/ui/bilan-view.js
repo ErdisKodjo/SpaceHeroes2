@@ -196,6 +196,7 @@ export function createBilanView({ rapport, astraTexte, onRejouer, onSuivante, on
         <section class="sh-bilan-nasa">
           <h3 class="sh-bilan-section">${t('Dans la vraie vie', 'In real life')}</h3>
           <p class="sh-bilan-equivalence">${esc(rapport.nasa.phrase)}</p>
+          ${rapport.nasa.outil ? `<p class="sh-bilan-outil">${esc(rapport.nasa.outil)}</p>` : ''}
           ${cartes ? `<ul class="sh-bilan-fiches">${cartes}</ul>` : ''}
           <div id="sh-bilan-fiche-detail" class="sh-bilan-fiche-detail" hidden></div>
         </section>

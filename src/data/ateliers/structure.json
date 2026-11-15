@@ -59,7 +59,7 @@
       "masse": 0.12,
       "coutK": 15,
       "deblocage": "chapitre_04",
-      "description": "Protège l'électronique des ceintures de Van Allen.",
+      "description": "Protège l'électronique des ceintures de Van Allen. SPENVIS modélise ce rayonnement.",
       "plafonds": { "radiation": 6 }
     }
   ]

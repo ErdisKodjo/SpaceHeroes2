@@ -22,7 +22,7 @@ Le QG est l'accueil. La Terre tourne derrière le panneau.
 - Le message d'ASTRA salue le commandant par son nom.
 - **Continuer** n'apparaît que s'il existe une partie en cours. Il reprend le chapitre et l'épisode sauvegardés.
 - Les huit cartes sont les missions. Seul le chapitre 1 est ouvert au départ. Un chapitre suivant s'ouvre quand le précédent a un score au bilan. En Découverte, les huit sont ouvertes.
-- La carte du système solaire suit le même verrou. Soleil, L1, Terre et ses cinq orbites, Lune, Mars : un schéma, pas une échelle. Un lieu ouvert lance le chapitre. Un lieu fermé reste inactif.
+- La carte du système solaire suit le même verrou. Elle s'ouvre sur le schéma : Soleil, L1, Terre et ses cinq orbites, Lune, Mars. Ce n'est pas une échelle. Le bouton **Planétaire** remplace ce schéma par les orbites : Terre et Mars suivent les éléments JPL 1800–2050, la Lune part de la nouvelle lune du 8 janvier 2008 et avance d'un mois sidéral. Lune et L1 sont écartés de la Terre, sinon ils se confondraient avec elle. La date avance d'un jour toutes les 0,8 s, et reste fixe si les animations sont réduites. **Schéma** ramène la ligne. Un lieu ouvert lance le chapitre. Un lieu fermé reste inactif.
 - Une carte terminée affiche le meilleur score et une médaille.
 - **Changer de rôle** ouvre le choix du poste et du nom, sans lancer de mission.
 - L'engrenage ouvre les paramètres.
@@ -109,7 +109,7 @@ Quatre temps.
 
 ### Bilan
 
-L'écran montre le score sur 100, la médaille, le détail du score, les ressources, trois décisions, une comparaison avec une mission réelle, les badges et les jetons d'atelier. Sous « Dans la vraie vie », chaque mission citée est une fiche : nom, agence et année. Un clic ouvre le résumé, un second clic sur la même fiche le referme. En partie à 4, le rapport ajoute le bilan commun : le score de chaque poste, le veto, et chaque moment où une jauge passe 80 % ou dépasse le plafond.
+L'écran montre le score sur 100, la médaille, le détail du score, les ressources, trois décisions, une comparaison avec une mission réelle, les badges et les jetons d'atelier. Sous « Dans la vraie vie », chaque mission citée est une fiche : nom, agence et année. Un clic ouvre le résumé, un second clic sur la même fiche le referme. Une ligne nomme un outil public quand il a sa place : Debris Assessment Software pour la fin de vie en orbite basse, Trajectory Browser pour Mars et, à côté des chiffres GMAT, pour la Lune. L'atelier cite PyCubed. Le blindage cite SPENVIS. En partie à 4, le rapport ajoute le bilan commun : le score de chaque poste, le veto, et chaque moment où une jauge passe 80 % ou dépasse le plafond.
 
 | Score | Médaille | Jetons d'atelier |
 | --- | --- | --- |

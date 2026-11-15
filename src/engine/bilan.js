@@ -386,6 +386,27 @@ function astraPour(medal) {
   return 'bilan_aucun';
 }
 
+const OUTILS = {
+  leo_cubesat: [
+    'Le Debris Assessment Software sert à juger la fin de vie. Ici, la propagation s\'arrête à 200 km.',
+    'The Debris Assessment Software is used to judge end of life. Here, the propagation stops at 200 km.'
+  ],
+  lune: [
+    'Les chiffres de cette capture viennent de GMAT. Le Trajectory Browser est le catalogue public des trajectoires vers les planètes et les petits corps.',
+    'These capture figures come from GMAT. The Trajectory Browser is the public catalogue of trajectories to planets and small bodies.'
+  ],
+  mars: [
+    'Le Trajectory Browser est le catalogue public des trajectoires vers les planètes et les petits corps.',
+    'The Trajectory Browser is the public catalogue of trajectories to planets and small bodies.'
+  ]
+};
+
+export function outilNasa(profil) {
+  const lignes = OUTILS[profil];
+  if (!lignes) return '';
+  return t(lignes[0], lignes[1]);
+}
+
 function missionNasa(chapter, score) {
   const profil = chapter.profil || 'leo_cubesat';
   const liste = missionsReelles.filter((m) => m.profil === profil);
@@ -395,6 +416,7 @@ function missionNasa(chapter, score) {
     reference,
     proches,
     equivalence: score,
+    outil: outilNasa(profil),
     phrase: reference
       ? t(
         `Ton score équivaut à ${score} % de la mission ${reference.nom}.`,
