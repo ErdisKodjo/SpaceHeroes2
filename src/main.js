@@ -110,8 +110,8 @@ window.addEventListener('settings-change', () => {
 
 // Célébration 3D quand le CubeSat atteint l'orbite.
 // L'astuce « explorer la vue » attend la fin du bandeau, pour ne pas le couvrir.
-window.addEventListener('orbite-atteinte', () => {
-  vue3d.celebrate?.();
+window.addEventListener('orbite-atteinte', ({ detail }) => {
+  vue3d.celebrate?.(detail);
   dismissTutorial();
   setTimeout(() => tutorialStep('orbite'), 3200);
 });
@@ -357,7 +357,7 @@ function startMission({ chapterId, restore = false }) {
       }
     }
 
-    runner.next();
+    return runner.next();
   }
 
   astra.say('accueil');

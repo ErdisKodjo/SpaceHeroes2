@@ -190,9 +190,29 @@ function ligneGmat(chapter) {
   const table = GMAT[chapter.gmat];
   if (!table) return null;
   const r = table.resultats || {};
-  if (r.periodeMinutes) return t(`Période ${r.periodeMinutes} min`, `Period ${r.periodeMinutes} min`);
-  if (r.dureeTransfertJours) return t(`Transfert ${r.dureeTransfertJours} jours`, `Transfer ${r.dureeTransfertJours} days`);
-  if (r.periodeHaloJours) return t(`Halo ${r.periodeHaloJours} jours`, `Halo ${r.periodeHaloJours} days`);
+  if (r.periodeMinutes) {
+    const base = t(`Période ${r.periodeMinutes} min`, `Period ${r.periodeMinutes} min`);
+    if (r.departHohmann !== 'debut decembre 2026') return base;
+    return base + t(' · départ début décembre 2026', ' · departure early December 2026');
+  }
+  if (r.dureeTransfertJours) {
+    const approche = Number(r.approcheMinKm);
+    const dv = Number(r.deltaVInjectionKmS);
+    const base = t(`Transfert ${r.dureeTransfertJours} jours`, `Transfer ${r.dureeTransfertJours} days`);
+    const injection = Number.isFinite(dv)
+      ? t(` · injection ${String(dv).replace('.', ',')} km/s`, ` · injection ${dv} km/s`)
+      : '';
+    if (!Number.isFinite(approche)) return base + injection;
+    const fr = Math.round(approche).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
+    const en = Math.round(approche).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+    return base + injection + t(` · ${fr} km, pas une capture`, ` · ${en} km, not a capture`);
+  }
+  if (r.periodeHaloJours) {
+    const corrections = Number(r.correctionsParAn);
+    const base = t(`Halo ${r.periodeHaloJours} jours`, `Halo ${r.periodeHaloJours} days`);
+    if (!Number.isFinite(corrections)) return base;
+    return base + t(` · ${corrections} corrections/an, hypothèse`, ` · ${corrections} corrections/year, hypothesis`);
+  }
   return null;
 }
 

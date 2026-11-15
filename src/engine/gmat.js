@@ -38,6 +38,14 @@ function muDepuisPeriode(aKm, periodMin) {
   return (4 * Math.PI * Math.PI * aKm * aKm * aKm) / (t * t);
 }
 
+function milliers(n, sep) {
+  return Math.round(n).toString().replace(/\B(?=(\d{3})+(?!\d))/g, sep);
+}
+
+function virgule(n) {
+  return String(n).replace('.', ',');
+}
+
 function lumiereMs(distanceKm) {
   return (2 * distanceKm / C_KMS) * 1000;
 }
@@ -75,12 +83,22 @@ export function resolveGmat(table) {
     const e = (ra - rp) / (ra + rp);
     const jours = r.dureeTransfertJours || 5;
     const periodMin = jours * 2 * 24 * 60;
+    const approche = Number(r.approcheMinKm);
+    const plusPres = Number.isFinite(approche)
+      ? ` · plus près ${milliers(approche, ' ')} km · pas une capture`
+      : '';
+    const closest = Number.isFinite(approche)
+      ? ` · closest ${milliers(approche, ',')} km · not a capture`
+      : '';
+    const dv = Number(r.deltaVInjectionKmS);
+    const injection = Number.isFinite(dv) ? ` · injection ${virgule(dv)} km/s` : '';
+    const injectionEn = Number.isFinite(dv) ? ` · injection ${dv} km/s` : '';
     return profil({
       type,
       labelFr: 'Transfert Terre-Lune',
       labelEn: 'Earth–Moon transfer',
-      captionFr: `Parking ${alt} km · Lune en ${jours} j`,
-      captionEn: `Parking orbit ${alt} km · Moon in ${jours} d`,
+      captionFr: `Parking ${alt} km · Lune en ${jours} j${injection}${plusPres}`,
+      captionEn: `Parking orbit ${alt} km · Moon in ${jours} d${injectionEn}${closest}`,
       altitudeKm: alt,
       bodyRadiusKm: body,
       mu,
@@ -100,12 +118,19 @@ export function resolveGmat(table) {
     const periodMin = jours * 24 * 60;
     const aKm = dist;
     const millions = Math.round((dist / 1e6) * 10) / 10;
+    const corrections = Number(r.correctionsParAn);
+    const hypothese = Number.isFinite(corrections)
+      ? ` · ${corrections} corrections/an, hypothèse`
+      : '';
+    const hypothesis = Number.isFinite(corrections)
+      ? ` · ${corrections} corrections/year, hypothesis`
+      : '';
     return profil({
       type,
       labelFr: 'Halo autour de L1',
       labelEn: 'Halo about L1',
-      captionFr: `L1 · ${millions} million km · halo ${jours} j`,
-      captionEn: `L1 · ${millions} million km · halo ${jours} d`,
+      captionFr: `L1 · ${millions} million km · halo ${jours} j${hypothese}`,
+      captionEn: `L1 · ${millions} million km · halo ${jours} d${hypothesis}`,
       altitudeKm: dist - body,
       bodyRadiusKm: body,
       mu: muDepuisPeriode(aKm, periodMin),
@@ -123,12 +148,18 @@ export function resolveGmat(table) {
     const mu = p.muMars || 42828;
     const alt = p.altitudeKm || 300;
     const periodMin = r.periodeMinutes;
+    const fenetre = r.departHohmann === 'debut decembre 2026'
+      ? ' · départ début décembre 2026'
+      : '';
+    const windowEn = r.departHohmann === 'debut decembre 2026'
+      ? ' · departure early December 2026'
+      : '';
     return profil({
       type,
       labelFr: 'Orbite basse martienne',
       labelEn: 'Low Mars orbit',
-      captionFr: `Altitude ${alt} km · un tour en ${periodMin} min`,
-      captionEn: `Altitude ${alt} km · one revolution in ${periodMin} min`,
+      captionFr: `Altitude ${alt} km · un tour en ${periodMin} min${fenetre}`,
+      captionEn: `Altitude ${alt} km · one revolution in ${periodMin} min${windowEn}`,
       altitudeKm: alt,
       bodyRadiusKm: body,
       mu,

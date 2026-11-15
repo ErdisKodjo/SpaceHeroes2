@@ -447,7 +447,12 @@ export function createLaunchSequence({ scene, camera, earth, container, sunDirec
     {
       at: T_DEPLOY + 1.6,
       run: () => {
-        overlay.count('ORBITE ATTEINTE', 'is-success');
+        overlay.count(
+          derived.type === 'transfert_lune'
+            ? tr('APPROCHE LUNAIRE', 'LUNAR APPROACH')
+            : tr('ORBITE ATTEINTE', 'ORBIT REACHED'),
+          'is-success'
+        );
         overlay.caption(
           tr(derived.labelFr, derived.labelEn),
           tr(derived.captionFr, derived.captionEn)

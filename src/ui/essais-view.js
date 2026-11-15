@@ -236,7 +236,7 @@ function showResult(root, succes, msg) {
 
 // ─── Orchestrateur ──────────────────────────────────────────────────────────
 
-export function createEssaisView(container, { astra, resources, chapter, selections, repartitions, onValider } = {}) {
+export function createEssaisView(container, { astra, resources, chapter, selections, repartitions, onValider, onRetour } = {}) {
   const vibrations = reglageVibrations(selections?.structure, repartitions?.structure);
   const profil = chapter?.profil || 'leo_cubesat';
   let epreuveIndex = 0;
@@ -277,8 +277,16 @@ export function createEssaisView(container, { astra, resources, chapter, selecti
           </button>
         </div>
       `;
-      container.querySelector('#sh-essais-valider').addEventListener('click', () => {
-        onValider?.({ fiabilite: pct });
+      container.querySelector('#sh-essais-valider').addEventListener('click', async () => {
+        const suite = await onValider?.({ fiabilite: pct });
+        if (suite !== false || !onRetour || container.querySelector('#sh-essais-retour')) return;
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.id = 'sh-essais-retour';
+        btn.className = 'sh-essais-retour';
+        btn.textContent = t('REVENIR À L\'ATELIER', 'RETURN TO THE WORKSHOP');
+        btn.addEventListener('click', () => onRetour());
+        container.querySelector('.sh-essais-bilan')?.appendChild(btn);
       });
       return;
     }

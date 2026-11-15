@@ -73,6 +73,17 @@ export class EpisodeRunner {
     return true;
   }
 
+  // Le CML 4 ferme la sortie des essais. On revient à l'atelier pour revoir la conception.
+  retourAtelier() {
+    if (this.currentEpisode?.type !== 'essais') return false;
+    const index = this.chapter.episodes.findIndex((ep) => ep.type === 'atelier');
+    if (index < 0) return false;
+    this.index = index;
+    this._enterEpisode();
+    this.astra?.say('retour_atelier');
+    return true;
+  }
+
   snapshot() {
     return {
       chapitreId: this.chapter.id,

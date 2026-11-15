@@ -142,8 +142,9 @@ export function renderEpisode(container, episodeRunner, {
           repartitions,
           onValider: ({ fiabilite }) => {
             window.dispatchEvent(new CustomEvent('essais-termines', { detail: { fiabilite } }));
-            onNext?.();
-          }
+            return onNext?.();
+          },
+          onRetour: () => episodeRunner.retourAtelier()
         }
       );
     }

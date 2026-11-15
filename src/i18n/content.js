@@ -36,8 +36,8 @@ const EP_TEXT = {
   'chapitre_03.briefing': 'Choose the science question: relief, ice at the poles, or the gravity field. Transfer and radio delay follow from it.',
   'chapitre_03.atelier': 'Plan transfer propellant, a link that tolerates the delay, and a mapping instrument.',
   'chapitre_03.essais': 'The transfer engine, vacuum thermal control and the electrical chain must hold before injection.',
-  'chapitre_03.lancement': 'Parking orbit, then the burn toward the Moon. Lunar capture is decided at the end of the transfer.',
-  'chapitre_03.operations': 'Commands leave three seconds early. Deploy the instruments once in lunar orbit.',
+  'chapitre_03.lancement': 'Parking orbit, then the burn toward the Moon. Closest approach 66,400 km: this is not a capture.',
+  'chapitre_03.operations': 'Commands leave three seconds early. The satellite is on the transfer, not in lunar orbit.',
   'chapitre_03.bilan': 'Mission report, score, medal and ASTRA\'s read.',
   'chapitre_04.briefing': 'The launch window is the first choice. Everything else, power and endurance, must last until arrival.',
   'chapitre_04.atelier': 'Compare solar arrays and an RTG. At several astronomical units the Sun is no longer enough, unlike near Earth.',
@@ -48,7 +48,7 @@ const EP_TEXT = {
   'chapitre_05.briefing': 'Define what the Guardian must see before Earth does: plasma, magnetic field, or an image of the solar disc.',
   'chapitre_05.atelier': 'Outside the magnetosphere, shielding, power and alert data rate matter more than mass alone.',
   'chapitre_05.essais': 'Radiation, thermal and electrical integrity: the halo is not repaired on the ground.',
-  'chapitre_05.lancement': 'Insertion toward L1, then the first corrections to catch the halo orbit.',
+  'chapitre_05.lancement': 'Insertion toward L1, then the halo. Four corrections a year: an operational hypothesis, not a propagation.',
   'chapitre_05.operations': 'Hold the halo and send the alert for as long as the link to Earth holds.',
   'chapitre_05.bilan': 'Mission report, score, medal and ASTRA\'s read.'
 };

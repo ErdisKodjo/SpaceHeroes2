@@ -157,13 +157,16 @@ export function mountScene(container) {
   }
   document.addEventListener('visibilitychange', onVisibility);
 
-  function showMissionBanner() {
+  function showMissionBanner(type) {
     document.getElementById('sh-mission-accomplie')?.remove();
     document.getElementById('cam-hint')?.classList.add('is-gone');
     const banner = document.createElement('div');
     banner.id = 'sh-mission-accomplie';
     banner.setAttribute('role', 'status');
-    banner.innerHTML = `<p>${t('Mission accomplie', 'Mission complete')}</p><span>${t('Orbite atteinte', 'Orbit reached')}</span>`;
+    const ligne = type === 'transfert_lune'
+      ? t('Approche, pas une capture', 'Approach, not a capture')
+      : t('Orbite atteinte', 'Orbit reached');
+    banner.innerHTML = `<p>${t('Mission accomplie', 'Mission complete')}</p><span>${ligne}</span>`;
     document.body.appendChild(banner);
     requestAnimationFrame(() => banner.classList.add('is-in'));
     setTimeout(() => {
@@ -223,8 +226,8 @@ export function mountScene(container) {
       earth.flash();
     },
     /** Burst doré + bandeau, au moment où le CubeSat atteint l'orbite. */
-    celebrate() {
-      showMissionBanner();
+    celebrate(detail) {
+      showMissionBanner(detail?.type);
       if (reduceMotion) return;
       celebActive = true;
       const origin = new THREE.Vector3(1.08, 0.2, 0);

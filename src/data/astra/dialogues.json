@@ -134,6 +134,11 @@
     "texte": "Le CML {niveau} n'est pas validé. Il faut 80 % de critères verts avant de quitter cet épisode.",
     "texteEn": "CML {niveau} is not validated. It needs 80% green criteria before this episode can be left."
   },
+  "retour_atelier": {
+    "categorie": "alerte",
+    "texte": "Le CML 4 ne passe pas. Retourne à l'atelier, revois la conception, puis refais les essais.",
+    "texteEn": "CML 4 does not pass. Return to the workshop, revise the design, then run the tests again."
+  },
   "briefing_ch2_intro": {
     "categorie": "narration",
     "texte": "Cette mission revoit le même lieu à la même heure solaire. C'est l'orbite héliosynchrone : la lumière reste comparable d'un passage à l'autre.",

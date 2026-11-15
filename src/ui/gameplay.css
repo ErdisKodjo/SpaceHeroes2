@@ -630,6 +630,21 @@
 }
 .sh-essais-valider:hover { filter: brightness(1.1); }
 
+.sh-essais-retour {
+  font-family: var(--font-hud);
+  font-weight: 700;
+  font-size: 0.72rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  background: transparent;
+  color: var(--hud);
+  border: 1px solid rgba(124, 240, 255, 0.45);
+  padding: 10px;
+  cursor: pointer;
+  width: 100%;
+}
+.sh-essais-retour:hover { background: rgba(124, 240, 255, 0.08); }
+
 /* Responsive */
 @media (max-width: 540px) {
   .sh-atelier-jauges { flex-direction: column; }

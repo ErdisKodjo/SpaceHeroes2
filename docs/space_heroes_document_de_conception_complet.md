@@ -17,11 +17,11 @@ Le chapitre 1 (*Le premier signal*, CubeSat, orbite basse, masse plafonnée à 4
 ### Déroulé réel
 
 - **QG.** Cinq missions au choix, bouton Continuer si une sauvegarde existe, changement de rôle, message d'accueil d'ASTRA. Le tableau de bord mural, la bibliothèque « Dans la vraie vie » et la carte cliquable du système solaire restent de la conception.
-- **Rôle.** Quatre postes (DM, IV, ISB, RSN). En solo, ASTRA tient les trois autres. Le multijoueur en ligne n'est pas dans cette version.
+- **Rôle.** Quatre postes (DM, IV, ISB, RSN). En solo, ASTRA tient les trois autres. Au départ, le rôle élargit un plafond ou allège un coût, et il donne un geste en opérations : veto, calcul de durée, reboot ou compression. Le multijoueur en ligne n'est pas dans cette version.
 - **Briefing.** Objectif, ce qui rend la mission unique, fenêtre, classe de budget, croquis. ASTRA évalue le CML 1.
-- **Atelier.** Un composant par famille : moteur, structure, énergie, communications, instrument. Le CubeSat 3D se construit au fur et à mesure. La masse totale est surveillée avant validation.
+- **Atelier.** Un composant par famille : moteur, structure, énergie, communications, instrument. Douze points par famille. Une pièce verrouillée s'achète en jetons, au prix du numéro de son chapitre. En orbite, un clic sur le CubeSat ouvre la fiche de la face touchée et de la pièce choisie. Le modèle 3D reste un CubeSat 1U.
 - **Essais.** Trois épreuves seulement : **vibrations**, **isolation thermique**, **compatibilité électrique**. Il n'y a pas de test vide séparé, et rien ne se fabrique sur cet écran.
-- **Lancement.** Compte à rebours et décollage 3D. Si le CML demandé n'est pas à 80 % de vert, ASTRA le **signale**. Le compte à rebours **n'est pas verrouillé**. Le bilan en tient compte.
+- **Lancement.** Compte à rebours et décollage 3D. Si le CML demandé n'est pas à 80 % de vert, on ne quitte pas l'épisode : ASTRA le dit. Une fois sur cet écran, le compte à rebours part. La légende d'orbite lit la table GMAT du chapitre. La Lune s'approche à 66 400 km sans capture, avec une injection de 3,12 km/s. Mars part début décembre 2026. Les 4 corrections par an de L1 sont une hypothèse.
 - **Opérations.** Contact radio vers une station au sol, puis déploiement dans l'ordre **communications → énergie → instrument**, transmission des données, et parfois une anomalie.
 - **Bilan.** Score, ressources, trois décisions, médaille, phrase NASA, citation d'ASTRA. Bouton **Exporter le PDF** : fichier `SpaceHeroes_{titre}_{AAAA-MM-JJ}.pdf`, bandeau sombre, logo, corps blanc.
 
@@ -37,7 +37,8 @@ Le chapitre 1 (*Le premier signal*, CubeSat, orbite basse, masse plafonnée à 4
 - Les options cliquables restent un **brouillon** jusqu'à **Enregistrer**. Le bouton n'est actif que si quelque chose a changé. Annuler, fermer, cliquer le fond ou Échap jette le brouillon.
 - Police, contraste, daltonisme, réduction des animations et plein écran ne s'appliquent qu'à l'enregistrement.
 - Effacer, exporter et importer les données s'appliquent tout de suite.
-- Les quatre difficultés (Cadet, Ingénieur, Directeur de mission, Bac à sable) sont proposées dans les paramètres. Le moteur de mission **n'applique pas encore** la pré-validation CML du mode Cadet.
+- Les quatre difficultés s'appliquent au départ d'une mission. Cadet : plafonds ×1,15, CML 1 et 2 déjà verts, pas d'événement aléatoire. Ingénieur : la mission du chapitre, l'aléa suit le réglage. Directeur : plafonds ×0,85, aléa forcé, CML 3 pour quitter l'atelier, CML 4 pour quitter les essais, avec un retour à l'atelier. Bac à sable : la porte CML ne retient pas l'épisode.
+- Le mode de jeu s'applique aussi au départ. Campagne : le chapitre suivant s'ouvre avec un score. Défi : masse ×0,80 et durée ×0,70. Découverte : les cinq cartes sont ouvertes et le parcours n'est pas classé.
 
 ### Identité visuelle et premier écran
 
@@ -46,7 +47,7 @@ Le chapitre 1 (*Le premier signal*, CubeSat, orbite basse, masse plafonnée à 4
 
 ### Bande-son
 
-Musique originale synthétisée dans le navigateur, sans fichier audio, une boucle par écran. Le bouton SON / MUET coupe musique, effets et voix. Le curseur **Musique d'ambiance** est un volume global par-dessus les volumes de la carte. Au décollage, la musique baisse sous le grondement, puis revient.
+Musique originale synthétisée dans le navigateur, sans fichier audio, une boucle par écran. Le bouton SON / MUET coupe musique, effets et voix. Le curseur **Volume général** baisse les trois. Le curseur **Musique d'ambiance** ne baisse que la bande-son. Au décollage, la musique baisse sous le grondement, puis revient.
 
 | Scène | BPM | Volume | Ambiance | Suite |
 | --- | --- | --- | --- | --- |
@@ -226,7 +227,7 @@ ASTRA joue le rôle d'**évaluateur indépendant** (conforme à la méthodologie
 - Chaque critère est coté **Rouge / Jaune / Vert**.
 - Un niveau est validé dès que **4 critères sur 5 sont verts (seuil 80 %)**.
 - **Le joueur ne coche jamais lui-même** : ASTRA l'interroge et colore la pastille selon l'état réel de la conception.
-- **Adaptation à la difficulté (prévue, pas encore appliquée par le moteur)** : en mode *Cadet*, les niveaux CML 1 et 2 seraient pré-validés par ASTRA ; en mode *Directeur de mission*, les 4 niveaux devraient être intégralement validés. Dans la version jouable, le réglage est enregistré, mais tous les chapitres suivent la même grille.
+- **Adaptation à la difficulté, appliquée au départ d'une mission** : en mode *Cadet*, ASTRA pré-valide les CML 1 et 2, les plafonds sont plus larges et il n'y a pas d'événement aléatoire. En mode *Directeur de mission*, les plafonds sont plus serrés, l'événement est toujours là, le CML 3 ferme l'atelier et le CML 4 ferme les essais. Le *Bac à sable* n'est pas retenu par cette porte. L'*Ingénieur* suit la grille du chapitre.
 
 #### Grille des 20 critères CML
 

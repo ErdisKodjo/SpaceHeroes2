@@ -90,10 +90,7 @@ La voix WebRTC reste après D5. Elle n'est pas nécessaire pour jouer.
 
 ## Lot E — Qualité
 
-Dépend : rien pour démarrer. Dépendances absentes :
-
-- Pas de lanceur de tests dans `package.json` (pas de Vitest, pas de Jest).
-- Pas de dossier `.github`, donc pas d'intégration continue.
+Dépend : rien pour démarrer. Le lanceur de tests est Vitest. Le workflow est `.github/workflows/verifier.yml`.
 
 | Étape | Livrable | Dépendance |
 |---|---|---|
@@ -112,10 +109,26 @@ Dépend : rien pour démarrer. Dépendances absentes :
 4. Lot C seulement après un choix explicite d'ajouter des chapitres.
 5. Lot D en dernier. Il demande un serveur qui n'existe pas.
 
-Lot suivant à coder si on reprend « la suite » sans autre consigne : **B2, le retour à l'atelier quand le directeur rate le CML 4**.
+Lot suivant à coder si on reprend « la suite » sans autre consigne : **aucun, sans un choix**. Le lot C demande de décider si la polaire, la haute et la GEO deviennent des chapitres. Le lot D, le multijoueur, reste le dernier.
 
 ## Fait le 15 novembre 2026
 
 Lot A. Le volume général, les effets, la voix, les sous-titres, la vitesse de lecture, la vitesse d'orbite au décollage et la qualité graphique sont lus. Le guide joueur le dit.
 
 B1. Un clic sur le CubeSat en orbite ouvre la fiche de la face touchée : moteur, structure, énergie, antenne ou instrument, avec la pièce choisie à l'atelier.
+
+B2. Si la confirmation des essais est refusée parce qu'un CML bloque la sortie, le bouton « Revenir à l'atelier » ramène à la conception. ASTRA le dit. Le coût d'atelier est remplacé, pas ajouté une seconde fois.
+
+B3. L'écran du chapitre Lune dit que le plus près, 66 400 km, n'est pas une capture. La légende d'orbite, le bandeau, la carte du QG, le lancement, les opérations et le bilan le disent. Aucune capture n'a été inventée.
+
+B4. Les 4 corrections par an de L1 sont nommées comme une hypothèse opérationnelle, dans la légende d'orbite, le bilan, le lancement et la carte du QG. Elles ne viennent pas du correcteur d'exemple.
+
+B5. La légende d'orbite et le bilan montrent le départ de début décembre 2026 pour Mars, et l'injection lunaire de 3,12 km/s. Ces deux chiffres étaient déjà dans les tables.
+
+E1. Vitest 2 est une dépendance de développement. `npm test` lance `vitest run`. Les tests du moteur viennent à l'étape E2.
+
+E2. `src/engine/moteur.test.js` couvre les portes CML, la difficulté, le mode de jeu, le remplacement du coût d'atelier et les jetons. Le lanceur est Node, pas le navigateur.
+
+E3. `.github/workflows/verifier.yml` lance `npm test` puis `npm run build` à chaque push et sur chaque pull request, avec Node 22.
+
+E4. Le guide joueur et la section « version jouable » disent la même chose que Plan3 : difficulté, mode de jeu, rôle, porte CML, fiche du CubeSat, et les légendes GMAT de la Lune, de Mars et de L1.
