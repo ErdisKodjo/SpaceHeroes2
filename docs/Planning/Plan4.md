@@ -5,7 +5,7 @@ Les lots A à E et la voix de la table sont faits. Rien d'autre n'est en file : 
 
 Plan3 décrit la version jouable solo. Ce fichier dit ce qui a été ajouté ensuite, et ce qui a été laissé dehors.
 
-Dépendances déjà présentes, à ne pas réinstaller : Node et Vite 5, Three.js 0.160, jsPDF 4, Vitest 2, `ws` 8, GMAT R2026a dans `F:\SPACE HEROES\gmat-win-R2026a`. GMAT ne s'appelle pas depuis le navigateur. Le serveur de table est un second processus, `npm run server`, sur `127.0.0.1:8787`.
+Dépendances déjà présentes, à ne pas réinstaller : Node et Vite 5, Three.js 0.160, jsPDF 4, Vitest 2, `ws` 8, GMAT R2026a dans `F:\SPACE HEROES\gmat-win-R2026a`. GMAT ne s'appelle pas depuis le navigateur. Le serveur de table est un second processus, `npm run server`, sur le port 8787, joignable depuis le réseau local.
 
 ---
 
@@ -14,9 +14,9 @@ Dépendances déjà présentes, à ne pas réinstaller : Node et Vite 5, Three.j
 | Lot | État |
 |---|---|
 | A — Réglages | Fait. Volume, effets, voix, sous-titres, lecture, vitesse d'orbite, qualité graphique. |
-| B — Trous d'une mission | Fait. Fiche du CubeSat, retour à l'atelier, légendes Lune / Mars / L1. Trois limites restent, listées plus bas. |
+| B — Trous d'une mission | Fait. Fiche du CubeSat, retour à l'atelier, légendes Lune / Mars / L1, traînée des 12 semaines sur quatre faces CDS. La correction de L1 reste une hypothèse. |
 | C — Contenu | Fait. Chapitres 6, 7 et 8, fiches « Dans la vraie vie », schéma du système solaire au QG. |
-| D — Table à 4 | Fait. WebSocket, quatre postes, jauges et veto du serveur, bilan commun, voix WebRTC. |
+| D — Table à 4 | Fait. WebSocket, quatre postes, jauges et veto du serveur, bilan commun, voix WebRTC, salon joignable sur le réseau local. |
 | E — Qualité | Fait. Vitest, tests du moteur, jauges, table et voix, workflow `npm test` puis `npm run build`. |
 
 ---
@@ -25,10 +25,8 @@ Dépendances déjà présentes, à ne pas réinstaller : Node et Vite 5, Three.j
 
 Ces points ne sont pas des cases à coder. Ils disent ce que les lots ont choisi de ne pas construire.
 
-- La traînée d'orbite basse reste un texte d'atelier. Elle ne raccourcit pas les 12 semaines du chapitre. La surface reste 0,01 m² : changer de châssis ne change que la masse.
-- Le chapitre Lune s'approche à 66 400 km. Ce n'est pas une capture. Aucune capture, aucun nouveau Δv lunaire.
 - Les 4 corrections par an de L1 restent une hypothèse opérationnelle. Elles ne viennent pas du correcteur d'exemple GMAT.
-- Le serveur de table écoute `127.0.0.1`. Il n'y a pas d'hébergement public. La page Vite ne l'importe pas.
+- Il n'y a pas d'hébergement public. Si la machine n'a pas d'adresse joignable depuis un autre réseau, le salon le dit. Il peut rejoindre un serveur qui l'est déjà. La page Vite ne l'importe pas.
 - La voix n'a pas de serveur TURN. Deux joueurs derrière des réseaux fermés peuvent ne pas s'entendre. Le micro refusé laisse la partie jouable. Le serveur ne transporte pas le son.
 - Hors du jeu actuel : la suite des chapitres du plan 24 h, les filières rang 2 à 5, les scénarios hors filière, Opération Phénix, Opération Horizon, la mission habitée, les constellations, l'assistance gravitationnelle, le rendez-vous, l'évitement.
 
@@ -50,7 +48,7 @@ B1. Un clic sur le CubeSat en orbite ouvre la fiche de la face touchée : moteur
 
 B2. Si la confirmation des essais est refusée parce qu'un CML bloque la sortie, le bouton « Revenir à l'atelier » ramène à la conception. ASTRA le dit. Le coût d'atelier est remplacé, pas ajouté une seconde fois.
 
-B3. L'écran du chapitre Lune dit que le plus près, 66 400 km, n'est pas une capture. La légende d'orbite, le bandeau, la carte du QG, le lancement, les opérations et le bilan le disent. Aucune capture n'a été inventée.
+B3. L'écran du chapitre Lune a d'abord dit que le plus près, 66 400 km, n'était pas une capture. Une propagation ultérieure, départ le 1 janvier 2026 à 00:00, nœud 355°, trouve une périlune à 50 km. Le freinage de 0,87 km/s capture l'orbiteur. Ces deux chiffres viennent de GMAT.
 
 B4. Les 4 corrections par an de L1 sont nommées comme une hypothèse opérationnelle, dans la légende d'orbite, le bilan, le lancement et la carte du QG. Elles ne viennent pas du correcteur d'exemple.
 
@@ -83,3 +81,11 @@ D4. Une fois la table lancée, les six jauges et la réserve de veto sont celles
 D5. Le bilan d'une partie à 4 ajoute un rapport commun : le score envoyé par chaque poste, l'usage du veto, et les moments où une jauge passe 80 % ou dépasse son plafond. Le même poste ne compte qu'une fois. Ce rapport n'écrit pas le score dans le navigateur.
 
 Voix. **Ouvrir le micro** ouvre un maillage WebRTC entre les joueurs de la table. Le serveur transmet l'offre, la réponse et les candidats, puis le son va d'un navigateur à l'autre. La partie reste jouable si le micro est refusé.
+
+Réseau. Le serveur écoute le réseau local, plus seulement cette machine. Le salon se branche sur le nom de la page, ou sur `?serveur=` si le serveur est ailleurs, et il affiche l'adresse que les autres joueurs ouvrent. Il n'y a pas d'hébergement public.
+
+Hors réseau. Le salon sépare les adresses du même réseau de celles qu'un autre réseau peut ouvrir. Une adresse de partage d'opérateur n'est pas proposée. Sans adresse joignable, le salon le dit et propose de rejoindre un serveur qui l'est déjà. Aucun hébergement public n'a été ajouté.
+
+Capture lunaire. Le départ du 1 janvier 2026 à 00:00, nœud 355°, injection 3,12 km/s, atteint une périlune à 50 km. Le freinage de 0,87 km/s capture l'orbiteur. Huit jours et sept dixièmes plus tard, l'altitude propagée est 37 km.
+
+Traînée. En orbite basse, les 12 semaines perdent une part des 350 km qui séparent le départ d'une orbite circulaire à 200 km. Cette part est la perte de demi-grand axe propagée sur 84 jours. Quatre faces du CDS sont dans la table : 0,0100 m² (extrémité 1U, aluminium), 0,01702 m² (côté 1,5U, Al-Li), 0,0227 m² (côté 2U, titane), 0,03405 m² (côté 3U, CFRP). Les masses des pièces ne changent pas. À 1,33 kg, ces faces perdent 43,1 km, 65,5 km, 85,5 km et 137,6 km. La face 3U à 1,33 kg atteint 200 km au jour 114,8. Les autres lignes tiennent 120 jours. Hors de 1,33 à 4 kg, la perte est prolongée en 1/masse. Entre 2,22 et 4 kg, la perte à 84 jours n'est pas monotone : l'excentricité 0,035 est lue à un jour fixe.

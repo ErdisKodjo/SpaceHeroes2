@@ -9,7 +9,7 @@ Guide du jeu tel qu'il se joue dans le navigateur. Une mission va du QG au bilan
 3. Ensuite : `npm run dev`.
 4. Ouvrir l'adresse indiquée par Vite, en général `http://127.0.0.1:5173/`.
 
-`npm run server` lance un second processus, sur `ws://127.0.0.1:8787`. Il ne fait pas partie de la page Vite. **Partie à 4**, au QG, s'y connecte. **Ouvrir le micro** relie les voix des joueurs directement entre leurs navigateurs. Le serveur ne transporte que la signalisation, pas le son. Sans micro autorisé, la partie continue.
+`npm run server` lance un second processus, sur le port 8787. Il ne fait pas partie de la page Vite. **Partie à 4** affiche les adresses du même réseau, et celles qui sont joignables depuis un autre réseau. Une adresse de partage d'opérateur ne l'est pas. Si cette machine n'en a pas, le salon le dit. Le champ **Serveur déjà joignable** relie le salon à un serveur qui l'est déjà. **Ouvrir le micro** relie les voix des joueurs directement entre leurs navigateurs. Le serveur ne transporte que la signalisation, pas le son. Sans micro autorisé, la partie continue.
 
 Le premier écran est le logo circulaire Space Heroes, avec une phrase de chargement. Il disparaît quand les textures sont prêtes. Un clic dans la page est nécessaire pour entendre la musique, les effets et la voix : le navigateur bloque le son tant qu'on n'a pas cliqué.
 
@@ -31,7 +31,7 @@ Cliquer une carte ouverte demande d'abord de confirmer le rôle, puis la mission
 
 ## Choisir un rôle
 
-Quatre postes. En solo, ASTRA tient les trois autres, et le veto dépense les jetons enregistrés dans le navigateur. **Partie à 4** ouvre une table sur le serveur : un joueur par poste, un poste ne se partage pas, et un siège vide reste vide. Le premier joueur lance le chapitre quand les quatre postes sont tenus. Les six jauges et la réserve de veto viennent alors du serveur. La partie à 4 n'est pas écrite dans la sauvegarde du navigateur.
+Quatre postes. En solo, ASTRA tient les trois autres, et le veto dépense les jetons enregistrés dans le navigateur. **Partie à 4** ouvre une table sur le serveur : un joueur par poste, un poste ne se partage pas, et un siège vide reste vide. Le salon indique les adresses du même réseau, et celles joignables depuis un autre réseau. Sans adresse joignable, il propose un serveur qui l'est déjà. Le premier joueur lance le chapitre quand les quatre postes sont tenus. Les six jauges et la réserve de veto viennent alors du serveur. La partie à 4 n'est pas écrite dans la sauvegarde du navigateur.
 
 | Sigle | Poste | Ce que la carte annonce |
 | --- | --- | --- |
@@ -84,6 +84,8 @@ Cinq familles, un composant chacune : moteur, structure, énergie, communication
 
 **Valider l'atelier** n'est accepté que lorsque les cinq familles ont un choix. Le message « Sélectionne un composant dans chaque famille » apparaît sinon.
 
+En orbite basse, la face du châssis entre dans la durée. Quatre faces propagées 84 jours sont proposées : 0,0100 m² (extrémité 1U), 0,01702 m² (côté 1,5U), 0,0227 m² (côté 2U), 0,03405 m² (côté 3U). La perte de demi-grand axe sur ces 84 jours est rapportée aux 350 km qui mènent à 200 km, puis retirée des 12 semaines. La face 3U à 1,33 kg atteint 200 km au jour 114,8. Hors de 1,33 à 4 kg, l'atelier le dit : le chiffre est prolongé en 1/masse.
+
 ### Essais
 
 Trois épreuves, dans l'ordre. La fiabilité (0 à 100) part au bilan.
@@ -94,7 +96,7 @@ Trois épreuves, dans l'ordre. La fiabilité (0 à 100) part au bilan.
 
 ### Lancement
 
-Le bouton **Lancer** démarre le compte à rebours. La caméra devient cinématique : la souris et le clavier ne dirigent plus la vue. La musique baisse sous le grondement, puis revient une fois la trajectoire affichée. La légende donne les chiffres GMAT du chapitre : pour la Lune, injection 3,12 km/s et plus près à 66 400 km, sans capture ; pour Mars, un tour en 113,3 min et un départ début décembre 2026 ; pour L1, 1,5 million de km, un halo de 173 jours, et 4 corrections par an nommées comme une hypothèse.
+Le bouton **Lancer** démarre le compte à rebours. La caméra devient cinématique : la souris et le clavier ne dirigent plus la vue. La musique baisse sous le grondement, puis revient une fois la trajectoire affichée. La légende donne les chiffres GMAT du chapitre : pour la Lune, injection 3,12 km/s, périlune à 50 km et capture de 0,87 km/s ; pour Mars, un tour en 113,3 min et un départ début décembre 2026 ; pour L1, 1,5 million de km, un halo de 173 jours, et 4 corrections par an nommées comme une hypothèse.
 
 ### Opérations
 

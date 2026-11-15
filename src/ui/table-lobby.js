@@ -2,7 +2,7 @@
 
 import { playerStore } from '../engine/player.js';
 import { definirEquipage } from '../net/equipage.js';
-import { couperTable, envoyerTable, ouvrirTable, suivreTable } from '../net/partie.js';
+import { adresseTable, couperTable, definirServeur, envoyerTable, ouvrirTable, suivreTable } from '../net/partie.js';
 import { mettrePaires, recevoirVoix, couperVoix } from '../net/voix.js';
 import { monterVoix } from './voix-barre.js';
 import { pick, t } from '../i18n.js';
@@ -39,6 +39,35 @@ export function createTableLobby({ chapters = [], onDepart } = {}) {
   let etat = { joueurs: [], places: 4, prete: false, hote: null };
   let erreur = t('Connexion au serveur…', 'Connecting to the server…');
   let parti = false;
+  let locales = [];
+  let partagees = [];
+  let serveurSaisi = '';
+
+  function pageDe(ip) {
+    const lieu = globalThis.location;
+    const port = lieu?.port ? `:${lieu.port}` : '';
+    const proto = lieu?.protocol === 'https:' ? 'https:' : 'http:';
+    return `${proto}//${ip}${port}/`;
+  }
+
+  function htmlListe(ips) {
+    return ips.map((ip) => `<span class="sh-table-adresse">${esc(pageDe(ip))}</span>`).join('');
+  }
+
+  function htmlAdresses() {
+    const meme = locales.length
+      ? `<p class="sh-table-adresses">${t('Sur le même réseau, les autres joueurs ouvrent :', 'On the same network, other players open:')}${htmlListe(locales)}</p>`
+      : '';
+    const ailleurs = partagees.length
+      ? `<p class="sh-table-adresses">${t('Depuis un autre réseau, les autres joueurs ouvrent :', 'From another network, other players open:')}${htmlListe(partagees)}</p>`
+      : `<p class="sh-table-adresses">${t('Cette machine n\'a pas d\'adresse joignable depuis un autre réseau.', 'This machine has no address reachable from another network.')}</p>`;
+    return `${meme}${ailleurs}
+      <form class="sh-table-serveur" id="sh-table-serveur-form">
+        <label for="sh-table-serveur">${t('Serveur déjà joignable', 'Server already reachable')}</label>
+        <input id="sh-table-serveur" value="${esc(serveurSaisi)}" placeholder="adresse:8787" autocomplete="off">
+        <button type="submit">${t('Rejoindre', 'Join')}</button>
+      </form>`;
+  }
 
   function occupant(roleId) {
     return etat.joueurs.find((j) => j.roleId === roleId) || null;
@@ -55,6 +84,7 @@ export function createTableLobby({ chapters = [], onDepart } = {}) {
           <p>${t('Chaque poste est tenu par un joueur. Un siège vide le reste : ASTRA ne le prend pas.', 'Each seat is held by a player. An empty seat stays empty: ASTRA does not take it.')}</p>
         </header>
         <p class="sh-table-statut">${esc(raison)}</p>
+        ${htmlAdresses()}
         <div class="sh-table-roles">
           ${roles.map((role) => {
             const qui = occupant(role.id);
@@ -102,6 +132,20 @@ export function createTableLobby({ chapters = [], onDepart } = {}) {
       const chapterId = overlay.querySelector('#sh-table-chapitre')?.value;
       envoyer({ type: 'lancer', chapterId });
     });
+    overlay.querySelector('#sh-table-serveur')?.addEventListener('input', (event) => {
+      serveurSaisi = event.target.value;
+    });
+    overlay.querySelector('#sh-table-serveur-form')?.addEventListener('submit', (event) => {
+      event.preventDefault();
+      const cible = definirServeur(serveurSaisi);
+      if (!cible) {
+        erreur = t('Cette adresse de serveur est illisible.', 'That server address cannot be read.');
+        render();
+        return;
+      }
+      serveurSaisi = cible;
+      relier();
+    });
   }
 
   function envoyer(message) {
@@ -137,8 +181,49 @@ export function createTableLobby({ chapters = [], onDepart } = {}) {
     overlay.remove();
   }
 
-  socket = ouvrirTable();
-  oublier = suivreTable((message) => {
+  async function lireAdresses() {
+    try {
+      const url = new URL(adresseTable());
+      url.protocol = url.protocol === 'wss:' ? 'https:' : 'http:';
+      url.pathname = '/sante';
+      url.search = '';
+      const res = await fetch(url);
+      const data = await res.json();
+      locales = Array.isArray(data.locales) ? data.locales.filter((ip) => typeof ip === 'string') : [];
+      partagees = Array.isArray(data.partagees) ? data.partagees.filter((ip) => typeof ip === 'string') : [];
+    } catch {
+      locales = [];
+      partagees = [];
+    }
+    if (!parti) render();
+  }
+
+  function relier() {
+    oublier();
+    barre?.dispose();
+    barre = null;
+    couperVoix();
+    couperTable();
+    moi = null;
+    erreur = t('Connexion au serveur…', 'Connecting to the server…');
+    socket = ouvrirTable();
+    lireAdresses();
+    oublier = suivreTable(recevoir);
+    if (socket.readyState === 1) envoyer({ type: 'rejoindre', nom: playerStore.nom });
+    socket.addEventListener('open', () => {
+      erreur = '';
+      envoyer({ type: 'rejoindre', nom: playerStore.nom });
+    });
+    socket.addEventListener('close', () => {
+      if (parti) return;
+      if (!moi) erreur = t('Le serveur ne répond pas. Lancez npm run server.', 'The server is not answering. Run npm run server.');
+      moi = null;
+      render();
+    });
+    render();
+  }
+
+  function recevoir(message) {
     if (message.type === 'toi') {
       moi = message.id;
       barre = monterVoix();
@@ -162,19 +247,8 @@ export function createTableLobby({ chapters = [], onDepart } = {}) {
       return;
     }
     render();
-  });
-  if (socket.readyState === 1) envoyer({ type: 'rejoindre', nom: playerStore.nom });
-  socket.addEventListener('open', () => {
-    erreur = '';
-    envoyer({ type: 'rejoindre', nom: playerStore.nom });
-  });
-  socket.addEventListener('close', () => {
-    if (parti) return;
-    if (!moi) erreur = t('Le serveur ne répond pas. Lancez npm run server.', 'The server is not answering. Run npm run server.');
-    moi = null;
-    render();
-  });
+  }
 
-  render();
+  relier();
   return { dispose: fermer };
 }

@@ -95,12 +95,19 @@ export function resolveGmat(table) {
     const jours = r.dureeTransfertJours || 5;
     const periodMin = jours * 2 * 24 * 60;
     const approche = Number(r.approcheMinKm);
-    const plusPres = Number.isFinite(approche)
-      ? ` · plus près ${milliers(approche, ' ')} km · pas une capture`
-      : '';
-    const closest = Number.isFinite(approche)
-      ? ` · closest ${milliers(approche, ',')} km · not a capture`
-      : '';
+    const altitudeLune = Number(r.altitudePeriluneKm);
+    const capture = Number(r.deltaVCaptureKmS);
+    const liee = Number.isFinite(altitudeLune) && Number.isFinite(capture);
+    const plusPres = liee
+      ? ` · périlune ${milliers(altitudeLune, ' ')} km · capture ${virgule(capture)} km/s`
+      : Number.isFinite(approche)
+        ? ` · plus près ${milliers(approche, ' ')} km · pas une capture`
+        : '';
+    const closest = liee
+      ? ` · perilune ${milliers(altitudeLune, ',')} km · capture ${capture} km/s`
+      : Number.isFinite(approche)
+        ? ` · closest ${milliers(approche, ',')} km · not a capture`
+        : '';
     const dv = Number(r.deltaVInjectionKmS);
     const injection = Number.isFinite(dv) ? ` · injection ${virgule(dv)} km/s` : '';
     const injectionEn = Number.isFinite(dv) ? ` · injection ${dv} km/s` : '';

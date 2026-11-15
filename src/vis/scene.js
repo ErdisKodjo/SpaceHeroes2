@@ -164,7 +164,7 @@ export function mountScene(container) {
     banner.id = 'sh-mission-accomplie';
     banner.setAttribute('role', 'status');
     const ligne = type === 'transfert_lune'
-      ? t('Approche, pas une capture', 'Approach, not a capture')
+      ? t('Capture à 50 km', 'Capture at 50 km')
       : t('Orbite atteinte', 'Orbit reached');
     banner.innerHTML = `<p>${t('Mission accomplie', 'Mission complete')}</p><span>${ligne}</span>`;
     document.body.appendChild(banner);

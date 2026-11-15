@@ -228,6 +228,15 @@ function ligneGmat(chapter) {
     const injection = Number.isFinite(dv)
       ? t(` · injection ${String(dv).replace('.', ',')} km/s`, ` · injection ${dv} km/s`)
       : '';
+    const altitudeLune = Number(r.altitudePeriluneKm);
+    const capture = Number(r.deltaVCaptureKmS);
+    if (Number.isFinite(altitudeLune) && Number.isFinite(capture)) {
+      const freinage = String(capture).replace('.', ',');
+      return base + injection + t(
+        ` · périlune ${altitudeLune} km, capture ${freinage} km/s`,
+        ` · perilune ${altitudeLune} km, capture ${capture} km/s`
+      );
+    }
     if (!Number.isFinite(approche)) return base + injection;
     const fr = Math.round(approche).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
     const en = Math.round(approche).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');

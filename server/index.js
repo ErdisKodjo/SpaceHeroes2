@@ -6,21 +6,36 @@ import { WebSocketServer } from 'ws';
 import { creerTable } from './table.js';
 import { contraintesChapitre, creerJauges } from './jauges.js';
 import { chargeValide, destinataire } from './voix.js';
+import { adressesIpv4 } from './adresses.js';
+import { trierAdresses } from '../src/net/portee.js';
 
 const port = Number(process.env.PORT) || 8787;
+const hote = process.env.HOST || '0.0.0.0';
+
+function adressesAnnoncees() {
+  if (hote === '127.0.0.1' || hote === 'localhost') return [];
+  if (hote === '0.0.0.0' || hote === '::') return adressesIpv4();
+  return [hote];
+}
 const table = creerTable();
 let jauges = null;
 
 const server = http.createServer((req, res) => {
   if (req.url === '/sante') {
     const etat = table.etat();
-    res.writeHead(200, { 'content-type': 'application/json; charset=utf-8' });
+    res.writeHead(200, {
+      'content-type': 'application/json; charset=utf-8',
+      'access-control-allow-origin': '*'
+    });
     res.end(JSON.stringify({
       service: 'space-heroes',
       transport: 'websocket',
       joueurs: etat.joueurs.length,
       prete: etat.prete,
-      reserveVeto: jauges ? jauges.etat().reserveVeto : null
+      reserveVeto: jauges ? jauges.etat().reserveVeto : null,
+      port,
+      adresses: adressesAnnoncees(),
+      ...trierAdresses(adressesAnnoncees())
     }));
     return;
   }
@@ -149,6 +164,7 @@ wss.on('connection', (socket) => {
   });
 });
 
-server.listen(port, '127.0.0.1', () => {
-  console.log(`serveur multijoueur ws://127.0.0.1:${port}`);
+server.listen(port, hote, () => {
+  console.log(`serveur multijoueur ws://${hote}:${port}`);
+  for (const ip of adressesAnnoncees()) console.log(`autre machine ws://${ip}:${port}`);
 });

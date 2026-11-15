@@ -13,7 +13,8 @@ import { t } from '../i18n.js';
 import { compDesc, compName, familyLabel, unlockLabel } from '../i18n/content.js';
 import { coutNet, pieceEffective } from '../engine/atelier-cout.js';
 import { prixAnticipe } from '../engine/jetons.js';
-import { perteSmaKm } from '../engine/trainee.js';
+import { arret200Jours, masseDansTable, perteSmaKm } from '../engine/trainee.js';
+import { trouverPiece } from '../engine/atelier-cout.js';
 import {
   axesFamille, facteursRepartition, jugerRepartition, plafondAxe, repartitionDepart
 } from '../engine/repartition.js';
@@ -276,11 +277,21 @@ export function createAtelierView(container, {
       </div>
     `;
 
-    const perte = mission.gmat === 'orbite_basse' ? perteSmaKm(masse) : null;
+    const surface = trouverPiece(selections.structure)?.surfaceM2 || 0.01;
+    const reliefMasse = resources?.relief?.masse ?? 1;
+    const masseTrainee = reliefMasse > 0 ? masse / reliefMasse : masse;
+    const perte = mission.gmat === 'orbite_basse' ? perteSmaKm(masseTrainee, surface) : null;
+    const semaines = mission.gmat === 'orbite_basse' ? net().duree : 0;
+    const arret = perte == null ? null : arret200Jours(masseTrainee, surface);
+    const horsTable = perte != null && !masseDansTable(masseTrainee, surface);
+    const faceFr = String(surface).replace('.', ',');
+    const kmFr = perte == null ? '' : perte.toFixed(1).replace('.', ',');
+    const semFr = String(Math.round(semaines * 100) / 100).replace('.', ',');
+    const semainesMission = mission.contraintes?.duree || 12;
     const trainee = perte == null ? '' : `
       <p class="sh-atelier-trainee">${t(
-        `Trainée, 120 jours : −${Math.round(perte)} km de demi-grand axe.`,
-        `Drag, 120 days: −${Math.round(perte)} km of semi-major axis.`
+        `Traînée, face ${faceFr} m² : −${kmFr} km en 84 jours${horsTable ? ', prolongé en 1/masse hors de 1,33 à 4 kg' : ''}. Les ${semainesMission} semaines perdent ${semFr} sem.${arret == null ? '' : ` 200 km au jour ${arret.toFixed(1).replace('.', ',')}.`}`,
+        `Drag, face ${surface} m²: −${perte.toFixed(1)} km in 84 days${horsTable ? ', extended as 1/mass outside 1.33–4 kg' : ''}. The ${semainesMission} weeks lose ${Math.round(semaines * 100) / 100} wk.${arret == null ? '' : ` 200 km on day ${arret.toFixed(1)}.`}`
       )}</p>`;
 
     container.innerHTML = `

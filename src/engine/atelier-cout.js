@@ -4,6 +4,7 @@
 // qu'une sélection médiane consomme environ 72 % de chaque plafond.
 
 import { facteursRepartition } from './repartition.js';
+import { semainesTrainee } from './trainee.js';
 import moteursData from '../data/ateliers/moteurs.json';
 import structureData from '../data/ateliers/structure.json';
 import energieData from '../data/ateliers/energie.json';
@@ -120,6 +121,11 @@ export function coutSelections(chapter, selections = {}, repartitions = {}) {
   if (lien) out.communications += lien * (c.communications || 0);
   const partDonnees = PART_DONNEES[selections.instrument] || 0;
   if (partDonnees) out.donnees += partDonnees * (c.donnees || 0);
+  if (chapter?.gmat === 'orbite_basse' && out.masse > 0) {
+    const chassis = trouverPiece(selections.structure);
+    const surface = Number(chassis?.surfaceM2) > 0 ? chassis.surfaceM2 : 0.01;
+    out.duree += semainesTrainee(out.masse, surface, c.duree || 12);
+  }
   return out;
 }
 

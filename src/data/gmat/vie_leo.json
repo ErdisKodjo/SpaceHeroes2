@@ -1,17 +1,55 @@
 {
   "statut": "gmat_r2026a",
-  "note": "GMAT R2026a, 15 novembre 2026. Quatre masses sur 120 jours : gmat-win-R2026a/output/sh-vie-leo.script. Orbite du chapitre 1 : SMA 6 928 km, e 0,035, inclinaison 51,6 deg, 1 janvier 2026. Jacchia-Roberts, F10.7 = 150, Ap = 3, JGM2 4x4, Cd 2,2, surface 0,01 m2. Le plus leger (1,33 kg) perd 52,3 km de demi-grand axe, le plus lourd (4 kg) en perd 23,4. Prolongation sh-vie-leo-long.script : a 400 jours, le CubeSat de 1,33 kg est encore en orbite, demi-grand axe 6 666 km, excentricite 0,0085.",
+  "note": "GMAT R2026a, 15 novembre 2026. Orbite du chapitre 1 : SMA 6 928 km, e 0,035, inclinaison 51,6 deg, 1 janvier 2026. Jacchia-Roberts, F10.7 = 150, Ap = 3, JGM2 4x4, Cd 2,2. La surface SRP égale la surface de traînée. Faces du CubeSat Design Specification Rev 14.1 : extrémité 1U, 100 × 100 mm, 0,0100 m² (sh-vie-leo.script sur 120 jours, sh-vie-leo-84.script sur 84 jours) ; côté 1,5U, 100 × 170,2 mm, 0,01702 m² ; côté 2U, 100 × 227,0 mm, 0,0227 m² ; côté 3U, 100 × 340,5 mm, 0,03405 m² (sh-vie-leo-faces.script et sh-vie-leo-84.script). Les semaines lisent la perte de demi-grand axe à 84 jours. À 0,03405 m² et 1,33 kg, l'altitude 200 km est atteinte au jour 114,8305515255815 : cette ligne n'a pas de perte à 120 jours. La perte à 84 jours n'est pas monotone entre 2,22 et 4 kg, parce que l'excentricité est lue à un jour fixe. Hors de 1,33 à 4 kg, la perte est prolongée en 1/masse, sans nouvelle propagation. Prolongation sh-vie-leo-long.script : à 400 jours, le CubeSat de 1,33 kg et 0,01 m² est encore en orbite, demi-grand axe 6 666 km, excentricité 0,0085.",
   "parametres": {
     "smaDepartKm": 6928,
     "excentricite": 0.035,
     "cd": 2.2,
-    "surfaceM2": 0.01,
-    "jours": 120
+    "jours": 120,
+    "joursMission": 84,
+    "margeSmaKm": 350,
+    "noteMarge": "350 km séparent le demi-grand axe de départ, 6 928 km, d'une orbite circulaire à l'altitude d'arrêt de 200 km (rayon terrestre 6 378 km). Les 84 jours sont les 12 semaines du chapitre 1."
   },
-  "points": [
-    { "masseKg": 1.33, "perteSmaKm": 52.3 },
-    { "masseKg": 2.22, "perteSmaKm": 33.7 },
-    { "masseKg": 3.11, "perteSmaKm": 25.4 },
-    { "masseKg": 4, "perteSmaKm": 23.4 }
+  "faces": [
+    {
+      "surfaceM2": 0.01,
+      "cds": "1U, extrémité 100 × 100 mm",
+      "points": [
+        { "masseKg": 1.33, "perte84Km": 43.1, "perte120Km": 52.3 },
+        { "masseKg": 2.22, "perte84Km": 18.6, "perte120Km": 33.7 },
+        { "masseKg": 3.11, "perte84Km": 24.0, "perte120Km": 25.4 },
+        { "masseKg": 4, "perte84Km": 22.0, "perte120Km": 23.4 }
+      ]
+    },
+    {
+      "surfaceM2": 0.01702,
+      "cds": "1,5U, côté 100 × 170,2 mm",
+      "points": [
+        { "masseKg": 1.33, "perte84Km": 65.5, "perte120Km": 84.3 },
+        { "masseKg": 2.22, "perte84Km": 37.3, "perte120Km": 46.1 },
+        { "masseKg": 3.11, "perte84Km": 23.1, "perte120Km": 41.5 },
+        { "masseKg": 4, "perte84Km": 27.7, "perte120Km": 30.5 }
+      ]
+    },
+    {
+      "surfaceM2": 0.0227,
+      "cds": "2U, côté 100 × 227,0 mm",
+      "points": [
+        { "masseKg": 1.33, "perte84Km": 85.5, "perte120Km": 121.7 },
+        { "masseKg": 2.22, "perte84Km": 44.0, "perte120Km": 70.5 },
+        { "masseKg": 3.11, "perte84Km": 37.8, "perte120Km": 43.9 },
+        { "masseKg": 4, "perte84Km": 31.7, "perte120Km": 33.5 }
+      ]
+    },
+    {
+      "surfaceM2": 0.03405,
+      "cds": "3U, côté 100 × 340,5 mm",
+      "points": [
+        { "masseKg": 1.33, "perte84Km": 137.6, "perte120Km": null, "arret200Jours": 114.8305515255815 },
+        { "masseKg": 2.22, "perte84Km": 72.3, "perte120Km": 116.5 },
+        { "masseKg": 3.11, "perte84Km": 47.4, "perte120Km": 77.0 },
+        { "masseKg": 4, "perte84Km": 40.1, "perte120Km": 55.8 }
+      ]
+    }
   ]
 }

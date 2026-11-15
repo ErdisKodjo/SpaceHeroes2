@@ -252,7 +252,31 @@
 }
 .sh-table-header p,
 .sh-table-statut,
-.sh-table-attente { margin: 0 0 12px; color: var(--muted, #8aa0b8); font-size: 0.88rem; }
+.sh-table-attente,
+.sh-table-adresses { margin: 0 0 12px; color: var(--muted, #8aa0b8); font-size: 0.88rem; }
+.sh-table-adresse {
+  display: block;
+  margin-top: 4px;
+  color: var(--ink, #e8f4ff);
+  word-break: break-all;
+}
+.sh-table-serveur {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  margin: 0 0 12px;
+}
+.sh-table-serveur label { font-size: 0.82rem; color: var(--muted, #8aa0b8); }
+.sh-table-serveur input,
+.sh-table-serveur button {
+  font: inherit;
+  color: var(--ink, #e8f4ff);
+  background: transparent;
+  border: 1px solid rgba(124, 240, 255, 0.35);
+  padding: 8px 10px;
+}
+.sh-table-serveur input { min-width: 12rem; }
 .sh-table-roles {
   display: grid;
   grid-template-columns: 1fr 1fr;

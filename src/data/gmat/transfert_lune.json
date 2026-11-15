@@ -1,20 +1,22 @@
 {
   "type": "transfert_lune",
   "statut": "gmat_r2026a",
-  "note": "GMAT R2026a, 15 novembre 2026, script gmat-win-R2026a/output/sh-lune-final.script. Parking 300 km, inclinaison 28,5 deg, noeud 340 deg, depart le 1 janvier 2026. Injection tangentielle de 3,12 km/s. Terre JGM2 8x8, Lune et Soleil en points massifs. Le plus pres de la Lune est a 6,2 jours : 66 400 km du centre lunaire, a 424 700 km de la Terre. Ce n'est pas une capture. Le correcteur differentiel n'a pas trouve de tir direct qui vise 10 000 km sur cette date. Le delai radio est l'aller-retour lumiere a cette distance.",
+  "note": "GMAT R2026a, 15 novembre 2026, script gmat-win-R2026a/output/sh-lune-capture.script. Parking 300 km, inclinaison 28,5 deg, noeud 355 deg, depart le 1 janvier 2026 00:00. Injection tangentielle de 3,12 km/s. Terre JGM2 8x8, Lune et Soleil en points massifs. Perilune a 7,817 jours : rayon 1 788,183 km, altitude 49,983 km, a 389 653 km de la Terre. Freinage impulsif de 0,87 km/s, anti-vitesse, origine Lune. Juste apres, l'altitude reste 49,983 km. 8,7 jours plus tard, l'altitude est 37,174 km : l'orbiteur est encore lie. Le delai radio est l'aller-retour lumiere a 389 653 km.",
   "parametres": {
     "altitudeParkingKm": 300,
     "distanceLuneKm": 384400,
     "muTerre": 398600,
     "rayonTerreKm": 6378,
     "inclinaisonDeg": 28.5,
-    "raanDeg": 340,
-    "epoque": "01 Jan 2026 12:00:00"
+    "raanDeg": 355,
+    "epoque": "01 Jan 2026 00:00:00"
   },
   "resultats": {
-    "dureeTransfertJours": 6.2,
-    "delaiRadioAllerRetourSecondes": 2.8,
+    "dureeTransfertJours": 7.8,
+    "delaiRadioAllerRetourSecondes": 2.6,
     "deltaVInjectionKmS": 3.12,
-    "approcheMinKm": 66400
+    "approcheMinKm": 1788,
+    "altitudePeriluneKm": 50,
+    "deltaVCaptureKmS": 0.87
   }
 }

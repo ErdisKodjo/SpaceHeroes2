@@ -4,6 +4,7 @@ let socket = null;
 let jauges = null;
 let monId = null;
 let equipiers = [];
+let serveurForce = null;
 const ecouteurs = new Set();
 
 function diffuser(message) {
@@ -25,10 +26,35 @@ export function equipiersTable() {
   return equipiers;
 }
 
+export function definirServeur(valeur) {
+  const propre = String(valeur ?? '').trim().replace(/\/.*$/, '');
+  if (!propre) {
+    serveurForce = null;
+    return null;
+  }
+  if (!/^[A-Za-z0-9.-]+(?::\d{1,5})?$/.test(propre)) return null;
+  serveurForce = propre.includes(':') ? propre : `${propre}:8787`;
+  return serveurForce;
+}
+
+export function adresseTable(lieu = globalThis.location) {
+  const scheme = lieu?.protocol === 'https:' ? 'wss' : 'ws';
+  if (serveurForce) return `${scheme}://${serveurForce}`;
+  const demande = lieu?.search ? new URLSearchParams(lieu.search).get('serveur') : null;
+  if (demande) {
+    const propre = String(demande).trim().replace(/\/.*$/, '');
+    if (/^[A-Za-z0-9.-]+(?::\d{1,5})?$/.test(propre)) {
+      return `${scheme}://${propre.includes(':') ? propre : `${propre}:8787`}`;
+    }
+  }
+  const hotePage = lieu?.hostname || '127.0.0.1';
+  return `${scheme}://${hotePage}:8787`;
+}
+
 export function ouvrirTable() {
   if (socket && socket.readyState < 2) return socket;
   jauges = null;
-  socket = new WebSocket('ws://127.0.0.1:8787');
+  socket = new WebSocket(adresseTable());
   socket.addEventListener('message', (event) => {
     try {
       diffuser(JSON.parse(event.data));
