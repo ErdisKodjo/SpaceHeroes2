@@ -1,7 +1,7 @@
 # Plan3 — Exécution en cours
 ## SpaceHeroes2, au 15 novembre 2026
 
-Plan1 (scène 3D) est terminé. Plan2 reste le backlog premium d'origine : ses cases ne reflètent plus le code. Ce fichier est le plan de travail actif.
+Plan1 (scène 3D) est terminé. Plan2 reste le backlog premium d'origine : ses cases ne reflètent plus le code. Ce fichier décrit ce qui a été exécuté jusqu'au 15 novembre 2026. La suite est dans Plan4.
 
 Principe retenu : chaque chapitre doit se jouer autrement, avec le code déjà branché, avant d'ajouter un nouveau moteur.
 

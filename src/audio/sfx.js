@@ -22,8 +22,26 @@ export function createGameAudio() {
   let muted = loadMute();
   let pendingLine = null;
   let lastSpoken = '';
+  let fileVoix = [];
+  let voixEnCours = false;
   let music = null;
   let pendingScene = 'hub';
+
+  function niveau(key, fallback) {
+    const n = Number(settingsStore.get(key));
+    if (!Number.isFinite(n)) return fallback;
+    return Math.max(0, Math.min(1, n));
+  }
+
+  function applySettings() {
+    if (master) {
+      const cible = muted ? 0 : niveau('volume', 0.7);
+      master.gain.setTargetAtTime(cible, now(), 0.05);
+    }
+    music?.setVolume(niveau('ambientVolume', 0.4));
+    if (rumbleGain) rumbleGain.gain.value = 0.08 * niveau('sfxVolume', 1);
+    if (settingsStore.get('voiceEnabled') === false) window.speechSynthesis?.cancel();
+  }
 
   function ensure() {
     if (ctx) return ctx;
@@ -31,11 +49,11 @@ export function createGameAudio() {
     if (!AC) return null;
     ctx = new AC();
     master = ctx.createGain();
-    master.gain.value = muted ? 0 : 0.7;
+    master.gain.value = muted ? 0 : niveau('volume', 0.7);
     master.connect(ctx.destination);
     music = createMusic(ctx, master);
     music.setMuted(muted);
-    music.setVolume(settingsStore.get('ambientVolume') ?? 0.4);
+    music.setVolume(niveau('ambientVolume', 0.4));
     music.setScene(pendingScene);
     music.start();
     return ctx;
@@ -47,8 +65,9 @@ export function createGameAudio() {
 
   function envGain(duration, peak = 0.2, attack = 0.01) {
     const g = ctx.createGain();
+    const crete = Math.max(0.0001, peak * niveau('sfxVolume', 1));
     g.gain.setValueAtTime(0.0001, now());
-    g.gain.exponentialRampToValueAtTime(peak, now() + attack);
+    g.gain.exponentialRampToValueAtTime(crete, now() + attack);
     g.gain.exponentialRampToValueAtTime(0.0001, now() + duration);
     g.connect(master);
     return g;
@@ -87,7 +106,7 @@ export function createGameAudio() {
     } catch {
       /* ignore quota */
     }
-    if (master) master.gain.setTargetAtTime(muted ? 0 : 0.7, now(), 0.05);
+    if (master) master.gain.setTargetAtTime(muted ? 0 : niveau('volume', 0.7), now(), 0.05);
     music?.setMuted(muted);
     if (muted) window.speechSynthesis?.cancel();
   }
@@ -101,26 +120,28 @@ export function createGameAudio() {
     return synth.getVoices().find((v) => v.lang?.toLowerCase().startsWith(want)) || null;
   }
 
-  function speak(texte) {
-    pendingLine = texte;
-    if (!texte || muted) return;
+  function parler(texte) {
     const synth = window.speechSynthesis;
-    if (!synth) return;
-    if (texte === lastSpoken && synth.speaking) return;
-    lastSpoken = texte;
+    if (!synth || !texte || muted || settingsStore.get('voiceEnabled') === false) return;
+    const lente = settingsStore.get('readingSpeed') === 'lente';
     const language = speechLanguage();
-
     const start = () => {
-      if (muted || pendingLine !== texte) return;
+      if (muted || pendingLine !== texte || settingsStore.get('voiceEnabled') === false) return;
       synth.cancel();
       const utter = new SpeechSynthesisUtterance(texte);
       utter.lang = language === 'en' ? 'en-US' : 'fr-FR';
-      utter.rate = 1.04;
+      utter.rate = lente ? 0.82 : 1.04;
       utter.pitch = 1.12;
-      utter.volume = 0.95;
+      utter.volume = Math.max(0.05, 0.95 * niveau('volume', 0.7));
       const voice = pickVoice(synth, language);
-      // Ne pas coller une voix française sur un texte anglais : elle reste muette.
       if (voice) utter.voice = voice;
+      voixEnCours = true;
+      utter.onend = () => {
+        voixEnCours = false;
+        if (settingsStore.get('readingSpeed') !== 'lente') return;
+        const suite = fileVoix.shift();
+        if (suite) setTimeout(() => speak(suite), 700);
+      };
       synth.speak(utter);
       if (!voice && synth.getVoices().length === 0) {
         const retry = () => {
@@ -131,8 +152,23 @@ export function createGameAudio() {
         synth.addEventListener('voiceschanged', retry);
       }
     };
-
     start();
+  }
+
+  function speak(texte) {
+    pendingLine = texte;
+    if (!texte || muted || settingsStore.get('voiceEnabled') === false) return;
+    const synth = window.speechSynthesis;
+    if (!synth) return;
+    if (texte === lastSpoken && synth.speaking) return;
+    const lente = settingsStore.get('readingSpeed') === 'lente';
+    if (lente && voixEnCours) {
+      fileVoix = [texte];
+      return;
+    }
+    fileVoix = [];
+    lastSpoken = texte;
+    parler(texte);
   }
 
   return {
@@ -172,7 +208,7 @@ export function createGameAudio() {
       rumbleOsc.type = 'sawtooth';
       rumbleOsc.frequency.value = 48;
       rumbleGain = ctx.createGain();
-      rumbleGain.gain.value = 0.08;
+      rumbleGain.gain.value = 0.08 * niveau('sfxVolume', 1);
       const lp = ctx.createBiquadFilter();
       lp.type = 'lowpass';
       lp.frequency.value = 140;
@@ -202,6 +238,7 @@ export function createGameAudio() {
     setAmbient(value) {
       music?.setVolume(value);
     },
+    applySettings,
     dispose() {
       window.speechSynthesis?.cancel();
       ctx?.close();

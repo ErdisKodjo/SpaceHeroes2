@@ -12,6 +12,7 @@ import { createLaunchSequence } from './launch.js';
 import { createOrbitHud } from './hud.js';
 import { createPlayerControls } from './controls.js';
 import { gmatPour } from '../engine/gmat.js';
+import { settingsStore } from '../engine/settings-store.js';
 import { t } from '../i18n.js';
 
 // Direction du Soleil (monde). Legerement de cote pour montrer le terminateur
@@ -20,7 +21,19 @@ const SUN_DIRECTION = new THREE.Vector3(1, 0.25, 0.55).normalize();
 
 export function mountScene(container) {
   const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false });
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+  function ratioPixels() {
+    const dpr = window.devicePixelRatio || 1;
+    const qualite = settingsStore.get('graphicsQuality') || 'haute';
+    if (qualite === 'basse') return 1;
+    if (qualite === 'moyenne') return Math.min(dpr, 1.5);
+    if (qualite === 'ultra') return Math.min(dpr, 3);
+    return Math.min(dpr, 2);
+  }
+  function echelleDepart() {
+    const n = Number(settingsStore.get('defaultTimeScale'));
+    return n === 1 || n === 100 || n === 1000 ? n : 1000;
+  }
+  renderer.setPixelRatio(ratioPixels());
   renderer.outputColorSpace = THREE.SRGBColorSpace;
   renderer.setClearColor(0x02030a, 1);
   container.appendChild(renderer.domElement);
@@ -117,10 +130,9 @@ export function mountScene(container) {
     if (launch.launched && launch.orbit) {
       if (!hudArmed) {
         hudArmed = true;
-        launch.orbit.setTimeScale(1000);
-        hud.setTimeScale(1000);
+        launch.orbit.setTimeScale(echelleDepart());
+        hud.setTimeScale(echelleDepart());
         hud.show();
-        // Brancher le raycasting sur le CubeSat une fois en orbite
         player.setCubesat(launch.cubesat?.object, launch.orbit);
       }
       hud.update(launch.orbit.telemetry());
@@ -172,11 +184,15 @@ export function mountScene(container) {
     renderer,
     earth,
     stars,
+    applyQuality() {
+      renderer.setPixelRatio(ratioPixels());
+      resize();
+    },
     /** Pose la trajectoire du chapitre et démonte un lancement précédent. */
     setMission(gmatId) {
       hudArmed = false;
       hud.hide();
-      hud.setTimeScale(1000);
+      hud.setTimeScale(echelleDepart());
       player.setCubesat(null, null);
       launch.setProfile(gmatPour(gmatId));
     },

@@ -168,15 +168,24 @@ Réglages qui changent l'écran ou la partie dès l'enregistrement :
 | Réglage | Effet |
 | --- | --- |
 | Tutoriel guidé | Affiche ou cache les bulles d'aide |
-| Événements aléatoires | Autorise ou retire l'anomalie en opérations |
-| Musique d'ambiance | Volume de la bande-son |
+| Événements aléatoires | Autorise ou retire l'anomalie en opérations. Le Cadet n'en a pas, le Directeur en a toujours |
+| Difficulté | Cadet élargit les plafonds et prépare le CML 1 et 2. Directeur les resserre et exige les CML 3 et 4. Bac à sable n'est pas retenu par la porte CML |
+| Mode de jeu | Campagne ouvre le chapitre suivant avec un score. Défi réduit la masse et la durée. Découverte ouvre tout et ne classe pas le parcours |
+| Volume général | Baisse la musique, les effets et la voix ensemble |
+| Effets sonores | Baisse le compte à rebours, le grondement et la radio |
+| Musique d'ambiance | Volume de la bande-son seule |
+| Voix ASTRA | Coupe la synthèse. Le texte reste |
+| Sous-titres ASTRA | Masque le texte quand la voix est allumée |
+| Vitesse de lecture | Lente ralentit la voix et laisse un silence entre deux répliques |
+| Vitesse de simulation | ×1, ×100 ou ×1000 au moment où l'orbite s'affiche. Le HUD peut encore la changer |
+| Qualité graphique | Basse, moyenne, haute ou ultra règle la netteté du rendu 3D |
 | Plein écran | Passe le navigateur en plein écran |
 | Réduction de mouvement | Coupe les animations, dont le logo du chargement et le compteur du bilan |
 | Contrastes élevés | Renforce les contrastes |
 | Mode daltonien | Filtre deutéranopie, protanopie ou tritanopie |
 | Taille de police | Normale, grande ou très grande |
 
-D'autres options sont enregistrées pour la suite du projet et ne modifient pas encore la mission : difficulté, mode Campagne / Défi / Découverte, vitesse de simulation, volume général, effets sonores, interrupteur « Voix ASTRA », qualité graphique, sous-titres et vitesse de lecture. Le son et la voix se coupent avec le bouton **SON / MUET**.
+Le son et la voix se coupent aussi avec le bouton **SON / MUET**.
 
 ## Adresses de démonstration
 

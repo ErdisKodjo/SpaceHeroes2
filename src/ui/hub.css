@@ -1017,8 +1017,8 @@
   z-index: 400;
   bottom: 80px;
   right: 16px;
-  width: 220px;
-  background: rgba(4, 10, 28, 0.94);
+  width: 260px;
+  background: rgba(4, 10, 28, 0.98);
   border: 1px solid rgba(124,240,255,0.25);
   border-radius: 10px;
   backdrop-filter: blur(14px);
@@ -1076,3 +1076,22 @@
 .sh-cubesat-popup-rows li strong { color: var(--ink); font-weight: 600; }
 .sh-cubesat-popup-rows .is-warn { color: var(--warn); }
 .sh-cubesat-popup-rows .is-crit { color: var(--crit); }
+
+.sh-cubesat-popup-nom {
+  margin: 0;
+  padding: 8px 12px 4px;
+  color: var(--ink);
+  font-size: 0.92rem;
+  font-weight: 600;
+}
+
+.sh-cubesat-popup-desc,
+.sh-cubesat-popup-alt {
+  margin: 0;
+  padding: 0 12px;
+  color: var(--muted, #9aa3b2);
+  font-size: 0.78rem;
+  line-height: 1.4;
+}
+
+.sh-cubesat-popup-alt { padding: 8px 12px 10px; }

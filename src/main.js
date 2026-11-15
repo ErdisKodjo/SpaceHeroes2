@@ -21,6 +21,7 @@ import { renderDashboard } from './ui/dashboard.js';
 import { renderAstra } from './ui/astra-widget.js';
 import { renderEpisode } from './ui/episode-view.js';
 import { mountScene } from './vis/scene.js';
+import { bindMontage } from './vis/controls.js';
 import { createGameAudio } from './audio/sfx.js';
 import { createHub } from './ui/hub.js';
 import { applyDocumentSettings } from './ui/settings.js';
@@ -52,6 +53,7 @@ if (!demo) {
 // La scène 3D tourne toujours en fond (Terre + étoiles) — même pendant le hub.
 const vue3d = mountScene(vue3dEl);
 const audio = createGameAudio();
+let lastAstra = null;
 
 // Bouton son
 const audioBtn = document.getElementById('btn-audio');
@@ -81,6 +83,7 @@ window.addEventListener('keydown',     unlockAudio, { once: true });
 // Réaction audio + visuelle aux répliques ASTRA.
 window.addEventListener('astra-message', ({ detail }) => {
   if (detail?.texte) {
+    lastAstra = detail;
     audio.radio(detail.texte);
     renderAstra(astraEl, detail);
   }
@@ -100,6 +103,9 @@ window.addEventListener('vis-announcer', ({ detail }) => {
 window.addEventListener('settings-change', () => {
   applyDocumentSettings();
   applyChrome();
+  audio.applySettings();
+  vue3d.applyQuality();
+  if (lastAstra) renderAstra(astraEl, lastAstra);
 });
 
 // Célébration 3D quand le CubeSat atteint l'orbite.
@@ -166,6 +172,7 @@ function startMission({ chapterId, restore = false }) {
 
   // Restaurer depuis sauvegarde si demandé
   let savedSelections = {};
+  bindMontage(() => savedSelections);
   let savedRepartitions = {};
   let savedFiabilite  = null;
   let savedScoreOps   = null;
