@@ -195,22 +195,52 @@ export function createRocket({ height = 0.03 } = {}) {
   };
 }
 
-/** Pas de tir : dalle + tour de lancement. Repere local : +Y = verticale du lieu. */
+function boite(w, h, d, material, x, y, z) {
+  const mesh = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), material);
+  mesh.position.set(x, y, z);
+  return mesh;
+}
+
+/** Centre de lancement : aire, carneau, tour, mats, blockhaus, reservoirs.
+ *  Repere local : +Y = verticale du lieu. Le lanceur reste au centre. */
 export function createLaunchPad({ scale = 0.03 } = {}) {
   const group = new THREE.Group();
   group.name = 'pas-de-tir';
   const concrete = mat(0x6d7078, { roughness: 0.9 });
+  const apronMat = mat(0x5c616a, { roughness: 0.95 });
   const steel = mat(0xb83a2e, { roughness: 0.6, metalness: 0.4 });
-  const dark = mat(0x2a2c31, { roughness: 0.8 });
+  const dark = mat(0x1c1e22, { roughness: 0.8 });
+  const white = mat(0xe7e4dc, { roughness: 0.4, metalness: 0.2 });
+  const glass = mat(0x9fd6e8, { roughness: 0.15, metalness: 0.1 });
+  const caution = mat(0xd7a441, { roughness: 0.5 });
 
+  const apron = new THREE.Mesh(new THREE.CylinderGeometry(1.35, 1.4, 0.045, 48), apronMat);
+  apron.position.y = -0.02;
+  group.add(apron);
   const slab = new THREE.Mesh(new THREE.CylinderGeometry(0.42, 0.46, 0.08, 40), concrete);
-  slab.position.y = 0.0;
   group.add(slab);
-  const trench = new THREE.Mesh(new THREE.BoxGeometry(0.1, 0.006, 0.3), dark);
-  trench.position.set(0, 0.04, 0.2);
-  group.add(trench);
+  const mark = new THREE.Mesh(new THREE.RingGeometry(0.16, 0.19, 32), caution);
+  mark.rotation.x = -Math.PI / 2;
+  mark.position.y = 0.041;
+  group.add(mark);
 
-  // Tour ombilicale en treillis simplifie.
+  // Carneau : le jet part sous la table et sort par le deflecteur.
+  const trench = boite(0.16, 0.05, 0.72, dark, 0, 0.02, 0.34);
+  group.add(trench);
+  const deflector = boite(0.2, 0.08, 0.1, steel, 0, 0.02, 0.68);
+  deflector.rotation.x = -0.45;
+  group.add(deflector);
+  for (const z of [0.22, 0.4, 0.58]) {
+    group.add(boite(0.18, 0.012, 0.02, steel, 0, 0.048, z));
+  }
+
+  // Pieds de retenue autour du lanceur.
+  for (let k = 0; k < 4; k++) {
+    const a = (k * Math.PI) / 2 + Math.PI / 4;
+    group.add(boite(0.03, 0.07, 0.03, caution, Math.cos(a) * 0.1, 0.075, Math.sin(a) * 0.1));
+  }
+
+  // Tour ombilicale en treillis.
   const tower = new THREE.Group();
   tower.position.set(-0.17, 0.04, 0);
   const H = 0.95;
@@ -230,6 +260,31 @@ export function createLaunchPad({ scale = 0.03 } = {}) {
     tower.add(arm);
   }
   group.add(tower);
+
+  // Mats parafoudre aux quatre coins de l'aire.
+  for (const [x, z] of [[0.85, 0.85], [0.85, -0.85], [-0.85, 0.85], [-0.85, -0.85]]) {
+    const mast = new THREE.Mesh(new THREE.CylinderGeometry(0.012, 0.018, 1.15, 8), steel);
+    mast.position.set(x, 0.58, z);
+    group.add(mast);
+    const lamp = new THREE.Mesh(new THREE.SphereGeometry(0.03, 8, 8), caution);
+    lamp.position.set(x, 1.16, z);
+    group.add(lamp);
+  }
+
+  // Blockhaus, a l'ecart du carneau.
+  group.add(boite(0.46, 0.22, 0.28, concrete, 0.78, 0.14, -0.15));
+  group.add(boite(0.28, 0.06, 0.02, glass, 0.78, 0.18, -0.01));
+  group.add(boite(0.5, 0.04, 0.32, dark, 0.78, 0.27, -0.15));
+
+  // Reservoirs et route d'acces.
+  for (const [x, z] of [[-0.72, -0.55], [-0.72, -0.78]]) {
+    const tank = new THREE.Mesh(new THREE.CylinderGeometry(0.09, 0.09, 0.34, 16), white);
+    tank.rotation.z = Math.PI / 2;
+    tank.position.set(x, 0.12, z);
+    group.add(tank);
+  }
+  group.add(boite(1.1, 0.012, 0.16, dark, 0.2, 0.012, -0.95));
+
   group.scale.setScalar(scale);
 
   return {

@@ -90,6 +90,8 @@ Capture lunaire. Le départ du 1 janvier 2026 à 00:00, nœud 355°, injection 3
 
 Vues. Après l'orbite, trois boutons cadrent la trajectoire déjà calculée : Ensemble, Satellite, Lune. Lune n'apparaît que sur le transfert. La sphère est au bout de l'ellipse, et son rayon est 1 788 km moins les 50 km de périlune.
 
+Lancement. Le centre de tir montre l'aire, le carneau, la tour ombilicale, quatre mâts, le blockhaus et les réservoirs. La montée traverse quatre anneaux : 12, 50, 80 et 100 km. La légende nomme la couche. Ces bornes sont usuelles, pas des sorties GMAT. L'altitude reste celle de la table du chapitre.
+
 Outils. Les fiches nomment un outil public sans lui attribuer la mission : Debris Assessment Software pour la fin de vie en orbite basse, Trajectory Browser pour Mars et à côté des chiffres GMAT pour la Lune. L'atelier cite PyCubed. Le blindage cite SPENVIS.
 
 Planétaire. Le schéma en ligne du QG reste la vue ouverte. Le bouton Planétaire la remplace, et Schéma la ramène. Terre et Mars suivent les éléments képlériens JPL pour 1800–2050, tournés par Rz(−Ω) Rx(−I) Rz(−ω). La Lune part de la nouvelle lune du 8 janvier 2008 et avance du mois sidéral de 27,32166 jours. Le dessin écarte la Lune et L1, qui seraient sur la Terre à l'échelle des demi-grands axes. La date avance d'un jour toutes les 0,8 s, et reste celle du jour si les animations sont réduites. Les cinq orbites autour de la Terre restent des boutons.
