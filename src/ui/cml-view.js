@@ -139,7 +139,7 @@ function statutBadge(statut) {
   return statusDot(statut);
 }
 
-export function createCmlView(container, { cml, astra, onNiveauValide } = {}) {
+export function createCmlView(container, { cml, astra, onEvaluer, onNiveauValide } = {}) {
   let critereCourantId = null;
   let reponseEnCours   = false;
 
@@ -183,7 +183,6 @@ export function createCmlView(container, { cml, astra, onNiveauValide } = {}) {
     // Panneau de dialogue ASTRA pour l'évaluation en cours
     const dialogueHTML = critereCourantId ? (() => {
       const dial  = CML_DIALOGUES[critereCourantId] ?? {};
-      const statC = cml.snapshot().flatMap(n => n.criteres).find(c => c.id === critereCourantId);
       return `
         <div class="cml-dialogue">
           <div class="cml-dialogue-question">
@@ -191,15 +190,9 @@ export function createCmlView(container, { cml, astra, onNiveauValide } = {}) {
             ${cmlTalk(critereCourantId, 'question', dial.question ?? '…')}
           </div>
           <div class="cml-dialogue-actions">
-            <button type="button" class="cml-rep" data-rep="rouge">${t('❌ Pas encore', '❌ Not yet')}</button>
-            <button type="button" class="cml-rep" data-rep="jaune">${t('⚠️ Partiellement', '⚠️ Partly')}</button>
-            <button type="button" class="cml-rep" data-rep="vert">${t('✅ Oui, c\'est fait', '✅ Yes, done')}</button>
+            <button type="button" class="cml-rep" data-rep="juger">${t('ASTRA TRANCHE', 'ASTRA DECIDES')}</button>
           </div>
-          ${statC?.statut !== 'rouge' ? `
-            <div class="cml-dialogue-feedback">
-              ${statC?.statut === 'vert'  ? cmlTalk(critereCourantId, 'vert', dial.vert ?? '') : ''}
-              ${statC?.statut === 'jaune' ? cmlTalk(critereCourantId, 'jaune', dial.jaune ?? '') : ''}
-            </div>` : ''}
+          <div class="cml-dialogue-feedback" id="cml-verdict"></div>
         </div>
       `;
     })() : '';
@@ -241,21 +234,14 @@ export function createCmlView(container, { cml, astra, onNiveauValide } = {}) {
         reponseEnCours = true;
 
         const deja = new Set(cml.snapshot().filter((n) => n.valide).map((n) => n.level));
-        const rep    = btn.dataset.rep; // 'rouge' | 'jaune' | 'vert'
-        const dial   = CML_DIALOGUES[critereCourantId] ?? {};
-
-        // ASTRA évalue de façon indépendante — c'est elle qui pose le statut
-        astra?.evaluerCritereCml(critereCourantId, () => rep === 'vert');
-        // Pour jaune : on force manuellement (evaluerCritereCml ne connaît que vert/rouge)
-        if (rep === 'jaune') cml.setStatus(critereCourantId, 'jaune');
-
-        const texte = cmlTalk(
-          critereCourantId,
-          rep,
-          dial[rep] ?? (rep === 'vert'
-            ? t('Critère validé.', 'Criterion validated.')
-            : t('Critère à retravailler.', 'Criterion needs more work.'))
-        );
+        const verdict = onEvaluer?.(critereCourantId) || {
+          statut: 'rouge',
+          texte: t('Aucune preuve pour ce critère.', 'No evidence for this criterion.')
+        };
+        const rep = verdict.statut;
+        const texte = verdict.texte;
+        const verdictEl = container.querySelector('#cml-verdict');
+        if (verdictEl) verdictEl.textContent = texte;
         let announced = false;
         cml.snapshot().forEach((niv) => {
           if (niv.valide && !deja.has(niv.level)) {

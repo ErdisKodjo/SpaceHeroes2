@@ -186,8 +186,8 @@
   },
   "briefing_ch4_intro": {
     "categorie": "narration",
-    "texte": "Mars ne s'aligne bien avec la Terre que tous les 26 mois. Rater cette fenêtre, c'est attendre la suivante.",
-    "texteEn": "Mars lines up well with Earth only every 26 months. Miss this window and you wait for the next one."
+    "texte": "La prochaine fenêtre de départ s'ouvre début décembre 2026. La rater, c'est attendre 26 mois, jusqu'à l'opposition suivante.",
+    "texteEn": "The next departure window opens in early December 2026. Miss it and you wait 26 months, until the following opposition."
   },
   "atelier_ch4_intro": {
     "categorie": "narration",

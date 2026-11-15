@@ -1,15 +1,16 @@
 {
   "type": "point_lagrange_l1",
-  "statut": "placeholder_formule",
-  "note": "Point de Lagrange L1 du système Soleil-Terre, à environ 1,5 million de km de la Terre en direction du Soleil. Les satellites réels (SOHO, ACE, DSCOVR) décrivent une orbite en halo autour de ce point, instable, d'une période d'environ 6 mois. Le délai lumière est d'environ 5 secondes. Table provisoire, à remplacer par une sortie GMAT.",
+  "statut": "gmat_r2026a",
+  "note": "GMAT R2026a, 15 novembre 2026, script gmat-win-R2026a/output/sh-l1.script. Le point de libration Soleil-Terre L1 est a 1 466 670 km de la Terre le 1 janvier 2026. L'etat ACE du script Ex_LibrationPointStationKeeping_ESM coupe le plan Y = 0 a 58,2 jours puis a 144,8 jours : une periode de 173 jours. Entre les deux noeuds, la distance a la Terre passe de 1,39 a 1,62 million de km : l'orbite n'est pas fermee. Les 4 corrections par an restent l'hypothese operationnelle, le correcteur du script d'exemple etant trop grossier pour les compter.",
   "parametres": {
-    "distanceTerreKm": 1500000,
+    "distanceTerreKm": 1466670,
     "systeme": "Soleil-Terre",
-    "stabilite": "instable"
+    "stabilite": "instable",
+    "epoque": "01 Jan 2026 12:00:00"
   },
   "resultats": {
-    "periodeHaloJours": 178,
-    "delaiRadioSecondes": 5,
+    "periodeHaloJours": 173,
+    "delaiRadioSecondes": 4.9,
     "correctionsParAn": 4
   }
 }

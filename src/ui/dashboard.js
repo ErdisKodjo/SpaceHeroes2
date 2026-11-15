@@ -42,12 +42,16 @@ export function renderDashboard(container, resourceManager, { chapter } = {}) {
 
   const titre = chapter ? chapterText(chapter, 'titre') : 'Space Heroes';
   const code = (chapter?.id || 'ch').replace('chapitre_', 'CH.');
+  const bonus = resourceManager.bonusNote;
+  const bonusLine = bonus
+    ? ` · ${bonus.sigle} ${t(LABELS[bonus.ressource]?.[0] || bonus.ressource, LABELS[bonus.ressource]?.[1] || bonus.ressource)} ×${bonus.facteur.toFixed(2)}`
+    : '';
 
   container.innerHTML = `
     <div class="hud-brand">
       <div class="hud-brand-kicker">Space Heroes</div>
       <div class="hud-brand-title">${titre}</div>
-      <div class="hud-brand-sub">${code} · ${chapter ? chapterText(chapter, 'sousTitre') : t('Mission', 'Mission')}</div>
+      <div class="hud-brand-sub">${code} · ${chapter ? chapterText(chapter, 'sousTitre') : t('Mission', 'Mission')}${bonusLine}</div>
     </div>
     <div class="hud-bars">${jauges}</div>
     <div class="hud-segments">${segments}</div>

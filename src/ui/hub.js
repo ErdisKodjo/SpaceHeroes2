@@ -68,8 +68,8 @@ const CHAPTERS = [
     titreEn: 'Signal from Mars',
     sousTitre: 'Sonde · Mars',
     sousTitreEn: 'Probe · Mars',
-    description: 'Une fenêtre de lancement tous les 26 mois. Ne la rate pas.',
-    descriptionEn: 'A launch window every 26 months. Do not miss it.',
+    description: 'Prochaine fenêtre : début décembre 2026. Ensuite, 26 mois d\'attente.',
+    descriptionEn: 'Next window: early December 2026. Then a 26-month wait.',
     destination: 'Mars',
     emoji: '🔴',
     locked: true
@@ -115,6 +115,7 @@ function buildHTML(savedGame) {
         <div class="sh-hub-card-titre">${pick(ch, 'titre')}</div>
         <div class="sh-hub-card-sub">${pick(ch, 'sousTitre')}</div>
         <div class="sh-hub-card-dest">${icon('compass', 11)} ${pick(ch, 'destination')}</div>
+        <div class="sh-hub-card-desc">${pick(ch, 'description')}</div>
         ${best !== null ? `<div class="sh-hub-card-best">${medalHtml} ${best} ${t('pts', 'pts')}</div>` : ''}
       </button>
     `;

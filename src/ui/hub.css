@@ -206,6 +206,13 @@
   margin-top: 2px;
 }
 
+.sh-hub-card-desc {
+  font-size: 0.68rem;
+  color: var(--muted);
+  margin-top: 6px;
+  line-height: 1.35;
+}
+
 .sh-hub-card-best {
   font-family: var(--font-hud);
   font-size: 0.7rem;

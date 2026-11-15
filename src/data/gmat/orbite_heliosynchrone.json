@@ -1,7 +1,7 @@
 {
   "type": "orbite_heliosynchrone",
-  "statut": "placeholder_formule",
-  "note": "Orbite héliosynchrone typique : 700 km, inclinaison 98,7 degrés, nœud descendant vers 10 h 30 heure solaire locale. Période calculée par T = 2*PI*sqrt(a^3/mu), a = 7078 km. La précession du nœud qui maintient l'heure solaire n'est pas recalculée ici. Table provisoire, à remplacer par une sortie GMAT.",
+  "statut": "gmat_r2026a",
+  "note": "Contacts GMAT R2026a du 15 novembre 2026, script gmat-win-R2026a/output/sh-contacts.script. Un jour à partir du 1 janvier 2026 12:00 UTC, JGM2 4x4, masque 5 degrés, inclinaison 98,7 degrés, 700 km. La période reste la formule de Kepler. Le chiffre affiché est celui de Svalbard, la station du chapitre : un passage presque à chaque tour.",
   "parametres": {
     "altitudeKm": 700,
     "rayonTerreKm": 6378,
@@ -12,7 +12,15 @@
   },
   "resultats": {
     "periodeMinutes": 98.8,
-    "passagesParJourSurUneStation": 2,
-    "dureeContactMoyenneMinutes": 12
+    "stationDeReference": "svalbard",
+    "passagesParJourSurUneStation": 15,
+    "dureeContactMoyenneMinutes": 9.4,
+    "parStation": {
+      "kourou": { "passagesParJour": 4, "dureeMoyenneMinutes": 8.4 },
+      "svalbard": { "passagesParJour": 15, "dureeMoyenneMinutes": 9.4 },
+      "madrid": { "passagesParJour": 5, "dureeMoyenneMinutes": 8.9 },
+      "goldstone": { "passagesParJour": 4, "dureeMoyenneMinutes": 10.2 },
+      "canberra": { "passagesParJour": 4, "dureeMoyenneMinutes": 9.7 }
+    }
   }
 }

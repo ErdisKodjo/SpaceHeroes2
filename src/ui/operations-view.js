@@ -9,92 +9,35 @@
 // Chaque étape dispatche des événements pour la scène 3D (orbit.js).
 
 import { settingsStore } from '../engine/settings-store.js';
+import { appliquerEffet, planOperations } from '../engine/operations-plan.js';
 import { icon } from '../ui/icons.js';
 import { t } from '../i18n.js';
+import { eventText } from '../i18n/content.js';
 
-// ─── Données : stations au sol ────────────────────────────────────────────
-
-const STATIONS = [
-  { id: 'madrid',    nom: 'Madrid (DSN)',    lat: 40.4,   lon: -4.2,   flag: 'ES' },
-  { id: 'goldstone', nom: 'Goldstone (DSN)', lat: 35.4,   lon: -116.9, flag: 'US' },
-  { id: 'canberra',  nom: 'Canberra (DSN)',  lat: -35.4,  lon: 149.0,  flag: 'AU' },
-  { id: 'kourou',    nom: 'Kourou (ESA)',    lat: 5.2,    lon: -52.8,  flag: 'GF' }
-];
-
-// ─── Événements imprévus ──────────────────────────────────────────────────
-
-const EVENEMENTS = [
-  {
-    id: 'panne_batterie',
-    iconName: 'battery',
-    titre: 'Panne batterie',
-    titreEn: 'Battery fault',
-    description: 'La batterie principale montre une chute de tension anormale.',
-    descriptionEn: 'The main battery shows an abnormal voltage drop.',
-    options: [
-      { label: 'Basculer sur la batterie de secours', labelEn: 'Switch to the backup battery', correct: true, explication: 'Bon réflexe. La redondance sauve la mission.', explicationEn: 'Good call. Redundancy saves the mission.' },
-      { label: 'Augmenter la puissance des panneaux', labelEn: 'Increase array power', correct: false, explication: 'Impossible en éclipse. Les panneaux ne produisent rien.', explicationEn: 'Impossible in eclipse. The arrays produce nothing.' },
-      { label: 'Éteindre l\'instrument scientifique', labelEn: 'Switch off the science instrument', correct: true, explication: 'Délestage correct : priorité aux systèmes critiques.', explicationEn: 'Correct load shed: critical systems come first.' }
-    ]
-  },
-  {
-    id: 'perte_signal',
-    iconName: 'signal',
-    titre: 'Perte de signal',
-    titreEn: 'Loss of signal',
-    description: 'Le signal radio vers la Terre s\'est interrompu depuis 4 min.',
-    descriptionEn: 'The radio link to Earth has been down for 4 min.',
-    options: [
-      { label: 'Réorienter l\'antenne vers la station', labelEn: 'Repoint the antenna at the station', correct: true, explication: 'Correct. Le pointage manuel rétablit la liaison.', explicationEn: 'Correct. Manual pointing restores the link.' },
-      { label: 'Augmenter la puissance d\'émission', labelEn: 'Increase transmit power', correct: false, explication: 'La puissance maximale est déjà atteinte. Le problème est géométrique.', explicationEn: 'Maximum power is already in use. The problem is geometry.' },
-      { label: 'Attendre le prochain passage', labelEn: 'Wait for the next pass', correct: false, explication: 'Trop long. 95 min d\'attente feraient dépasser la limite de données.', explicationEn: 'Too long. A 95 min wait would blow the data limit.' }
-    ]
-  },
-  {
-    id: 'debris',
-    iconName: 'warning',
-    titre: 'Alerte débris',
-    titreEn: 'Debris alert',
-    description: 'Un fragment de satellite désorbité approche à moins de 2 km.',
-    descriptionEn: 'A fragment from a decaying satellite is closing inside 2 km.',
-    options: [
-      { label: 'Manœuvre d\'évitement (Δv +0.3 m/s)', labelEn: 'Avoidance burn (Δv +0.3 m/s)', correct: true, explication: 'Manœuvre standard. Le carburant consommé est négligeable.', explicationEn: 'Standard manoeuvre. The propellant used is negligible.' },
-      { label: 'Ne rien faire, probabilité faible', labelEn: 'Do nothing, the odds are low', correct: false, explication: 'La probabilité de collision est de 1/1000, ce qui est trop élevé selon les normes.', explicationEn: 'The collision probability is 1/1000, which is too high by the standards.' },
-      { label: 'Mettre le satellite en mode sécurité', labelEn: 'Put the satellite in safe mode', correct: true, explication: 'Mode sécurité correct en attendant l\'évaluation au sol.', explicationEn: 'Safe mode is correct while the ground assesses it.' }
-    ]
+function delaiTexte(ms) {
+  if (ms >= 60000) {
+    const min = Math.round(ms / 60000);
+    return t(`${min} min`, `${min} min`);
   }
-];
-
-// ─── Helpers ──────────────────────────────────────────────────────────────
-
-function randomEvenement() {
-  if (!settingsStore.get('randomEvents')) return null;
-  return EVENEMENTS[Math.floor(Math.random() * EVENEMENTS.length)];
-}
-
-function formatDuree(s) {
-  const m = Math.floor(s / 60);
-  const ss = Math.floor(s % 60);
-  return `${String(m).padStart(2,'0')}:${String(ss).padStart(2,'0')}`;
+  if (ms >= 1000) {
+    const sec = (ms / 1000).toFixed(1);
+    return t(`${sec} s`, `${sec} s`);
+  }
+  return t(`${Math.max(1, Math.round(ms))} ms`, `${Math.max(1, Math.round(ms))} ms`);
 }
 
 // ─── Vue principale ────────────────────────────────────────────────────────
 
-export function createOperationsView(container, { resources, astra, orbit, onValider } = {}) {
+export function createOperationsView(container, { resources, astra, lien, chapter, onValider } = {}) {
+  const plan = planOperations(chapter);
   let etape = 0;           // 0 contact | 1 instruments | 2 collecte | 3 evenement | 4 bilan
   let stationSelectee = null;
-  let instrumentsActives = new Set();
   let collecteProgress = 0;
-  let collecteRaf = null;
   let evenement = null;
+  let evenementResolu = null;
   let scoreOps  = 0;       // 0–100
 
-  const INSTRUMENTS = [
-    { id: 'comm',       label: 'Antenne comm',      labelEn: 'Comm antenna', ordre: 1, iconName: 'antenna'    },
-    { id: 'energie',    label: 'Panneaux solaires',  labelEn: 'Solar arrays', ordre: 2, iconName: 'solar'      },
-    { id: 'instrument', label: 'Instrument science', labelEn: 'Science instrument', ordre: 3, iconName: 'microscope' }
-  ];
-  const ORDRE_CORRECT = [1, 2, 3];
+  const sequence = plan.sequence;
   let ordreJoueur = [];
 
   // ── Étape 0 : Premier contact radio ──────────────────────────────────────
@@ -105,11 +48,13 @@ export function createOperationsView(container, { resources, astra, orbit, onVal
         <div class="sh-ops-kicker">${t('Opérations · Étape 1 / 4', 'Operations · Step 1 / 4')}</div>
         <h2 class="sh-ops-titre">${icon('signal', 18)} ${t('Premier contact radio', 'First radio contact')}</h2>
         <p class="sh-ops-desc">
-          ${t('Le CubeSat vient d\'entrer en orbite. Choisis la station au sol dont l\'angle d\'élévation est le plus favorable pour établir le contact.', 'The CubeSat has just reached orbit. Choose the ground station with the best elevation angle to make contact.')}
+          ${plan.lointain
+            ? t('Le délai radio est la contrainte. Choisis le complexe qui a la cible en vue.', 'Radio delay is the constraint. Choose the complex that has the target in view.')
+            : t('Le passage est court. Choisis la station qui voit le satellite sous le meilleur angle.', 'The pass is short. Choose the station that sees the spacecraft at the best angle.')}
         </p>
 
         <div class="sh-ops-stations">
-          ${STATIONS.map(s => `
+          ${plan.stations.map(s => `
             <button type="button"
               class="sh-ops-station ${stationSelectee === s.id ? 'is-selected' : ''}"
               data-station="${s.id}">
@@ -121,7 +66,7 @@ export function createOperationsView(container, { resources, astra, orbit, onVal
         </div>
 
         <div class="sh-ops-hint">
-          💡 ${t(`Le signal met ~${orbitData().delaiMs} ms aller-retour. Tu as ${orbitData().dureeFenetreMin} min de fenêtre de contact.`, `Round-trip signal is ~${orbitData().delaiMs} ms. You have a ${orbitData().dureeFenetreMin} min contact window.`)}
+          ${lienPhrase()}
         </div>
 
         <button type="button" id="sh-ops-next"
@@ -144,7 +89,7 @@ export function createOperationsView(container, { resources, astra, orbit, onVal
 
     container.querySelector('#sh-ops-next')?.addEventListener('click', () => {
       if (!stationSelectee) return;
-      scoreOps += 25;
+      scoreOps += stationSelectee === plan.stationCorrecte ? 25 : 10;
       astra?.say('operations_contact');
       etape = 1;
       render();
@@ -154,7 +99,8 @@ export function createOperationsView(container, { resources, astra, orbit, onVal
   // ── Étape 1 : Déploiement des instruments ────────────────────────────────
 
   function renderInstruments() {
-    const tousActives = ordreJoueur.length === INSTRUMENTS.length;
+    const tousActives = ordreJoueur.length === sequence.length;
+    const ordreLibelle = sequence.map((etapeSeq) => t(etapeSeq.label, etapeSeq.labelEn)).join(' → ');
 
     container.innerHTML = `
       <div class="sh-ops">
@@ -162,17 +108,17 @@ export function createOperationsView(container, { resources, astra, orbit, onVal
         <h2 class="sh-ops-titre">${icon('satellite', 18)} ${t('Déploiement des instruments', 'Instrument deployment')}</h2>
         <p class="sh-ops-desc">
           ${t('Active les systèmes dans le bon ordre :', 'Power the systems up in this order:')}
-          <strong>${t('communications → énergie → instrument scientifique', 'communications → power → science instrument')}</strong>.
+          <strong>${sequence.map((etapeSeq) => t(etapeSeq.label, etapeSeq.labelEn)).join(' → ')}</strong>.
         </p>
 
         <div class="sh-ops-instruments">
-          ${INSTRUMENTS.map(ins => {
-            const posJoueur = ordreJoueur.indexOf(ins.ordre) + 1;
-            const isActive  = ordreJoueur.includes(ins.ordre);
+          ${sequence.map(ins => {
+            const posJoueur = ordreJoueur.indexOf(ins.id) + 1;
+            const isActive  = ordreJoueur.includes(ins.id);
             return `
               <button type="button"
                 class="sh-ops-instr ${isActive ? 'is-active' : ''}"
-                data-ordre="${ins.ordre}"
+                data-ordre="${ins.id}"
                 ${isActive ? 'disabled' : ''}>
                 <span class="sh-ops-instr-emoji">${icon(ins.iconName, 18)}</span>
                 <span class="sh-ops-instr-label">${t(ins.label, ins.labelEn)}</span>
@@ -186,7 +132,7 @@ export function createOperationsView(container, { resources, astra, orbit, onVal
           <div class="sh-ops-eval ${ordreCorrect() ? 'is-ok' : 'is-warn'}">
             ${ordreCorrect()
               ? `${icon('check', 14)} ${t('Séquence correcte. Tous les systèmes sont opérationnels.', 'Correct sequence. All systems are up.')}`
-              : `${icon('warning', 14)} ${t('Séquence incorrecte. Les panneaux auraient dû être déployés avant l\'instrument.', 'Wrong sequence. The arrays should have been deployed before the instrument.')}`}
+              : `${icon('warning', 14)} ${t(`Séquence incorrecte. L'ordre attendu était : ${ordreLibelle}.`, `Wrong sequence. The expected order was: ${ordreLibelle}.`)}`}
           </div>
         ` : ''}
 
@@ -199,11 +145,10 @@ export function createOperationsView(container, { resources, astra, orbit, onVal
 
     container.querySelectorAll('.sh-ops-instr:not(:disabled)').forEach(btn => {
       btn.addEventListener('click', () => {
-        const ordre = parseInt(btn.dataset.ordre, 10);
+        const ordre = btn.dataset.ordre;
         ordreJoueur.push(ordre);
-        // Dispatcher vers la scène 3D
         window.dispatchEvent(new CustomEvent('instrument-active', {
-          detail: { ordre, label: INSTRUMENTS.find(i => i.ordre === ordre)?.id }
+          detail: { ordre, label: ordre }
         }));
         renderInstruments();
       });
@@ -218,7 +163,7 @@ export function createOperationsView(container, { resources, astra, orbit, onVal
   }
 
   function ordreCorrect() {
-    return ordreJoueur.join(',') === ORDRE_CORRECT.join(',');
+    return ordreJoueur.join(',') === sequence.map((etapeSeq) => etapeSeq.id).join(',');
   }
 
   // ── Étape 2 : Collecte de données ────────────────────────────────────────
@@ -238,7 +183,9 @@ export function createOperationsView(container, { resources, astra, orbit, onVal
         <div class="sh-ops-kicker">${t('Opérations · Étape 3 / 4', 'Operations · Step 3 / 4')}</div>
         <h2 class="sh-ops-titre">${icon('chart', 18)} ${t('Collecte de données', 'Data collection')}</h2>
         <p class="sh-ops-desc">
-          ${t('L\'instrument transmet ses mesures. Surveille les ressources et clique sur TRANSMETTRE quand la fenêtre de contact est ouverte.', 'The instrument is sending its measurements. Watch the resources and click TRANSMIT while the contact window is open.')}
+          ${plan.lointain
+            ? t('Chaque échange part avant la réponse. Surveille les ressources, puis transmets.', 'Each exchange leaves before the reply. Watch the resources, then transmit.')
+            : t('Transmets pendant que la fenêtre de contact est ouverte.', 'Transmit while the contact window is open.')}
         </p>
 
         <div class="sh-ops-ressources">
@@ -279,6 +226,9 @@ export function createOperationsView(container, { resources, astra, orbit, onVal
       collecteProgress = Math.min(100, collecteProgress + 20);
       resources?.consume('donnees',        0.5);
       resources?.consume('communications', 0.4);
+      const pasDuree = Math.max(0.5, (resources?.max?.duree ?? 12) * 0.08);
+      resources?.consume('duree', pasDuree);
+      window.dispatchEvent(new CustomEvent('ressources-change'));
       window.dispatchEvent(new CustomEvent('donnees-transmises', {
         detail: { pct: collecteProgress }
       }));
@@ -288,8 +238,8 @@ export function createOperationsView(container, { resources, astra, orbit, onVal
     container.querySelector('#sh-ops-next')?.addEventListener('click', () => {
       if (collecteProgress < 100) return;
       scoreOps += 25;
-      evenement = randomEvenement();
-      etape = evenement ? 3 : 4;
+      evenement = settingsStore.get('randomEvents') ? plan.evenement : null;
+      etape = evenement?.options?.length ? 3 : 4;
       render();
     });
   }
@@ -304,8 +254,8 @@ export function createOperationsView(container, { resources, astra, orbit, onVal
     container.innerHTML = `
       <div class="sh-ops sh-ops--evenement">
         <div class="sh-ops-kicker">${icon('warning', 14)} ${t('ÉVÉNEMENT IMPRÉVU', 'UNPLANNED EVENT')}</div>
-        <h2 class="sh-ops-titre">${icon(evenement.iconName, 18)} ${t(evenement.titre, evenement.titreEn)}</h2>
-        <p class="sh-ops-desc">${t(evenement.description, evenement.descriptionEn)}</p>
+        <h2 class="sh-ops-titre">${icon(evenement.iconName, 18)} ${t('Aléa de mission', 'Mission contingency')}</h2>
+        <p class="sh-ops-desc">${eventText(chapter)}</p>
 
         <div class="sh-ops-ev-options">
           ${evenement.options.map((opt, i) => `
@@ -336,6 +286,11 @@ export function createOperationsView(container, { resources, astra, orbit, onVal
         fb.textContent = t(opt.explication, opt.explicationEn);
         fb.className   = `sh-ops-ev-feedback ${opt.correct ? 'is-ok' : 'is-err'}`;
 
+        evenementResolu = opt.correct;
+        appliquerEffet(resources, evenement.effet, {
+          supplement: opt.correct ? 0 : (resources?.max?.duree ?? 12) * 0.1
+        });
+        window.dispatchEvent(new CustomEvent('ressources-change'));
         if (opt.correct) {
           scoreOps += 25;
           astra?.sayRandomFrom('succes');
@@ -368,10 +323,10 @@ export function createOperationsView(container, { resources, astra, orbit, onVal
         </div>
         <div class="sh-ops-bilan-grade">${grade.label}</div>
         <ul class="sh-ops-bilan-liste">
-          <li>${icon(stationSelectee ? 'check' : 'close', 13)} ${t('Contact radio', 'Radio contact')} : ${stationSelectee ? (STATIONS.find(s => s.id === stationSelectee)?.nom ?? '') : t('Non établi', 'Not established')}</li>
+          <li>${icon(stationSelectee === plan.stationCorrecte ? 'check' : 'warning', 13)} ${t('Contact radio', 'Radio contact')} : ${stationSelectee ? (plan.stations.find(s => s.id === stationSelectee)?.nom ?? '') : t('Non établi', 'Not established')}</li>
           <li>${icon(ordreCorrect() ? 'check' : 'warning', 13)} ${t('Déploiement', 'Deployment')} : ${ordreCorrect() ? t('Séquence correcte', 'Correct sequence') : t('Séquence incorrecte', 'Wrong sequence')}</li>
           <li>${icon(collecteProgress >= 100 ? 'check' : 'warning', 13)} ${t('Données transmises', 'Data downlinked')} : ${collecteProgress >= 100 ? '100 %' : `${Math.floor(collecteProgress)} %`}</li>
-          <li>${icon(evenement ? (scoreOps >= 75 ? 'check' : 'warning') : 'info', 13)} ${t('Événement imprévu', 'Unplanned event')} : ${evenement ? (scoreOps >= 75 ? t('Résolu', 'Resolved') : t('Résolu partiellement', 'Partly resolved')) : t('Aucun événement', 'No event')}</li>
+          <li>${icon(evenement ? (evenementResolu ? 'check' : 'warning') : 'info', 13)} ${t('Aléa du chapitre', 'Chapter contingency')} : ${evenement ? (evenementResolu ? t('Tenue', 'Held') : t('Aggravé', 'Made worse')) : t('Aucun événement', 'No event')}</li>
         </ul>
         <button type="button" id="sh-ops-terminer" class="sh-ops-btn">
           ${t('CLORE LA MISSION → BILAN FINAL', 'CLOSE THE MISSION → FINAL DEBRIEF')}
@@ -384,14 +339,12 @@ export function createOperationsView(container, { resources, astra, orbit, onVal
     });
   }
 
-  // ── Données orbitales pour l'affichage ────────────────────────────────────
-
-  function orbitData() {
-    // Valeurs issues de orbite_basse.json
-    return {
-      delaiMs:          560,
-      dureeFenetreMin:  8
-    };
+  function lienPhrase() {
+    const delay = delaiTexte(lien?.delayMs ?? 0);
+    const fenetre = lien?.contactMin
+      ? t(` Fenêtre de contact : ${lien.contactMin} min.`, ` Contact window: ${lien.contactMin} min.`)
+      : '';
+    return t(`Délai radio aller-retour : ${delay}.${fenetre}`, `Round-trip radio delay: ${delay}.${fenetre}`);
   }
 
   // ── Routeur principal ─────────────────────────────────────────────────────

@@ -7,6 +7,7 @@
 
 import { icon } from './icons.js';
 import { t } from '../i18n.js';
+import { optionsThermiques, reglageVibrations, resultatElectrique } from '../engine/essais-plan.js';
 
 const EPREUVES = [
   {
@@ -40,7 +41,11 @@ const EPREUVES = [
 
 // ─── Épreuve 1 : Vibrations (mini-jeu de jauge) ─────────────────────────────
 
-function epreuveVibrations(onResult) {
+function epreuveVibrations(onResult, reglage) {
+  const bas = reglage?.bas ?? 35;
+  const haut = reglage?.haut ?? 65;
+  const impulsion = reglage?.impulsion ?? 22;
+  const chute = reglage?.chute ?? 18;
   let value    = 50;         // position actuelle 0–100
   let inZone   = 0;          // secondes cumulées dans la zone verte
   let total    = 0;          // secondes écoulées
@@ -53,9 +58,9 @@ function epreuveVibrations(onResult) {
   const root = document.createElement('div');
   root.className = 'sh-essai-vibrations';
   root.innerHTML = `
-    <div class="sh-vib-instruction">${t('Clique rapidement et régulièrement pour maintenir la jauge dans la zone verte.', 'Click quickly and steadily to keep the gauge in the green band.')}</div>
+    <div class="sh-vib-instruction">${t(reglage?.noteFr || 'Clique rapidement et régulièrement pour maintenir la jauge dans la zone verte.', reglage?.noteEn || 'Click quickly and steadily to keep the gauge in the green band.')}</div>
     <div class="sh-vib-track">
-      <div class="sh-vib-zone"></div>
+      <div class="sh-vib-zone" style="left:${bas}%;width:${haut - bas}%"></div>
       <div class="sh-vib-cursor" id="sh-vib-cursor"></div>
     </div>
     <div class="sh-vib-temps">
@@ -71,8 +76,7 @@ function epreuveVibrations(onResult) {
     lastT = ts;
     total += dt;
 
-    // La jauge descend naturellement
-    value = Math.max(0, value - 18 * dt);
+    value = Math.max(0, value - chute * dt);
 
     const cursor  = root.querySelector('#sh-vib-cursor');
     const inzoneEl = root.querySelector('#sh-vib-inzone b');
@@ -80,8 +84,7 @@ function epreuveVibrations(onResult) {
 
     if (cursor) cursor.style.left = `${value}%`;
 
-    // Zone verte = 35–65
-    const inGreen = value >= 35 && value <= 65;
+    const inGreen = value >= bas && value <= haut;
     if (inGreen) inZone += dt;
 
     if (inzoneEl) inzoneEl.textContent = `${inZone.toFixed(1)} s`;
@@ -99,7 +102,7 @@ function epreuveVibrations(onResult) {
 
   root.querySelector('#sh-vib-clic').addEventListener('click', () => {
     if (done) return;
-    value = Math.min(100, value + 22);
+    value = Math.min(100, value + impulsion);
     if (!lastT) raf = requestAnimationFrame(loop);
   });
 
@@ -108,22 +111,20 @@ function epreuveVibrations(onResult) {
 
 // ─── Épreuve 2 : Thermique (QCM) ────────────────────────────────────────────
 
-const THERMO_OPTIONS = [
-  { id: 'mli',      label: 'Couverture MLI multi-couches',           labelEn: 'Multi-layer MLI blanket', correct: true,  explication: 'Correct. Le MLI est le standard pour l\'isolation thermique spatiale.', explicationEn: 'Correct. MLI is the standard for spacecraft thermal insulation.' },
-  { id: 'mousse',   label: 'Mousse polyuréthane',                     labelEn: 'Polyurethane foam', correct: false, explication: 'Incorrect. Le polyuréthane dégazze dans le vide et se dégrade sous les UV.', explicationEn: 'Wrong. Polyurethane outgasses in vacuum and breaks down under UV.' },
-  { id: 'aerogel',  label: 'Aérogel de silice (non spatial)',         labelEn: 'Silica aerogel (not space-rated)', correct: false, explication: 'Incorrect. L\'aérogel non spatial est fragile et non qualifié pour le vol.', explicationEn: 'Wrong. Non-space aerogel is fragile and not qualified for flight.' }
-];
-
-function epreuveThermique(onResult) {
+function epreuveThermique(onResult, profil, structureId) {
+  const { besoin, options } = optionsThermiques(profil, structureId);
+  const question = besoin === 'blindage_rad'
+    ? t('Hors de la magnétosphère, le rayonnement domine le thermique.', 'Outside the magnetosphere, radiation dominates the thermal load.')
+    : t('En orbite terrestre, la coque encaisse des cycles de −120 °C à +120 °C.', 'In Earth orbit, the shell takes cycles from −120 °C to +120 °C.');
   const root = document.createElement('div');
   root.className = 'sh-essai-qcm';
   root.innerHTML = `
     <div class="sh-qcm-question">
-      ${t('Ton CubeSat va subir des cycles thermiques de −120 °C à +120 °C en orbite.', 'Your CubeSat will see thermal cycles from −120 °C to +120 °C in orbit.')}<br>
-      <strong>${t('Quel matériau d\'isolation choisis-tu pour la coque ?', 'Which insulation do you choose for the shell?')}</strong>
+      ${question}<br>
+      <strong>${t('Quel matériau retiens-tu pour cette trajectoire ?', 'Which material do you keep for this trajectory?')}</strong>
     </div>
     <div class="sh-qcm-options">
-      ${THERMO_OPTIONS.map(o => `
+      ${options.map(o => `
         <button type="button" class="sh-qcm-opt" data-id="${o.id}">
           ${t(o.label, o.labelEn)}
         </button>
@@ -135,13 +136,13 @@ function epreuveThermique(onResult) {
   root.querySelectorAll('.sh-qcm-opt').forEach(btn => {
     btn.addEventListener('click', () => {
       root.querySelectorAll('.sh-qcm-opt').forEach(b => b.disabled = true);
-      const opt = THERMO_OPTIONS.find(o => o.id === btn.dataset.id);
+      const opt = options.find(o => o.id === btn.dataset.id);
       btn.classList.add(opt.correct ? 'is-correct' : 'is-wrong');
       const fb = root.querySelector('#sh-thermo-fb');
       fb.textContent  = t(opt.explication, opt.explicationEn);
       fb.className    = `sh-qcm-feedback ${opt.correct ? 'is-ok' : 'is-err'}`;
       setTimeout(() => {
-        showResult(root, opt.correct, opt.correct ? t('Isolation validée ✓', 'Insulation validated ✓') : t('Mauvais matériau ✗', 'Wrong material ✗'));
+        showResult(root, opt.correct, opt.correct ? t('Protection validée ✓', 'Protection validated ✓') : t('Mauvaise protection ✗', 'Wrong protection ✗'));
         onResult(opt.correct);
       }, 1400);
     });
@@ -176,14 +177,19 @@ const ELECTRO_COMBOS = [
   }
 ];
 
-function epreuveElectrique(onResult) {
+function epreuveElectrique(onResult, resources) {
+  const depasse = Boolean(resources?.isOverLimit?.('puissance'));
+  const used = resources?.used?.puissance ?? 0;
+  const max = resources?.max?.puissance ?? 0;
   const shuffled = [...ELECTRO_COMBOS].sort(() => Math.random() - 0.5);
   const root = document.createElement('div');
   root.className = 'sh-essai-qcm';
   root.innerHTML = `
     <div class="sh-qcm-question">
-      ${t('L\'instrument scientifique nécessite une alimentation stable à 5 V.', 'The science instrument needs a stable 5 V supply.')}<br>
-      <strong>${t('Quelle combinaison est électriquement compatible ?', 'Which combination is electrically compatible?')}</strong>
+      ${t(`Bilan de puissance de l'atelier : ${used.toFixed(1)} / ${max}.`, `Workshop power budget: ${used.toFixed(1)} / ${max}.`)}<br>
+      <strong>${depasse
+        ? t('Le plafond est déjà dépassé. Aucun câblage ne rattrape ça.', 'The ceiling is already exceeded. No wiring recovers that.')
+        : t('Quelle combinaison est électriquement compatible ?', 'Which combination is electrically compatible?')}</strong>
     </div>
     <div class="sh-qcm-options">
       ${shuffled.map((o, i) => `
@@ -199,13 +205,17 @@ function epreuveElectrique(onResult) {
     btn.addEventListener('click', () => {
       root.querySelectorAll('.sh-qcm-opt').forEach(b => b.disabled = true);
       const opt = shuffled[parseInt(btn.dataset.idx, 10)];
-      btn.classList.add(opt.correct ? 'is-correct' : 'is-wrong');
+      const verdict = resultatElectrique(opt.correct, resources);
+      btn.classList.add(verdict.succes ? 'is-correct' : 'is-wrong');
       const fb = root.querySelector('#sh-elec-fb');
-      fb.textContent = t(opt.explication, opt.explicationEn);
-      fb.className   = `sh-qcm-feedback ${opt.correct ? 'is-ok' : 'is-err'}`;
+      const texte = verdict.depasse
+        ? t('Le bilan de puissance de l\'atelier dépasse le plafond. Le câblage, même juste, ne tient pas.', 'The workshop power budget is over the ceiling. Even the right wiring does not hold.')
+        : t(opt.explication, opt.explicationEn);
+      fb.textContent = texte;
+      fb.className   = `sh-qcm-feedback ${verdict.succes ? 'is-ok' : 'is-err'}`;
       setTimeout(() => {
-        showResult(root, opt.correct, opt.correct ? t('Câblage validé ✓', 'Wiring validated ✓') : t('Conflit de tension ✗', 'Voltage conflict ✗'));
-        onResult(opt.correct);
+        showResult(root, verdict.succes, verdict.succes ? t('Câblage validé ✓', 'Wiring validated ✓') : t('Essai électrique refusé ✗', 'Electrical test rejected ✗'));
+        onResult(verdict.succes);
       }, 1400);
     });
   });
@@ -226,7 +236,9 @@ function showResult(root, succes, msg) {
 
 // ─── Orchestrateur ──────────────────────────────────────────────────────────
 
-export function createEssaisView(container, { astra, onValider } = {}) {
+export function createEssaisView(container, { astra, resources, chapter, selections, repartitions, onValider } = {}) {
+  const vibrations = reglageVibrations(selections?.structure, repartitions?.structure);
+  const profil = chapter?.profil || 'leo_cubesat';
   let epreuveIndex = 0;
   const resultats  = [];   // true/false par épreuve
 
@@ -302,9 +314,9 @@ export function createEssaisView(container, { astra, onValider } = {}) {
       }, 2000);
     }
 
-    if (ep.id === 'vibrations') epreuveEl.appendChild(epreuveVibrations(onEpreuveResult));
-    if (ep.id === 'thermique')  epreuveEl.appendChild(epreuveThermique(onEpreuveResult));
-    if (ep.id === 'electrique') epreuveEl.appendChild(epreuveElectrique(onEpreuveResult));
+    if (ep.id === 'vibrations') epreuveEl.appendChild(epreuveVibrations(onEpreuveResult, vibrations));
+    if (ep.id === 'thermique')  epreuveEl.appendChild(epreuveThermique(onEpreuveResult, profil, selections?.structure));
+    if (ep.id === 'electrique') epreuveEl.appendChild(epreuveElectrique(onEpreuveResult, resources));
   }
 
   render();

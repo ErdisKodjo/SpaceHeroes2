@@ -10,8 +10,10 @@ import { CmlChecklist } from './engine/cml.js';
 import { AstraEngine } from './engine/astra.js';
 import { EpisodeRunner } from './engine/episode.js';
 import { evaluerMission } from './engine/bilan.js';
-import { playerStore } from './engine/player.js';
+import { playerStore, appliquerBonusRole, annoterBonusRole } from './engine/player.js';
 import { sauvegarder, charger, restaurerResources, restaurerCml, ageSauvegarde, effacer } from './engine/save.js';
+import { appliquerCoutAtelier, coutNet } from './engine/atelier-cout.js';
+import { appliquerPhase } from './engine/cml-preuves.js';
 
 import { renderDashboard } from './ui/dashboard.js';
 import { renderAstra } from './ui/astra-widget.js';
@@ -151,6 +153,7 @@ function startMission({ chapterId, restore = false }) {
 
   const chapterData = getChapitre(chapterId) || getChapitre('chapitre_01');
   chapterId = chapterData.id;
+  vue3d.setMission(chapterData.gmat || 'orbite_basse');
 
   const resources = new ResourceManager(chapterData.contraintes);
   const cml       = new CmlChecklist(cmlCriteria);
@@ -158,9 +161,13 @@ function startMission({ chapterId, restore = false }) {
 
   // Restaurer depuis sauvegarde si demandé
   let savedSelections = {};
+  let savedRepartitions = {};
   let savedFiabilite  = null;
   let savedScoreOps   = null;
   let startIndex      = 0;
+  let atelierApplique = false;
+  let aCompare        = false;
+  let chargedCost     = null;
 
   if (restore) {
     const save = charger();
@@ -168,11 +175,23 @@ function startMission({ chapterId, restore = false }) {
       restaurerResources(resources, save.resources);
       restaurerCml(cml, save.cml);
       savedSelections = save.selections ?? {};
+      savedRepartitions = save.repartitions ?? {};
       savedFiabilite  = save.fiabilite  ?? null;
       savedScoreOps   = save.scoreOps   ?? null;
       startIndex      = save.episodeIndex ?? 0;
+      atelierApplique = Boolean(save.atelierApplique);
+      aCompare        = Boolean(save.aCompare);
+      const roleSauve = playerStore.getRoles().find((r) => r.id === save.roleId);
+      if (roleSauve) {
+        const facteur = Number(roleSauve.bonus?.facteur);
+        const cle = roleSauve.bonus?.ressource;
+        if (cle && facteur > 0 && facteur < 1) resources.relief[cle] = facteur;
+        annoterBonusRole(resources, roleSauve);
+      }
+      if (atelierApplique) chargedCost = coutNet(resources, chapterData, savedSelections, savedRepartitions);
     }
   }
+  if (!resources.bonusNote) appliquerBonusRole(resources, playerStore.role);
 
   const runner = new EpisodeRunner(chapterData, {
     resources,
@@ -198,8 +217,12 @@ function startMission({ chapterId, restore = false }) {
       resources,
       cml,
       selections: savedSelections,
+      repartitions: savedRepartitions,
       fiabilite:  savedFiabilite,
-      scoreOps:   savedScoreOps
+      scoreOps:   savedScoreOps,
+      atelierApplique,
+      aCompare,
+      roleId: playerStore.roleId
     });
   }
 
@@ -238,7 +261,11 @@ function startMission({ chapterId, restore = false }) {
       bilan: episode?.type === 'bilan' ? ensureRapport() : null,
       onRejouer: () => startMission({ chapterId, restore: false }),
       onSuivante: (nextId) => startMission({ chapterId: nextId, restore: false }),
-      onQuitter: openHub
+      onQuitter: openHub,
+      preuves: contextePreuve,
+      lien: vue3d.lienOrbital(),
+      selections: savedSelections,
+      repartitions: savedRepartitions
     });
 
     if (episode?.id !== lastEpisodeId) {
@@ -254,12 +281,33 @@ function startMission({ chapterId, restore = false }) {
     }
   }
 
+  function contextePreuve() {
+    return {
+      chapter: chapterData,
+      resources,
+      selections: savedSelections,
+      fiabilite: savedFiabilite,
+      aCompare
+    };
+  }
+
+  const onRessources = () => {
+    renderDashboard(dashboardEl, resources, { chapter: chapterData });
+  };
+
   const onAtelier = ({ detail }) => {
     savedSelections = detail?.selections ?? {};
+    savedRepartitions = detail?.repartitions ?? {};
+    aCompare = Boolean(detail?.aCompare);
+    chargedCost = appliquerCoutAtelier(resources, chapterData, chargedCost, savedSelections, savedRepartitions);
+    atelierApplique = true;
+    appliquerPhase(astra, 'atelier', contextePreuve());
     autoSave();
+    onRessources();
   };
   const onEssais = ({ detail }) => {
     savedFiabilite = detail?.fiabilite ?? null;
+    appliquerPhase(astra, 'essais', contextePreuve());
     autoSave();
   };
   const onOperations = ({ detail }) => {
@@ -269,17 +317,18 @@ function startMission({ chapterId, restore = false }) {
   window.addEventListener('atelier-valide', onAtelier);
   window.addEventListener('essais-termines', onEssais);
   window.addEventListener('operations-terminees', onOperations);
+  window.addEventListener('ressources-change', onRessources);
   missionCleanup = () => {
     window.removeEventListener('atelier-valide', onAtelier);
     window.removeEventListener('essais-termines', onEssais);
     window.removeEventListener('operations-terminees', onOperations);
+    window.removeEventListener('ressources-change', onRessources);
   };
 
   async function handleNext() {
     if (busy) return;
 
     if (runner.currentEpisode?.type === 'lancement') {
-      runner.declencherEvenement();
       if (!vue3d.launched) {
         busy = true;
         render();
@@ -292,8 +341,7 @@ function startMission({ chapterId, restore = false }) {
     }
 
     if (runner.currentEpisode?.id === 'briefing') {
-      astra.evaluerCritereCml('cml1_objectif',      () => Boolean(chapterData.mission));
-      astra.evaluerCritereCml('cml1_classe_budget', () => Boolean(chapterData.contraintes.budget));
+      appliquerPhase(astra, 'briefing', contextePreuve());
     }
 
     runner.next();

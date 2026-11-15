@@ -5,17 +5,24 @@ const KEY = 'sh-save';
 
 // ─── Sérialisation ────────────────────────────────────────────────────────
 
-export function sauvegarder({ chapterId, episodeIndex, resources, cml, selections, fiabilite, scoreOps }) {
+export function sauvegarder({
+  chapterId, episodeIndex, resources, cml, selections, repartitions, fiabilite, scoreOps,
+  atelierApplique = false, aCompare = false, roleId = null
+}) {
   const data = {
-    v: 1,                          // version du format, pour migrations futures
+    v: 2,
     ts: Date.now(),
     chapterId,
     episodeIndex,
     resources: serializeResources(resources),
     cml:       serializeCml(cml),
     selections: selections ?? {},
+    repartitions: repartitions ?? {},
     fiabilite:  fiabilite  ?? null,
-    scoreOps:   scoreOps   ?? null
+    scoreOps:   scoreOps   ?? null,
+    atelierApplique: Boolean(atelierApplique),
+    aCompare: Boolean(aCompare),
+    roleId
   };
   try {
     localStorage.setItem(KEY, JSON.stringify(data));

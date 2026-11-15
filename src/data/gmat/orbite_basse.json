@@ -1,7 +1,7 @@
 {
   "type": "orbite_basse",
-  "statut": "placeholder_formule",
-  "note": "Table provisoire calculee par formule orbitale standard (T = 2*PI*sqrt(a^3/mu)), a remplacer par la vraie sortie GMAT des que la Piste 2 (plan 24h) l'a produite. Meme format de sortie, remplacement transparent.",
+  "statut": "gmat_r2026a",
+  "note": "Contacts GMAT R2026a du 15 novembre 2026, script gmat-win-R2026a/output/sh-contacts.script. Un jour à partir du 1 janvier 2026 12:00 UTC, JGM2 4x4, masque 5 degrés. Orbite 550 km, e = 0,035, inclinaison 51,6 degrés (déploiement type ISS). La période reste la formule de Kepler, déjà à 0,1 % de GMAT. Le chiffre affiché est celui de Kourou, la station du chapitre. Svalbard ne voit pas cette inclinaison.",
   "parametres": {
     "altitudeKm": 550,
     "rayonTerreKm": 6378,
@@ -10,7 +10,15 @@
   },
   "resultats": {
     "periodeMinutes": 95.6,
+    "stationDeReference": "kourou",
     "passagesParJourSurUneStation": 4,
-    "dureeContactMoyenneMinutes": 8
+    "dureeContactMoyenneMinutes": 7.8,
+    "parStation": {
+      "kourou": { "passagesParJour": 4, "dureeMoyenneMinutes": 7.8 },
+      "svalbard": { "passagesParJour": 0, "dureeMoyenneMinutes": 0 },
+      "madrid": { "passagesParJour": 7, "dureeMoyenneMinutes": 8.3 },
+      "goldstone": { "passagesParJour": 7, "dureeMoyenneMinutes": 8.0 },
+      "canberra": { "passagesParJour": 7, "dureeMoyenneMinutes": 7.9 }
+    }
   }
 }

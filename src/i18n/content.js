@@ -42,8 +42,8 @@ const EP_TEXT = {
   'chapitre_04.briefing': 'The launch window is the first choice. Everything else, power and endurance, must last until arrival.',
   'chapitre_04.atelier': 'Compare solar arrays and an RTG. At several astronomical units the Sun is no longer enough, unlike near Earth.',
   'chapitre_04.essais': 'A cruise of several months does not forgive a fault left on the ground.',
-  'chapitre_04.lancement': 'Injection onto the interplanetary trajectory. The window then closes for 26 months.',
-  'chapitre_04.operations': 'You are no longer live. Each command is a sequence, and the reply takes about twenty minutes.',
+  'chapitre_04.lancement': 'Injection onto the interplanetary trajectory. After the December 2026 window, the next one is 26 months away.',
+  'chapitre_04.operations': 'You are no longer live. Each command is a sequence, and the reply takes about forty minutes.',
   'chapitre_04.bilan': 'Mission report, score, medal and ASTRA\'s read.',
   'chapitre_05.briefing': 'Define what the Guardian must see before Earth does: plasma, magnetic field, or an image of the solar disc.',
   'chapitre_05.atelier': 'Outside the magnetosphere, shielding, power and alert data rate matter more than mass alone.',
@@ -351,7 +351,7 @@ const DECISIONS = {
   },
   chapitre_04: {
     titre: 'Window',
-    choix: 'Departure inside the 26-month window',
+    choix: 'Departure in the December 2026 window',
     consequence: 'Miss the injection and you wait for the next useful opposition.'
   },
   chapitre_05: {

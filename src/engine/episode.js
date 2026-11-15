@@ -40,11 +40,11 @@ export class EpisodeRunner {
     const evt = this.chapter.evenementAleatoire;
     if (!evt || this._evenementJoue) return null;
     this._evenementJoue = true;
-    if (evt.effet) {
+    if (evt.effet && this.resources) {
       for (const [cle, delta] of Object.entries(evt.effet)) {
-        if (this.resources && this.resources.max[cle] !== undefined) {
-          this.resources.max[cle] += delta;
-        }
+        if (this.resources.max[cle] === undefined) continue;
+        if (delta < 0) this.resources.consume(cle, -delta);
+        else if (delta > 0) this.resources.max[cle] += delta;
       }
     }
     this.log.push({ type: 'evenement', id: evt.id, texte: evt.texte });

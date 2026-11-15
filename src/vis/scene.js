@@ -11,6 +11,7 @@ import { createEarth } from './earth.js';
 import { createLaunchSequence } from './launch.js';
 import { createOrbitHud } from './hud.js';
 import { createPlayerControls } from './controls.js';
+import { gmatPour } from '../engine/gmat.js';
 import { t } from '../i18n.js';
 
 // Direction du Soleil (monde). Legerement de cote pour montrer le terminateur
@@ -171,6 +172,23 @@ export function mountScene(container) {
     renderer,
     earth,
     stars,
+    /** Pose la trajectoire du chapitre et démonte un lancement précédent. */
+    setMission(gmatId) {
+      hudArmed = false;
+      hud.hide();
+      hud.setTimeScale(1000);
+      player.setCubesat(null, null);
+      launch.setProfile(gmatPour(gmatId));
+    },
+    lienOrbital() {
+      const p = launch.profile;
+      return {
+        delayMs: p?.delayMs ?? 0,
+        contactMin: p?.contactMin ?? null,
+        labelFr: p?.labelFr,
+        labelEn: p?.labelEn
+      };
+    },
     /** Lance la sequence complete ; Promise resolue quand le CubeSat est en orbite. */
     launch: () => launch.launch(),
     get launched() {

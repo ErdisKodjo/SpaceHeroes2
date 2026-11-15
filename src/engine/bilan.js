@@ -145,7 +145,7 @@ const DECISIONS_CHAPITRE = {
   },
   chapitre_04: {
     titre: 'Fenêtre',
-    choix: 'Départ dans la fenêtre des 26 mois',
+    choix: 'Départ dans la fenêtre de décembre 2026',
     consequence: 'Rater l\'injection, c\'est attendre la prochaine opposition utile.'
   },
   chapitre_05: {
@@ -154,6 +154,14 @@ const DECISIONS_CHAPITRE = {
     consequence: 'Le point d\'équilibre ne retient pas le satellite : les corrections font partie de la mission.'
   }
 };
+
+function delaisRatio(resources) {
+  const max = resources.max.duree;
+  if (!max) return 1;
+  const left = resources.remaining('duree') / max;
+  if (left < 0) return 0.35;
+  return clamp01(left);
+}
 
 function clamp01(n) {
   if (Number.isNaN(n)) return 0;
@@ -367,7 +375,7 @@ export function evaluerMission({
   const valeur = valeurScientifique(selections, cml);
   const ressources = efficacite(resources);
   const decisionsQ = qualite(fiabilite, cml);
-  const delaisRespectes = resources.remaining('duree') >= 0 ? 1 : 0.35;
+  const delaisRespectes = delaisRatio(resources);
 
   const ratios = [objectifsReussis, valeur, ressources, decisionsQ, delaisRespectes];
   const score = computeScore({

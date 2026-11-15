@@ -14,9 +14,12 @@ export class ResourceManager {
   constructor(initial = {}) {
     this.max = {};
     this.used = {};
+    this.relief = {};
+    this.bonusNote = null;
     for (const key of RESOURCE_KEYS) {
       this.max[key] = initial[key] ?? 0;
       this.used[key] = 0;
+      this.relief[key] = 1;
     }
   }
 
@@ -24,7 +27,8 @@ export class ResourceManager {
     if (!RESOURCE_KEYS.includes(key)) {
       throw new Error(`Ressource inconnue : ${key}`);
     }
-    this.used[key] += amount;
+    const relief = amount > 0 ? (this.relief[key] ?? 1) : 1;
+    this.used[key] += amount * relief;
     return this.remaining(key);
   }
 

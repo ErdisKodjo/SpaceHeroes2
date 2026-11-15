@@ -9,6 +9,7 @@ import { createOperationsView }  from './operations-view.js';
 import { createBilanView }       from './bilan-view.js';
 import { t } from '../i18n.js';
 import { episodeText } from '../i18n/content.js';
+import { jugerCritere } from '../engine/cml-preuves.js';
 
 const TYPE_LABEL = {
   briefing: ['Briefing', 'Briefing'],
@@ -35,7 +36,8 @@ function clearActiveView() {
 
 export function renderEpisode(container, episodeRunner, {
   onNext, busy = false, resources, astra, cml,
-  bilan = null, onRejouer, onSuivante, onQuitter
+  bilan = null, onRejouer, onSuivante, onQuitter,
+  preuves = null, lien = null, selections = null, repartitions = null
 } = {}) {
   if (episodeRunner.isFinished) {
     clearActiveView();
@@ -75,9 +77,12 @@ export function renderEpisode(container, episodeRunner, {
         {
           resources,
           astra,
+          chapter: episodeRunner.chapter,
           chapterId: episodeRunner.chapter.id,
-          onValider: ({ selections }) => {
-            window.dispatchEvent(new CustomEvent('atelier-valide', { detail: { selections } }));
+          initialSelections: selections,
+          initialRepartitions: repartitions,
+          onValider: ({ selections: choix, repartitions: points, aCompare }) => {
+            window.dispatchEvent(new CustomEvent('atelier-valide', { detail: { selections: choix, repartitions: points, aCompare } }));
             onNext?.();
           }
         }
@@ -104,7 +109,16 @@ export function renderEpisode(container, episodeRunner, {
     if (cml && !_activeView) {
       _activeView = createCmlView(
         container.querySelector('#sh-episode-body'),
-        { cml, astra, onNiveauValide: () => {} }
+        {
+          cml,
+          astra,
+          onEvaluer: (id) => {
+            const verdict = jugerCritere(id, typeof preuves === 'function' ? preuves() : (preuves || {}));
+            astra?.evaluerCritereCml(id, verdict.statut);
+            return verdict;
+          },
+          onNiveauValide: () => {}
+        }
       );
     }
 
@@ -124,6 +138,10 @@ export function renderEpisode(container, episodeRunner, {
         container.querySelector('#sh-episode-body'),
         {
           astra,
+          resources,
+          chapter: episodeRunner.chapter,
+          selections,
+          repartitions,
           onValider: ({ fiabilite }) => {
             window.dispatchEvent(new CustomEvent('essais-termines', { detail: { fiabilite } }));
             onNext?.();
@@ -146,6 +164,8 @@ export function renderEpisode(container, episodeRunner, {
         {
           resources,
           astra,
+          lien,
+          chapter: episodeRunner.chapter,
           onValider: ({ scoreOps }) => {
             window.dispatchEvent(new CustomEvent('operations-terminees', { detail: { scoreOps } }));
             onNext?.();
