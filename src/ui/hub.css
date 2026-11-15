@@ -289,6 +289,31 @@
 .sh-table-lancer button:disabled { opacity: 0.4; cursor: not-allowed; }
 .sh-table-fermer { margin-top: 14px; }
 
+.sh-voix-barre {
+  position: fixed;
+  left: 16px;
+  bottom: 16px;
+  z-index: 260;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  max-width: min(420px, calc(100vw - 32px));
+  padding: 8px 10px;
+  border: 1px solid rgba(124, 240, 255, 0.35);
+  background: rgba(4, 10, 28, 0.94);
+  color: var(--ink, #e8f4ff);
+  font-size: 0.82rem;
+}
+.sh-voix-barre button {
+  font: inherit;
+  color: var(--ink, #e8f4ff);
+  background: transparent;
+  border: 1px solid rgba(124, 240, 255, 0.45);
+  padding: 6px 8px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
 #sh-table-overlay {
   position: fixed;
   inset: 0;

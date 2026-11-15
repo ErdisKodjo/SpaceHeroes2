@@ -3,6 +3,8 @@
 import { playerStore } from '../engine/player.js';
 import { definirEquipage } from '../net/equipage.js';
 import { couperTable, envoyerTable, ouvrirTable, suivreTable } from '../net/partie.js';
+import { mettrePaires, recevoirVoix, couperVoix } from '../net/voix.js';
+import { monterVoix } from './voix-barre.js';
 import { pick, t } from '../i18n.js';
 import { roleText } from '../i18n/content.js';
 
@@ -31,6 +33,7 @@ export function createTableLobby({ chapters = [], onDepart } = {}) {
   document.body.appendChild(overlay);
 
   let socket = null;
+  let barre = null;
   let oublier = () => {};
   let moi = null;
   let etat = { joueurs: [], places: 4, prete: false, hote: null };
@@ -128,16 +131,29 @@ export function createTableLobby({ chapters = [], onDepart } = {}) {
   function fermer() {
     if (parti) return;
     oublier();
+    barre?.dispose();
+    couperVoix();
     couperTable();
     overlay.remove();
   }
 
   socket = ouvrirTable();
   oublier = suivreTable((message) => {
-    if (message.type === 'toi') moi = message.id;
-    if (message.type === 'etat') {
-      etat = message.etat;
-      erreur = '';
+    if (message.type === 'toi') {
+      moi = message.id;
+      barre = monterVoix();
+    }
+    if (message.type === 'etat' || message.type === 'depart') {
+      const joueurs = message.etat?.joueurs || etat.joueurs;
+      if (message.type === 'etat') {
+        etat = message.etat;
+        erreur = '';
+      }
+      if (moi && joueurs) mettrePaires(moi, joueurs);
+    }
+    if (message.type === 'voix') {
+      recevoirVoix(message);
+      return;
     }
     if (message.type === 'refus') erreur = message.raison || '';
     if (message.type === 'depart') {

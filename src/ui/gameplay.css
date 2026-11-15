@@ -1187,6 +1187,18 @@
   line-height: 1.4;
 }
 .sh-bilan-fiche-detail[hidden] { display: none; }
+.sh-bilan-commun {
+  margin-top: 12px;
+  padding: 12px 14px;
+  border: 1px solid rgba(124, 240, 255, 0.28);
+}
+.sh-bilan-commun[hidden] { display: none; }
+.sh-bilan-commun-liste {
+  margin: 0 0 8px;
+  padding-left: 18px;
+  font-size: 0.86rem;
+  line-height: 1.4;
+}
 
 .sh-bilan-badges {
   list-style: none;

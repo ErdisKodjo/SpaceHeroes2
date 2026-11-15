@@ -141,6 +141,20 @@ export async function downloadBilanPdf(rapport, astraTexte) {
     }
   }
 
+  if (rapport.commun) {
+    y += 2;
+    doc.setFont('helvetica', 'bold');
+    y = paragraph(t('Bilan commun', 'Shared debrief'), y, 12);
+    doc.setFont('helvetica', 'normal');
+    const veto = rapport.commun.vetoUtilise
+      ? t('Le veto a été utilisé.', 'The veto was used.')
+      : t('Le veto n\'a pas été utilisé.', 'The veto was not used.');
+    y = paragraph(veto, y, 10);
+    for (const r of rapport.commun.rapports || []) {
+      y = paragraph(`${r.nom} · ${r.score}/100 · ${r.medaille}`, y, 10);
+    }
+  }
+
   if (rapport.badges?.length) {
     y += 2;
     doc.setFont('helvetica', 'bold');

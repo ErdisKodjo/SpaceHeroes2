@@ -2,15 +2,27 @@
 
 let socket = null;
 let jauges = null;
+let monId = null;
+let equipiers = [];
 const ecouteurs = new Set();
 
 function diffuser(message) {
   if (message.jauges) jauges = message.jauges;
+  if (message.type === 'toi') monId = message.id;
+  if (message.etat?.joueurs) equipiers = message.etat.joueurs;
   for (const fn of ecouteurs) fn(message);
 }
 
 export function jaugesCourantes() {
   return jauges;
+}
+
+export function moiTable() {
+  return monId;
+}
+
+export function equipiersTable() {
+  return equipiers;
 }
 
 export function ouvrirTable() {
@@ -40,5 +52,7 @@ export function couperTable() {
   socket?.close();
   socket = null;
   jauges = null;
+  monId = null;
+  equipiers = [];
   ecouteurs.clear();
 }

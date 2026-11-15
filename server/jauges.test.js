@@ -20,4 +20,20 @@ describe('jauges de la table', () => {
     expect(ok.etat.used.duree).toBe(avant);
     expect(jauges.veto('directeur').raison).toBe('reserve');
   });
+
+  it('retient le score de chaque poste et le moment où une jauge se tend', () => {
+    const jauges = creerJauges({ masse: 4, duree: 12 });
+    jauges.depense('masse', 3.3);
+    jauges.depense('masse', 0.1);
+    expect(jauges.etat().moments.filter((m) => m.cle === 'masse').map((m) => m.niveau)).toEqual(['orange']);
+    jauges.depense('masse', 1);
+    expect(jauges.etat().moments.filter((m) => m.cle === 'masse').map((m) => m.niveau)).toEqual(['orange', 'rouge']);
+    jauges.veto('directeur');
+    expect(jauges.etat().moments.some((m) => m.type === 'veto')).toBe(true);
+    jauges.noterScore({ id: 'j1', nom: 'Ada', roleId: 'directeur', score: 91, medaille: 'or' });
+    jauges.noterScore({ id: 'j1', nom: 'Ada', roleId: 'directeur', score: 88, medaille: 'or' });
+    expect(jauges.etat().rapports).toEqual([
+      { id: 'j1', nom: 'Ada', roleId: 'directeur', score: 88, medaille: 'or' }
+    ]);
+  });
 });

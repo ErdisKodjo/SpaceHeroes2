@@ -32,13 +32,32 @@ export function creerJauges(contraintes = {}) {
     reserveVeto: PRIX_VETO,
     vetoUtilise: false
   };
+  const moments = [];
+  const rapports = [];
+  const deja = new Set();
+
+  function marquer() {
+    for (const cle of CLES_JAUGE) {
+      const plafond = etat.max[cle];
+      if (!plafond) continue;
+      const ratio = etat.used[cle] / plafond;
+      const niveau = ratio >= 1 ? 'rouge' : ratio >= 0.8 ? 'orange' : null;
+      if (!niveau) continue;
+      const clef = `${cle}:${niveau}`;
+      if (deja.has(clef)) continue;
+      deja.add(clef);
+      moments.push({ type: 'jauge', cle, niveau });
+    }
+  }
 
   function copie() {
     return {
       max: { ...etat.max },
       used: { ...etat.used },
       reserveVeto: etat.reserveVeto,
-      vetoUtilise: etat.vetoUtilise
+      vetoUtilise: etat.vetoUtilise,
+      moments: moments.map((m) => ({ ...m })),
+      rapports: rapports.map((r) => ({ ...r }))
     };
   }
 
@@ -50,6 +69,7 @@ export function creerJauges(contraintes = {}) {
         return { ok: false, raison: 'jauge' };
       }
       etat.used[cle] += n;
+      marquer();
       return { ok: true, etat: copie() };
     },
     usage(valeurs) {
@@ -59,6 +79,7 @@ export function creerJauges(contraintes = {}) {
         if (n === null || n < 0 || n > 100000) return { ok: false, raison: 'jauge' };
       }
       for (const cle of CLES_JAUGE) etat.used[cle] = nombre(valeurs[cle]);
+      marquer();
       return { ok: true, etat: copie() };
     },
     plafond(cle, delta) {
@@ -67,6 +88,7 @@ export function creerJauges(contraintes = {}) {
         return { ok: false, raison: 'jauge' };
       }
       etat.max[cle] += n;
+      marquer();
       return { ok: true, etat: copie() };
     },
     veto(roleId) {
@@ -74,6 +96,25 @@ export function creerJauges(contraintes = {}) {
       if (etat.vetoUtilise || etat.reserveVeto < PRIX_VETO) return { ok: false, raison: 'reserve' };
       etat.reserveVeto -= PRIX_VETO;
       etat.vetoUtilise = true;
+      if (!deja.has('veto')) {
+        deja.add('veto');
+        moments.push({ type: 'veto' });
+      }
+      return { ok: true, etat: copie() };
+    },
+    noterScore(ligne) {
+      const score = Math.max(0, Math.min(100, Math.round(Number(ligne.score) || 0)));
+      const medaille = ['or', 'argent', 'bronze', 'aucune'].includes(ligne.medaille) ? ligne.medaille : 'aucune';
+      const propre = {
+        id: ligne.id,
+        nom: String(ligne.nom || 'Commandant').slice(0, 24),
+        roleId: ligne.roleId || null,
+        score,
+        medaille
+      };
+      const index = rapports.findIndex((r) => r.id === propre.id);
+      if (index >= 0) rapports[index] = propre;
+      else rapports.push(propre);
       return { ok: true, etat: copie() };
     }
   };

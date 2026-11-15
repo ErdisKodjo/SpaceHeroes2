@@ -5,6 +5,7 @@ import http from 'node:http';
 import { WebSocketServer } from 'ws';
 import { creerTable } from './table.js';
 import { contraintesChapitre, creerJauges } from './jauges.js';
+import { chargeValide, destinataire } from './voix.js';
 
 const port = Number(process.env.PORT) || 8787;
 const table = creerTable();
@@ -50,13 +51,15 @@ function diffuser() {
 
 wss.on('connection', (socket) => {
   socket.on('message', (raw) => {
-    if (Buffer.byteLength(raw) > 2048) return;
+    const taille = Buffer.byteLength(raw);
+    if (taille > 65536) return;
     let message;
     try {
       message = JSON.parse(String(raw));
     } catch {
       return;
     }
+    if (message.type !== 'voix' && taille > 2048) return;
     const id = sieges.get(socket);
     if (message.type === 'rejoindre' && !id) {
       const res = table.rejoindre(message.nom);
@@ -79,6 +82,12 @@ wss.on('connection', (socket) => {
     if (message.type === 'liberer') {
       table.liberer(id);
       diffuser();
+      return;
+    }
+    if (message.type === 'voix') {
+      if (!chargeValide(message.charge)) return;
+      const cible = destinataire(sieges, id, message.pour);
+      if (cible) envoyer(cible, { type: 'voix', de: id, charge: message.charge });
       return;
     }
     if (message.type === 'lancer') {
@@ -115,6 +124,19 @@ wss.on('connection', (socket) => {
       const res = jauges.veto(roleDe(id));
       if (!res.ok) envoyer(socket, { type: 'refus', raison: res.raison });
       else diffuserJauges({ type: 'veto', ok: true });
+      return;
+    }
+    if (message.type === 'score') {
+      const joueur = table.etat().joueurs.find((j) => j.id === id);
+      if (!joueur) return;
+      jauges.noterScore({
+        id,
+        nom: joueur.nom,
+        roleId: joueur.roleId,
+        score: message.score,
+        medaille: message.medaille || 'aucune'
+      });
+      diffuserJauges();
     }
   });
 

@@ -9,7 +9,7 @@ Guide du jeu tel qu'il se joue dans le navigateur. Une mission va du QG au bilan
 3. Ensuite : `npm run dev`.
 4. Ouvrir l'adresse indiquée par Vite, en général `http://127.0.0.1:5173/`.
 
-`npm run server` lance un second processus, sur `ws://127.0.0.1:8787`. Il ne fait pas partie de la page Vite. **Partie à 4**, au QG, s'y connecte.
+`npm run server` lance un second processus, sur `ws://127.0.0.1:8787`. Il ne fait pas partie de la page Vite. **Partie à 4**, au QG, s'y connecte. **Ouvrir le micro** relie les voix des joueurs directement entre leurs navigateurs. Le serveur ne transporte que la signalisation, pas le son. Sans micro autorisé, la partie continue.
 
 Le premier écran est le logo circulaire Space Heroes, avec une phrase de chargement. Il disparaît quand les textures sont prêtes. Un clic dans la page est nécessaire pour entendre la musique, les effets et la voix : le navigateur bloque le son tant qu'on n'a pas cliqué.
 
@@ -107,7 +107,7 @@ Quatre temps.
 
 ### Bilan
 
-L'écran montre le score sur 100, la médaille, le détail du score, les ressources, trois décisions, une comparaison avec une mission réelle, les badges et les jetons d'atelier. Sous « Dans la vraie vie », chaque mission citée est une fiche : nom, agence et année. Un clic ouvre le résumé, un second clic sur la même fiche le referme.
+L'écran montre le score sur 100, la médaille, le détail du score, les ressources, trois décisions, une comparaison avec une mission réelle, les badges et les jetons d'atelier. Sous « Dans la vraie vie », chaque mission citée est une fiche : nom, agence et année. Un clic ouvre le résumé, un second clic sur la même fiche le referme. En partie à 4, le rapport ajoute le bilan commun : le score de chaque poste, le veto, et chaque moment où une jauge passe 80 % ou dépasse le plafond.
 
 | Score | Médaille | Jetons d'atelier |
 | --- | --- | --- |

@@ -17,7 +17,9 @@ import { sauvegarder, charger, restaurerResources, restaurerCml, ageSauvegarde, 
 import { appliquerCoutAtelier, coutNet } from './engine/atelier-cout.js';
 import { appliquerPhase } from './engine/cml-preuves.js';
 import { definirEquipage } from './net/equipage.js';
-import { couperTable, envoyerTable, jaugesCourantes, suivreTable } from './net/partie.js';
+import { couperTable, envoyerTable, equipiersTable, jaugesCourantes, moiTable, suivreTable } from './net/partie.js';
+import { couperVoix, mettrePaires, recevoirVoix } from './net/voix.js';
+import { monterVoix } from './ui/voix-barre.js';
 
 import { renderDashboard } from './ui/dashboard.js';
 import { renderAstra } from './ui/astra-widget.js';
@@ -171,6 +173,7 @@ function startMission({ chapterId, restore = false, table = false }) {
 
   const resources = new ResourceManager(chapterData.contraintes);
   let oublierTable = () => {};
+  let barreVoix = null;
   if (table) {
     const appliquer = (etat) => {
       if (!etat?.max) return;
@@ -189,11 +192,15 @@ function startMission({ chapterId, restore = false, table = false }) {
       veto: () => envoyerTable({ type: 'veto' })
     };
     appliquer(jaugesCourantes());
+    barreVoix = monterVoix();
+    mettrePaires(moiTable(), equipiersTable());
     oublierTable = suivreTable((message) => {
       if (message.jauges) appliquer(message.jauges);
       if (message.type === 'veto' && message.ok) {
         window.dispatchEvent(new CustomEvent('table-veto'));
       }
+      if (message.type === 'etat') mettrePaires(moiTable(), message.etat.joueurs);
+      if (message.type === 'voix') recevoirVoix(message);
     });
   }
   const cml       = new CmlChecklist(cmlCriteria);
@@ -285,11 +292,12 @@ function startMission({ chapterId, restore = false, table = false }) {
       fiabilite: savedFiabilite,
       scoreOps: savedScoreOps
     });
-    if (!demo) {
+    if (!demo && !table) {
       if (pressionScore()) playerStore.enregistrerScore(chapterData.id, rapport.score);
       playerStore.ajouterJetons(rapport.jetons);
       effacer();
     }
+    rapport.table = table;
     return rapport;
   }
 
@@ -368,7 +376,11 @@ function startMission({ chapterId, restore = false, table = false }) {
   window.addEventListener('ressources-change', onRessources);
   missionCleanup = () => {
     oublierTable();
-    if (table) couperTable();
+    barreVoix?.dispose();
+    if (table) {
+      couperVoix();
+      couperTable();
+    }
     window.removeEventListener('atelier-valide', onAtelier);
     window.removeEventListener('essais-termines', onEssais);
     window.removeEventListener('operations-terminees', onOperations);
