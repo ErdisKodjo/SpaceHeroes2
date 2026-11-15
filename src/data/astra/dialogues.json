@@ -131,8 +131,8 @@
   },
   "cml_niveau_manquant": {
     "categorie": "alerte",
-    "texte": "Le CML {niveau} n'est pas validé : il faut 80 % de critères verts. Rien ne bloque l'épisode. Le bilan s'en souviendra.",
-    "texteEn": "CML {niveau} is not validated: it needs 80% green criteria. The episode is not blocked. The debrief will remember."
+    "texte": "Le CML {niveau} n'est pas validé. Il faut 80 % de critères verts avant de quitter cet épisode.",
+    "texteEn": "CML {niveau} is not validated. It needs 80% green criteria before this episode can be left."
   },
   "briefing_ch2_intro": {
     "categorie": "narration",

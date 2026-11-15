@@ -93,6 +93,7 @@ export function renderEpisode(container, episodeRunner, {
 
   // ── Briefing — validation CML 1 ──────────────────────────────────────────
   if (episode.type === 'briefing') {
+    clearActiveView();
     const niv1 = cml?.snapshot()?.[0];
     const pct  = niv1 ? Math.round(niv1.ratioVert * 100) : 0;
     const label = busy ? t('Séquence en cours…', 'Sequence in progress…') : (shown.bouton || t('Continuer →', 'Continue →'));
@@ -105,21 +106,18 @@ export function renderEpisode(container, episodeRunner, {
       <button id="btn-continuer" class="cta" ${busy ? 'disabled' : ''}>${label}</button>
     `;
 
-    // Afficher la grille CML niveau 1 en mode compact
-    if (cml && !_activeView) {
-      _activeView = createCmlView(
-        container.querySelector('#sh-episode-body'),
-        {
-          cml,
-          astra,
-          onEvaluer: (id) => {
-            const verdict = jugerCritere(id, typeof preuves === 'function' ? preuves() : (preuves || {}));
-            astra?.evaluerCritereCml(id, verdict.statut);
-            return verdict;
-          },
-          onNiveauValide: () => {}
-        }
-      );
+    const body = container.querySelector('#sh-episode-body');
+    if (cml && body) {
+      _activeView = createCmlView(body, {
+        cml,
+        astra,
+        onEvaluer: (id) => {
+          const verdict = jugerCritere(id, typeof preuves === 'function' ? preuves() : (preuves || {}));
+          astra?.evaluerCritereCml(id, verdict.statut);
+          return verdict;
+        },
+        onNiveauValide: () => {}
+      });
     }
 
     container.querySelector('#btn-continuer')

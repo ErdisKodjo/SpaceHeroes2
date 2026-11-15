@@ -67,6 +67,13 @@ export const playerStore = {
     save(_player);
     return _player.stats.jetons;
   },
+  depenserJetons(n) {
+    const cout = Math.max(0, Math.round(n) || 0);
+    if (this.jetons < cout) return false;
+    _player.stats.jetons = this.jetons - cout;
+    save(_player);
+    return true;
+  },
   possedeTech(id) {
     return (_player.stats.techs || []).includes(id);
   },

@@ -3,6 +3,7 @@
 // Flow : Hub → Sélection du rôle → Jeu
 
 import { playerStore } from '../engine/player.js';
+import { chapitresOuverts } from '../engine/mode-jeu.js';
 import { createRoleSelect } from './role-select.js';
 import { createSettings } from './settings.js';
 import { icon, medalIcon } from './icons.js';
@@ -96,7 +97,7 @@ function buildHTML(savedGame) {
 
   const cards = CHAPTERS.map((ch, index) => {
     const prevId = index === 0 ? null : CHAPTERS[index - 1].id;
-    const locked = index > 0 && playerStore.getMeilleurScore(prevId) === null;
+    const locked = !chapitresOuverts() && index > 0 && playerStore.getMeilleurScore(prevId) === null;
     ch = { ...ch, locked };
     const best  = playerStore.getMeilleurScore(ch.id);
     const medalHtml = best !== null ? medalIcon(best) : '';

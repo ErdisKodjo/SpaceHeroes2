@@ -8,8 +8,10 @@
 //
 // Chaque étape dispatche des événements pour la scène 3D (orbit.js).
 
-import { settingsStore } from '../engine/settings-store.js';
+import { evenementAutorise } from '../engine/difficulte.js';
 import { appliquerEffet, planOperations } from '../engine/operations-plan.js';
+import { competencePour } from '../engine/role-competence.js';
+import { playerStore } from '../engine/player.js';
 import { icon } from '../ui/icons.js';
 import { t } from '../i18n.js';
 import { eventText } from '../i18n/content.js';
@@ -30,6 +32,7 @@ function delaiTexte(ms) {
 
 export function createOperationsView(container, { resources, astra, lien, chapter, onValider } = {}) {
   const plan = planOperations(chapter);
+  const competence = competencePour(playerStore.roleId);
   let etape = 0;           // 0 contact | 1 instruments | 2 collecte | 3 evenement | 4 bilan
   let stationSelectee = null;
   let collecteProgress = 0;
@@ -223,7 +226,7 @@ export function createOperationsView(container, { resources, astra, lien, chapte
     `;
 
     container.querySelector('#sh-ops-transmettre')?.addEventListener('click', () => {
-      collecteProgress = Math.min(100, collecteProgress + 20);
+      collecteProgress = Math.min(100, collecteProgress + (competence.compression ? 30 : 20));
       resources?.consume('donnees',        0.5);
       resources?.consume('communications', 0.4);
       const pasDuree = Math.max(0.5, (resources?.max?.duree ?? 12) * 0.08);
@@ -238,7 +241,7 @@ export function createOperationsView(container, { resources, astra, lien, chapte
     container.querySelector('#sh-ops-next')?.addEventListener('click', () => {
       if (collecteProgress < 100) return;
       scoreOps += 25;
-      evenement = settingsStore.get('randomEvents') ? plan.evenement : null;
+      evenement = evenementAutorise() ? plan.evenement : null;
       etape = evenement?.options?.length ? 3 : 4;
       render();
     });
@@ -251,11 +254,28 @@ export function createOperationsView(container, { resources, astra, lien, chapte
 
     let reponduIdx = null;
 
+    const coutSem = Math.abs(evenement.effet?.duree || 0);
+    const calcul = competence.calcul && coutSem
+      ? `<p class="sh-ops-hint">${t(
+        `Calculateur : cet aléa coûte ${coutSem} sem. de durée.`,
+        `Calculator: this contingency costs ${coutSem} wk of duration.`
+      )}</p>`
+      : '';
+    const jetons = playerStore.jetons;
+    const prixVeto = competence.prixVeto || 2;
+    const veto = competence.veto
+      ? `<button type="button" id="sh-ops-veto" class="sh-ops-btn-secondary" ${jetons < prixVeto ? 'disabled' : ''}>
+          ${t(`VETO · ${prixVeto} jetons`, `VETO · ${prixVeto} tokens`)} · ${jetons}
+        </button>`
+      : '';
+
     container.innerHTML = `
       <div class="sh-ops sh-ops--evenement">
         <div class="sh-ops-kicker">${icon('warning', 14)} ${t('ÉVÉNEMENT IMPRÉVU', 'UNPLANNED EVENT')}</div>
         <h2 class="sh-ops-titre">${icon(evenement.iconName, 18)} ${t('Aléa de mission', 'Mission contingency')}</h2>
         <p class="sh-ops-desc">${eventText(chapter)}</p>
+        ${calcul}
+        ${veto}
 
         <div class="sh-ops-ev-options">
           ${evenement.options.map((opt, i) => `
@@ -287,9 +307,16 @@ export function createOperationsView(container, { resources, astra, lien, chapte
         fb.className   = `sh-ops-ev-feedback ${opt.correct ? 'is-ok' : 'is-err'}`;
 
         evenementResolu = opt.correct;
-        appliquerEffet(resources, evenement.effet, {
-          supplement: opt.correct ? 0 : (resources?.max?.duree ?? 12) * 0.1
-        });
+        const supplement = opt.correct || competence.reboot
+          ? 0
+          : (resources?.max?.duree ?? 12) * 0.1;
+        appliquerEffet(resources, evenement.effet, { supplement });
+        if (!opt.correct && competence.reboot) {
+          fb.textContent += t(
+            ' Reboot : le surcoût de durée est annulé.',
+            ' Reboot: the extra duration cost is cancelled.'
+          );
+        }
         window.dispatchEvent(new CustomEvent('ressources-change'));
         if (opt.correct) {
           scoreOps += 25;
@@ -300,6 +327,24 @@ export function createOperationsView(container, { resources, astra, lien, chapte
 
         container.querySelector('#sh-ops-next').style.display = '';
       });
+    });
+
+    container.querySelector('#sh-ops-veto')?.addEventListener('click', () => {
+      if (reponduIdx !== null) return;
+      if (!playerStore.depenserJetons(prixVeto)) return;
+      reponduIdx = -1;
+      container.querySelectorAll('.sh-ops-ev-opt').forEach(b => { b.disabled = true; });
+      const fb = container.querySelector('#sh-ops-ev-fb');
+      fb.textContent = t(
+        'Veto du directeur. La réserve encaisse l\'aléa, sans perdre de durée.',
+        'Director veto. The reserve absorbs the contingency, with no duration lost.'
+      );
+      fb.className = 'sh-ops-ev-feedback is-ok';
+      evenementResolu = true;
+      scoreOps += 25;
+      astra?.sayRandomFrom('succes');
+      container.querySelector('#sh-ops-next').style.display = '';
+      container.querySelector('#sh-ops-veto').disabled = true;
     });
 
     container.querySelector('#sh-ops-next')?.addEventListener('click', () => {

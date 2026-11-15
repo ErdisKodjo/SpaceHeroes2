@@ -1,0 +1,17 @@
+{
+  "statut": "gmat_r2026a",
+  "note": "GMAT R2026a, 15 novembre 2026. Quatre masses sur 120 jours : gmat-win-R2026a/output/sh-vie-leo.script. Orbite du chapitre 1 : SMA 6 928 km, e 0,035, inclinaison 51,6 deg, 1 janvier 2026. Jacchia-Roberts, F10.7 = 150, Ap = 3, JGM2 4x4, Cd 2,2, surface 0,01 m2. Le plus leger (1,33 kg) perd 52,3 km de demi-grand axe, le plus lourd (4 kg) en perd 23,4. Prolongation sh-vie-leo-long.script : a 400 jours, le CubeSat de 1,33 kg est encore en orbite, demi-grand axe 6 666 km, excentricite 0,0085.",
+  "parametres": {
+    "smaDepartKm": 6928,
+    "excentricite": 0.035,
+    "cd": 2.2,
+    "surfaceM2": 0.01,
+    "jours": 120
+  },
+  "points": [
+    { "masseKg": 1.33, "perteSmaKm": 52.3 },
+    { "masseKg": 2.22, "perteSmaKm": 33.7 },
+    { "masseKg": 3.11, "perteSmaKm": 25.4 },
+    { "masseKg": 4, "perteSmaKm": 23.4 }
+  ]
+}

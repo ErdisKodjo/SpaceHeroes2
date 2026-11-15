@@ -11,6 +11,8 @@ import { AstraEngine } from './engine/astra.js';
 import { EpisodeRunner } from './engine/episode.js';
 import { evaluerMission } from './engine/bilan.js';
 import { playerStore, appliquerBonusRole, annoterBonusRole } from './engine/player.js';
+import { appliquerMarge, prevaliderCml } from './engine/difficulte.js';
+import { appliquerMode, pressionScore } from './engine/mode-jeu.js';
 import { sauvegarder, charger, restaurerResources, restaurerCml, ageSauvegarde, effacer } from './engine/save.js';
 import { appliquerCoutAtelier, coutNet } from './engine/atelier-cout.js';
 import { appliquerPhase } from './engine/cml-preuves.js';
@@ -78,7 +80,10 @@ window.addEventListener('keydown',     unlockAudio, { once: true });
 
 // Réaction audio + visuelle aux répliques ASTRA.
 window.addEventListener('astra-message', ({ detail }) => {
-  if (detail?.texte) audio.radio(detail.texte);
+  if (detail?.texte) {
+    audio.radio(detail.texte);
+    renderAstra(astraEl, detail);
+  }
   if (detail?.categorie === 'alerte' || detail?.categorie === 'echec') vue3d.flashWarning();
 });
 
@@ -192,6 +197,11 @@ function startMission({ chapterId, restore = false }) {
     }
   }
   if (!resources.bonusNote) appliquerBonusRole(resources, playerStore.role);
+  if (!restore) {
+    appliquerMarge(resources);
+    appliquerMode(resources);
+    prevaliderCml(astra);
+  }
 
   const runner = new EpisodeRunner(chapterData, {
     resources,
@@ -202,7 +212,7 @@ function startMission({ chapterId, restore = false }) {
 
   // Avancer jusqu'à l'épisode sauvegardé
   if (startIndex > 0) {
-    for (let i = 0; i < startIndex && !runner.isFinished; i++) runner.next();
+    for (let i = 0; i < startIndex && !runner.isFinished; i++) runner.next({ forcer: true });
   }
 
   let busy = false;
@@ -238,7 +248,7 @@ function startMission({ chapterId, restore = false }) {
       scoreOps: savedScoreOps
     });
     if (!demo) {
-      playerStore.enregistrerScore(chapterData.id, rapport.score);
+      if (pressionScore()) playerStore.enregistrerScore(chapterData.id, rapport.score);
       playerStore.ajouterJetons(rapport.jetons);
       effacer();
     }
@@ -340,10 +350,6 @@ function startMission({ chapterId, restore = false }) {
       }
     }
 
-    if (runner.currentEpisode?.id === 'briefing') {
-      appliquerPhase(astra, 'briefing', contextePreuve());
-    }
-
     runner.next();
   }
 
@@ -368,9 +374,9 @@ function startMission({ chapterId, restore = false }) {
     };
     savedFiabilite = 82;
     savedScoreOps = 75;
-    while (!runner.isFinished && runner.currentEpisode?.type !== 'bilan') runner.next();
+    while (!runner.isFinished && runner.currentEpisode?.type !== 'bilan') runner.next({ forcer: true });
   } else if (demo === 'lancement') {
-    while (!runner.isFinished && runner.currentEpisode.type !== 'lancement') runner.next();
+    while (!runner.isFinished && runner.currentEpisode.type !== 'lancement') runner.next({ forcer: true });
     const seek = Number(new URLSearchParams(location.search).get('t'));
     if (seek > 0) {
       vue3d.advance(4);

@@ -13,6 +13,7 @@ import { t } from '../i18n.js';
 import { compDesc, compName, familyLabel, unlockLabel } from '../i18n/content.js';
 import { coutNet, pieceEffective } from '../engine/atelier-cout.js';
 import { prixAnticipe } from '../engine/jetons.js';
+import { perteSmaKm } from '../engine/trainee.js';
 import {
   axesFamille, facteursRepartition, jugerRepartition, plafondAxe, repartitionDepart
 } from '../engine/repartition.js';
@@ -275,6 +276,13 @@ export function createAtelierView(container, {
       </div>
     `;
 
+    const perte = mission.gmat === 'orbite_basse' ? perteSmaKm(masse) : null;
+    const trainee = perte == null ? '' : `
+      <p class="sh-atelier-trainee">${t(
+        `Trainée, 120 jours : −${Math.round(perte)} km de demi-grand axe.`,
+        `Drag, 120 days: −${Math.round(perte)} km of semi-major axis.`
+      )}</p>`;
+
     container.innerHTML = `
       <div class="sh-atelier">
         <!-- En-tête -->
@@ -317,6 +325,7 @@ export function createAtelierView(container, {
 
         <!-- Pied : message ASTRA + bouton valider -->
         <div class="sh-atelier-footer">
+          ${trainee}
           <div class="sh-atelier-status ${refus ? 'is-warn' : st.ok ? 'is-ok' : 'is-warn'}">
             ${refus
               ? `${icon('warning', 15)} ${refus}`

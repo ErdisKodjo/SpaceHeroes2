@@ -3,6 +3,7 @@
 // radar des 6 ressources, décisions, mission NASA, badges.
 
 import { settingsStore } from '../engine/settings-store.js';
+import { pressionScore } from '../engine/mode-jeu.js';
 import { icon, medalIcon } from './icons.js';
 import { downloadBilanPdf } from './pdf-report.js';
 import { t, tf } from '../i18n.js';
@@ -102,7 +103,7 @@ export function createBilanView({ rapport, astraTexte, onRejouer, onSuivante, on
     <div class="sh-bilan-overlay">
       <div class="sh-bilan-panel">
         <header class="sh-bilan-header">
-          <p class="sh-bilan-kicker">${t('Bilan de mission', 'Mission debrief')}${rapport.gmatLigne ? ` · ${esc(rapport.gmatLigne)}` : ''}</p>
+          <p class="sh-bilan-kicker">${t('Bilan de mission', 'Mission debrief')}${rapport.gmatLigne ? ` · ${esc(rapport.gmatLigne)}` : ''}${pressionScore() ? '' : ` · ${t('Parcours non classé', 'Unranked run')}`}</p>
           <h2>${esc(rapport.titre)}</h2>
           <span class="sh-bilan-medal ${medal.classe}">
             ${medalHtml} ${esc(t(medal.label[0], medal.label[1]))}

@@ -46,12 +46,20 @@ export function renderDashboard(container, resourceManager, { chapter } = {}) {
   const bonusLine = bonus
     ? ` · ${bonus.sigle} ${t(LABELS[bonus.ressource]?.[0] || bonus.ressource, LABELS[bonus.ressource]?.[1] || bonus.ressource)} ×${bonus.facteur.toFixed(2)}`
     : '';
+  const marge = resourceManager.margeNote;
+  const margeLine = marge
+    ? ` · ${t(marge.label, marge.labelEn)} ×${marge.facteur.toFixed(2)}`
+    : '';
+  const mode = resourceManager.modeNote;
+  const modeLine = mode
+    ? ` · ${t(mode.label, mode.labelEn)}`
+    : '';
 
   container.innerHTML = `
     <div class="hud-brand">
       <div class="hud-brand-kicker">Space Heroes</div>
       <div class="hud-brand-title">${titre}</div>
-      <div class="hud-brand-sub">${code} · ${chapter ? chapterText(chapter, 'sousTitre') : t('Mission', 'Mission')}${bonusLine}</div>
+      <div class="hud-brand-sub">${code} · ${chapter ? chapterText(chapter, 'sousTitre') : t('Mission', 'Mission')}${bonusLine}${margeLine}${modeLine}</div>
     </div>
     <div class="hud-bars">${jauges}</div>
     <div class="hud-segments">${segments}</div>
