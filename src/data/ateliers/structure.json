@@ -10,7 +10,8 @@
       "masse": 0.40,
       "coutK": 10,
       "deblocage": "au_depart",
-      "description": "Standard CubeSat, facile à usiner.",
+      "description": "Standard CubeSat, facile à usiner. Face d'extrémité 1U, 100 × 100 mm, 0,0100 m².",
+      "surfaceM2": 0.01,
       "plafonds": { "resistance": 4, "legerete": 4 }
     },
     {
@@ -19,7 +20,8 @@
       "masse": 0.32,
       "coutK": 14,
       "deblocage": "au_depart",
-      "description": "Alliage aluminium-lithium, 20 % plus léger que l'alu standard.",
+      "description": "Alliage aluminium-lithium, 20 % plus léger que l'alu standard. Face latérale 1,5U, 100 × 170,2 mm, 0,01702 m².",
+      "surfaceM2": 0.01702,
       "plafonds": { "resistance": 5, "legerete": 5 }
     },
     {
@@ -28,7 +30,8 @@
       "masse": 0.30,
       "coutK": 18,
       "deblocage": "au_depart",
-      "description": "Résistance exceptionnelle, léger, coûteux.",
+      "description": "Résistance exceptionnelle, léger, coûteux. Face latérale 2U, 100 × 227,0 mm, 0,0227 m².",
+      "surfaceM2": 0.0227,
       "plafonds": { "resistance": 6, "legerete": 5 }
     },
     {
@@ -37,7 +40,8 @@
       "masse": 0.25,
       "coutK": 28,
       "deblocage": "chapitre_03",
-      "description": "Le plus léger, mais fragile aux impacts et cher.",
+      "description": "Le plus léger, mais fragile aux impacts et cher. Face latérale 3U, 100 × 340,5 mm, 0,03405 m². À 1,33 kg, 200 km au jour 114,8.",
+      "surfaceM2": 0.03405,
       "plafonds": { "resistance": 4, "legerete": 6 }
     },
     {
@@ -55,7 +59,7 @@
       "masse": 0.12,
       "coutK": 15,
       "deblocage": "chapitre_04",
-      "description": "Protège l'électronique des ceintures de Van Allen.",
+      "description": "Protège l'électronique des ceintures de Van Allen. SPENVIS modélise ce rayonnement.",
       "plafonds": { "radiation": 6 }
     }
   ]

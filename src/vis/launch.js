@@ -14,16 +14,11 @@ import { createRocket, createLaunchPad } from './rocket.js';
 import { createCubeSat } from './cubesat.js';
 import { createOrbit } from './orbit.js';
 import { createParticlePool } from './particles.js';
-import orbitData from '../data/gmat/orbite_basse.json';
+import { gmatPour } from '../engine/gmat.js';
+import { distanceEnsemble } from './vues.js';
 import { t as tr } from '../i18n.js';
 
-const { altitudeKm: ALT_KM, rayonTerreKm: R_KM, muTerre: MU, excentricite: ECC = 0 } = orbitData.parametres;
-const ORBIT_RADIUS = 1 + ALT_KM / R_KM;
-const ORBIT_SPEED_KMS = Math.sqrt(MU / (R_KM + ALT_KM));
-const ORBIT_PERIOD_MIN = orbitData.resultats.periodeMinutes;
-const ORBIT_PERIOD_S = ORBIT_PERIOD_MIN * 60;
 const ORBIT_DISPLAY_PERIOD = 40; // secondes a l'ecran pour un tour pendant le lancement
-const LAUNCH_TIME_SCALE = ORBIT_PERIOD_S / ORBIT_DISPLAY_PERIOD;
 const OMEGA = (Math.PI * 2) / ORBIT_DISPLAY_PERIOD;
 
 const ROCKET_HEIGHT = 0.03;
@@ -45,7 +40,6 @@ const PHI = (OMEGA * ASCENT) / 3;
 // Montee verticale jusqu'a deux fois cette hauteur, puis virage.
 const TOWER_ARM = 0.84 * ROCKET_HEIGHT;
 const VERTICAL_ALT = 2 * TOWER_ARM;
-const CLIMB = ORBIT_RADIUS - 1 - PAD_LIFT;
 
 const easeInOut = (x) => (x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2);
 const smooth01 = (x) => x * x * (3 - 2 * x);
@@ -59,7 +53,6 @@ function smoothstepInverse(y) {
   }
   return (lo + hi) / 2;
 }
-const U_PITCH = smoothstepInverse(Math.min(0.85, (VERTICAL_ALT - PAD_LIFT) / CLIMB));
 const clamp01 = (x) => Math.min(1, Math.max(0, x));
 const rand = (a, b) => a + Math.random() * (b - a);
 const fmt = (x, d = 1) => x.toFixed(d).replace('.', ',');
@@ -150,9 +143,48 @@ function lookQuaternion(eye, target, up) {
 
 // ---------------------------------------------------------------------------
 
+function deriveProfile(p) {
+  const e = p.eccentricity || 0;
+  const deployR = p.sceneA * (1 - e);
+  const climb = Math.max(0.02, deployR - 1 - PAD_LIFT);
+  return {
+    ...p,
+    deployR,
+    climb,
+    uPitch: smoothstepInverse(Math.min(0.85, (VERTICAL_ALT - PAD_LIFT) / climb))
+  };
+}
+
+// Plan incliné qui passe par p0. L'inclinaison est l'angle entre la normale et l'axe polaire.
+function axesInclinaison(p0, inclinationDeg) {
+  const i = inclinationDeg * Math.PI / 180;
+  const ny = Math.cos(i);
+  const px = p0.x;
+  const py = p0.y;
+  const pz = p0.z;
+  const h2 = px * px + pz * pz;
+  if (h2 < 1e-6) return null;
+  const scale = (-ny * py) / h2;
+  let nx = px * scale;
+  let nz = pz * scale;
+  const ax = -pz;
+  const az = px;
+  const a2 = ax * ax + az * az;
+  const rest = 1 - ny * ny - nx * nx - nz * nz;
+  if (rest < -1e-4 || a2 < 1e-8) return null;
+  const k = Math.sqrt(Math.max(0, rest) / a2);
+  nx += ax * k;
+  nz += az * k;
+  const normal = new THREE.Vector3(nx, ny, nz).normalize();
+  if (Math.abs(normal.dot(p0)) > 0.05) return null;
+  const t0 = new THREE.Vector3().crossVectors(normal, p0).normalize();
+  return { p0: p0.clone().normalize(), t0 };
+}
+
 export function createLaunchSequence({ scene, camera, earth, container, sunDirection, getHomeView }) {
   const reduceMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
   const overlay = createOverlay(container);
+  let derived = deriveProfile(gmatPour('orbite_basse'));
 
   const smoke = createParticlePool({ max: 4500, additive: false });
   const fire = createParticlePool({ max: 2000, additive: true });
@@ -203,14 +235,15 @@ export function createLaunchSequence({ scene, camera, earth, container, sunDirec
 
   // --- Trajectoire d'ascension : montee verticale, puis virage une fois la tour degagee. ---
   function radiusAt(u) {
-    return 1 + PAD_LIFT + CLIMB * smooth01(u);
+    return 1 + PAD_LIFT + derived.climb * smooth01(u);
   }
-  // phi(U_PITCH) = 0 et derivee nulle ; phi(1) = PHI et dphi/du(1) = 3*PHI.
+  // phi(uPitch) = 0 et derivee nulle ; phi(1) = PHI et dphi/du(1) = 3*PHI.
   function pitchAngle(u) {
-    if (u <= U_PITCH) return 0;
-    const s = (u - U_PITCH) / (1 - U_PITCH);
-    const a = 1 - 3 * U_PITCH;
-    const b = 3 * U_PITCH;
+    const uPitch = derived.uPitch;
+    if (u <= uPitch) return 0;
+    const s = (u - uPitch) / (1 - uPitch);
+    const a = 1 - 3 * uPitch;
+    const b = 3 * uPitch;
     const s2 = s * s;
     return PHI * (a * s2 * s + b * s2);
   }
@@ -254,8 +287,8 @@ export function createLaunchSequence({ scene, camera, earth, container, sunDirec
   const chaseBack = (u) => 0.06 * u;
   function chaseU(u) {
     const climbed = clamp01((radiusAt(u) - 1 - PAD_LIFT) / Math.max(VERTICAL_ALT - PAD_LIFT, 1e-4));
-    if (u <= U_PITCH) return 0.12 * climbed;
-    const s = (u - U_PITCH) / (1 - U_PITCH);
+    if (u <= derived.uPitch) return 0.12 * climbed;
+    const s = (u - derived.uPitch) / (1 - derived.uPitch);
     const eased = s * s * (3 - 2 * s);
     return 0.12 + 0.88 * eased;
   }
@@ -388,22 +421,25 @@ export function createLaunchSequence({ scene, camera, earth, container, sunDirec
         overlay.caption(tr('Déploiement du CubeSat', 'CubeSat deployment'), tr('La coiffe s\'ouvre, ton satellite est libéré', 'The fairing opens, your satellite is released'));
         rocket.jettisonFairing();
         const p0 = trajectory(1, new THREE.Vector3()).normalize();
-        const t0 = velocity(1, new THREE.Vector3()).normalize();
+        const incline = derived.inclinationDeg == null
+          ? null
+          : axesInclinaison(p0, derived.inclinationDeg);
+        const t0 = incline?.t0 || velocity(1, new THREE.Vector3()).normalize();
         orbit = createOrbit({
-          a: ORBIT_RADIUS,
-          e: ECC,
-          p0,
+          a: derived.sceneA,
+          e: derived.eccentricity || 0,
+          p0: incline?.p0 || p0,
           t0,
-          period: ORBIT_PERIOD_S,
-          earthRadiusKm: R_KM,
-          muKm3s2: MU,
-          timeScale: LAUNCH_TIME_SCALE
+          period: derived.periodS,
+          earthRadiusKm: derived.bodyRadiusKm,
+          muKm3s2: derived.mu,
+          timeScale: derived.periodS / ORBIT_DISPLAY_PERIOD
         });
         scene.add(orbit.object);
         cubesat = createCubeSat();
         scene.add(cubesat.object);
         // Le CubeSat sort par le nez de la coiffe.
-        orbit.attach(cubesat.object, ROCKET_HEIGHT / ORBIT_RADIUS);
+        orbit.attach(cubesat.object, ROCKET_HEIGHT / derived.sceneA);
         cubesat.deploy();
         upperTheta = 0;
         burst(cubesat.object.position, 50, 0.01, C_BLUE_END);
@@ -412,24 +448,36 @@ export function createLaunchSequence({ scene, camera, earth, container, sunDirec
     {
       at: T_DEPLOY + 1.6,
       run: () => {
-        overlay.count('ORBITE ATTEINTE', 'is-success');
-        overlay.caption(tr('Orbite basse terrestre', 'Low Earth orbit'), tr(`Altitude ${ALT_KM} km · un tour en ${fmt(ORBIT_PERIOD_MIN)} min`, `Altitude ${ALT_KM} km · one revolution in ${fmt(ORBIT_PERIOD_MIN)} min`));
-        window.dispatchEvent(new CustomEvent('orbite-atteinte', { detail: { altitudeKm: ALT_KM } }));
+        overlay.count(
+          derived.type === 'transfert_lune'
+            ? tr('APPROCHE LUNAIRE', 'LUNAR APPROACH')
+            : tr('ORBITE ATTEINTE', 'ORBIT REACHED'),
+          'is-success'
+        );
+        overlay.caption(
+          tr(derived.labelFr, derived.labelEn),
+          tr(derived.captionFr, derived.captionEn)
+        );
+        window.dispatchEvent(new CustomEvent('orbite-atteinte', { detail: { altitudeKm: derived.altitudeKm, type: derived.type } }));
       }
     },
     {
       at: T_FLYOUT,
       run: () => {
         const home = getHomeView();
-        cameraMove = createCameraMove(camera, home.position, home.quaternion, FLYOUT_DURATION);
+        const need = distanceEnsemble(derived.apoapsisScene, home.position.length());
+        const position = home.position.clone().normalize().multiplyScalar(need);
+        const quaternion = lookQuaternion(position, new THREE.Vector3(0, 0, 0), new THREE.Vector3(0, 1, 0));
+        cameraMove = createCameraMove(camera, position, quaternion, FLYOUT_DURATION);
       }
     }
   ];
 
   function telemetry(u) {
-    const altKm = (radiusAt(u) - 1 - PAD_LIFT) * R_KM;
+    const frac = clamp01((radiusAt(u) - 1 - PAD_LIFT) / derived.climb);
+    const altKm = frac * derived.altitudeKm;
     velocity(u, vTmp);
-    const speed = (vTmp.length() / (OMEGA * ORBIT_RADIUS)) * ORBIT_SPEED_KMS;
+    const speed = (vTmp.length() / (OMEGA * derived.deployR)) * derived.circularSpeedKms;
     const met = Math.max(0, t - T_LIFTOFF);
     overlay.telemetry(`
       <span><b>T+</b> ${String(Math.floor(met)).padStart(2, '0')} s</span>
@@ -593,6 +641,59 @@ export function createLaunchSequence({ scene, camera, earth, container, sunDirec
     }
   }
 
+  function clearCraft() {
+    if (rocket) {
+      scene.remove(rocket.group);
+      rocket.dispose();
+      rocket = null;
+    }
+    if (orbit) {
+      scene.remove(orbit.object);
+      orbit.dispose();
+      orbit = null;
+    }
+    if (cubesat) {
+      scene.remove(cubesat.object);
+      cubesat.dispose();
+      cubesat = null;
+    }
+    if (lowerDebris) {
+      scene.remove(lowerDebris.object);
+      lowerDebris = null;
+    }
+    if (pad) {
+      earth.mesh.remove(pad.object);
+      pad.dispose();
+      pad = null;
+    }
+  }
+
+  function reset() {
+    clearCraft();
+    launching = false;
+    launched = false;
+    prepared = false;
+    controlsCamera = false;
+    cameraMove = null;
+    t = 0;
+    cueIndex = 0;
+    upperTheta = 0;
+    resolveLaunch?.();
+    resolveLaunch = null;
+    overlay.hide();
+    overlay.count('');
+    container.classList.remove('vue3d--cinema');
+    earth.setSpinEnabled(true);
+    earth.setCloudFade(1);
+    camera.up.set(0, 1, 0);
+  }
+
+  function setProfile(next) {
+    if (!next?.sceneA) return;
+    derived = deriveProfile(next);
+    if (prepared || launched || launching) reset();
+  }
+
   return {
     get controlsCamera() {
       return controlsCamera;
@@ -606,8 +707,13 @@ export function createLaunchSequence({ scene, camera, earth, container, sunDirec
     get cubesat() {
       return cubesat;
     },
+    get profile() {
+      return derived;
+    },
     prepare,
     launch,
+    setProfile,
+    reset,
     update(dt) {
       if (cameraMove) {
         cameraMove.update(dt);

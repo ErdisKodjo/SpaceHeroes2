@@ -49,7 +49,7 @@
       "id": "lancement",
       "type": "lancement",
       "titre": "Le Lancement",
-      "texte": "Insertion vers L1, puis premières corrections pour accrocher l'orbite en halo.",
+      "texte": "Insertion vers L1, puis le halo. Quatre corrections par an : une hypothèse opérationnelle, pas une propagation.",
       "astra": "lancement_ch5_intro",
       "bouton": "Lancer !",
       "cmlRequis": 2

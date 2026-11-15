@@ -145,15 +145,38 @@ const DECISIONS_CHAPITRE = {
   },
   chapitre_04: {
     titre: 'Fenêtre',
-    choix: 'Départ dans la fenêtre des 26 mois',
+    choix: 'Départ dans la fenêtre de décembre 2026',
     consequence: 'Rater l\'injection, c\'est attendre la prochaine opposition utile.'
   },
   chapitre_05: {
     titre: 'Halo',
     choix: 'Orbite en halo autour de L1',
     consequence: 'Le point d\'équilibre ne retient pas le satellite : les corrections font partie de la mission.'
+  },
+  chapitre_06: {
+    titre: 'Pôles',
+    choix: 'Orbite à 90 degrés, 500 km, contact par Svalbard',
+    consequence: 'Les deux pôles sont survolés. L\'heure solaire n\'est pas la même d\'un passage à l\'autre.'
+  },
+  chapitre_07: {
+    titre: 'Haute',
+    choix: '35 786 km, inclinaison 28 degrés, contact par Canberra',
+    consequence: 'Pour ce plan de départ, Canberra voit le plus longtemps. Kourou et Goldstone ne voient rien.'
+  },
+  chapitre_08: {
+    titre: 'Fixe',
+    choix: '35 786 km, inclinaison 0,01 degré, contact continu par Canberra',
+    consequence: 'Pour cette longitude de départ, Canberra voit le satellite sans coupure. Les quatre autres stations du jeu ne le voient pas.'
   }
 };
+
+function delaisRatio(resources) {
+  const max = resources.max.duree;
+  if (!max) return 1;
+  const left = resources.remaining('duree') / max;
+  if (left < 0) return 0.35;
+  return clamp01(left);
+}
 
 function clamp01(n) {
   if (Number.isNaN(n)) return 0;
@@ -182,9 +205,49 @@ function ligneGmat(chapter) {
   const table = GMAT[chapter.gmat];
   if (!table) return null;
   const r = table.resultats || {};
-  if (r.periodeMinutes) return t(`Période ${r.periodeMinutes} min`, `Period ${r.periodeMinutes} min`);
-  if (r.dureeTransfertJours) return t(`Transfert ${r.dureeTransfertJours} jours`, `Transfer ${r.dureeTransfertJours} days`);
-  if (r.periodeHaloJours) return t(`Halo ${r.periodeHaloJours} jours`, `Halo ${r.periodeHaloJours} days`);
+    if (r.periodeMinutes) {
+    const base = t(`Période ${r.periodeMinutes} min`, `Period ${r.periodeMinutes} min`);
+    if (table.type === 'orbite_geostationnaire') {
+      const contact = r.parStation?.canberra?.dureeMoyenneMinutes;
+      const autres = Object.entries(r.parStation || {}).filter(([id]) => id !== 'canberra');
+      const autresZero = autres.length > 0 && autres.every(([, v]) => v.passagesParJour === 0);
+      if (Number.isFinite(contact) && autresZero) {
+        return base + t(
+          ` · Canberra ${contact} min, les autres stations à 0 pour ce départ`,
+          ` · Canberra ${contact} min, the other stations at 0 for this departure`
+        );
+      }
+    }
+    if (r.departHohmann !== 'debut decembre 2026') return base;
+    return base + t(' · départ début décembre 2026', ' · departure early December 2026');
+  }
+  if (r.dureeTransfertJours) {
+    const approche = Number(r.approcheMinKm);
+    const dv = Number(r.deltaVInjectionKmS);
+    const base = t(`Transfert ${r.dureeTransfertJours} jours`, `Transfer ${r.dureeTransfertJours} days`);
+    const injection = Number.isFinite(dv)
+      ? t(` · injection ${String(dv).replace('.', ',')} km/s`, ` · injection ${dv} km/s`)
+      : '';
+    const altitudeLune = Number(r.altitudePeriluneKm);
+    const capture = Number(r.deltaVCaptureKmS);
+    if (Number.isFinite(altitudeLune) && Number.isFinite(capture)) {
+      const freinage = String(capture).replace('.', ',');
+      return base + injection + t(
+        ` · périlune ${altitudeLune} km, capture ${freinage} km/s`,
+        ` · perilune ${altitudeLune} km, capture ${capture} km/s`
+      );
+    }
+    if (!Number.isFinite(approche)) return base + injection;
+    const fr = Math.round(approche).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
+    const en = Math.round(approche).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+    return base + injection + t(` · ${fr} km, pas une capture`, ` · ${en} km, not a capture`);
+  }
+  if (r.periodeHaloJours) {
+    const corrections = Number(r.correctionsParAn);
+    const base = t(`Halo ${r.periodeHaloJours} jours`, `Halo ${r.periodeHaloJours} days`);
+    if (!Number.isFinite(corrections)) return base;
+    return base + t(` · ${corrections} corrections/an, hypothèse`, ` · ${corrections} corrections/year, hypothesis`);
+  }
   return null;
 }
 
@@ -323,6 +386,27 @@ function astraPour(medal) {
   return 'bilan_aucun';
 }
 
+const OUTILS = {
+  leo_cubesat: [
+    'Le Debris Assessment Software sert à juger la fin de vie. Ici, la propagation s\'arrête à 200 km.',
+    'The Debris Assessment Software is used to judge end of life. Here, the propagation stops at 200 km.'
+  ],
+  lune: [
+    'Les chiffres de cette capture viennent de GMAT. Le Trajectory Browser est le catalogue public des trajectoires vers les planètes et les petits corps.',
+    'These capture figures come from GMAT. The Trajectory Browser is the public catalogue of trajectories to planets and small bodies.'
+  ],
+  mars: [
+    'Le Trajectory Browser est le catalogue public des trajectoires vers les planètes et les petits corps.',
+    'The Trajectory Browser is the public catalogue of trajectories to planets and small bodies.'
+  ]
+};
+
+export function outilNasa(profil) {
+  const lignes = OUTILS[profil];
+  if (!lignes) return '';
+  return t(lignes[0], lignes[1]);
+}
+
 function missionNasa(chapter, score) {
   const profil = chapter.profil || 'leo_cubesat';
   const liste = missionsReelles.filter((m) => m.profil === profil);
@@ -332,6 +416,7 @@ function missionNasa(chapter, score) {
     reference,
     proches,
     equivalence: score,
+    outil: outilNasa(profil),
     phrase: reference
       ? t(
         `Ton score équivaut à ${score} % de la mission ${reference.nom}.`,
@@ -367,7 +452,7 @@ export function evaluerMission({
   const valeur = valeurScientifique(selections, cml);
   const ressources = efficacite(resources);
   const decisionsQ = qualite(fiabilite, cml);
-  const delaisRespectes = resources.remaining('duree') >= 0 ? 1 : 0.35;
+  const delaisRespectes = delaisRatio(resources);
 
   const ratios = [objectifsReussis, valeur, ressources, decisionsQ, delaisRespectes];
   const score = computeScore({

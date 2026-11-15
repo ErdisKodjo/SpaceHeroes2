@@ -1,16 +1,19 @@
 {
   "type": "orbite_mars",
-  "statut": "placeholder_formule",
-  "note": "Orbite basse martienne circulaire à 300 km. Période calculée avec le rayon équatorial de Mars (3 396 km) et mu = 42 828 km^3/s^2 : T ≈ 113,7 min. Le délai radio Terre-Mars varie d'environ 4 min à l'opposition à plus de 20 min quand Mars est loin ; la valeur retenue pour le chapitre est le cas long. Table provisoire, à remplacer par une sortie GMAT.",
+  "statut": "gmat_r2026a",
+  "note": "GMAT R2026a, 15 novembre 2026. Orbite : gmat-win-R2026a/output/sh-mars-orbite.script. SMA 3 696 km, excentricite 0,01, Mars50c 8x8, Soleil et Terre en points massifs. Un tour, d'un periastre au suivant : 6 800 s, soit 113,3 min. Fenetre : sh-mars-fenetre.script, DE405, pas de 5 jours. Mars est 44 deg devant la Terre le 2 decembre 2026 (45,2 deg) et le 7 decembre (42,4 deg) : le depart Hohmann tombe debut decembre 2026. Opposition le 20 fevrier 2027, a 0,68 UA, puis le 31 mars 2029. Au plus loin de ce cycle, le 10 mai 2028, la lumiere met 20 min a l'aller et 40 min pour la reponse.",
   "parametres": {
     "altitudeKm": 300,
     "rayonMarsKm": 3396,
     "muMars": 42828,
-    "excentricite": 0.01
+    "excentricite": 0.01,
+    "epoque": "01 Jan 2026 12:00:00"
   },
   "resultats": {
-    "periodeMinutes": 113.7,
-    "delaiRadioMinutes": 20,
-    "fenetreLancementMois": 26
+    "periodeMinutes": 113.3,
+    "delaiRadioMinutes": 40,
+    "fenetreLancementMois": 26,
+    "departHohmann": "debut decembre 2026",
+    "opposition": "20 Feb 2027"
   }
 }

@@ -18,6 +18,11 @@ export function createOrbitHud(container) {
       <span data-k="per"><b>PÉR</b> —</span>
       <span data-k="range"><b>PÉRI / APO</b> —</span>
     </div>
+    <div class="vis-hud-vues" role="group" aria-label="${tr('Point de vue', 'Viewpoint')}">
+      <button type="button" class="vis-hud-vue" data-vue="ensemble" aria-pressed="false">${tr('Ensemble', 'Overview')}</button>
+      <button type="button" class="vis-hud-vue" data-vue="satellite" aria-pressed="false">${tr('Satellite', 'Satellite')}</button>
+      <button type="button" class="vis-hud-vue" data-vue="lune" aria-pressed="false" hidden>${tr('Lune', 'Moon')}</button>
+    </div>
     <div class="vis-hud-scales" role="group" aria-label="${tr('Vitesse de simulation', 'Simulation speed')}">
       ${SCALES.map(
         (s) =>
@@ -36,8 +41,11 @@ export function createOrbitHud(container) {
     range: root.querySelector('[data-k="range"]')
   };
   const buttons = [...root.querySelectorAll('.vis-hud-scale')];
+  const vues = [...root.querySelectorAll('.vis-hud-vue')];
   let scale = 1000;
   let onScale = null;
+  let onVue = null;
+  let vue = null;
 
   function paintButtons() {
     for (const btn of buttons) {
@@ -47,7 +55,22 @@ export function createOrbitHud(container) {
     }
   }
 
+  function paintVues() {
+    for (const btn of vues) {
+      const active = btn.dataset.vue === vue;
+      btn.classList.toggle('is-active', active);
+      btn.setAttribute('aria-pressed', String(active));
+    }
+  }
+
   root.addEventListener('click', (event) => {
+    const vueBtn = event.target.closest('.vis-hud-vue');
+    if (vueBtn && !vueBtn.hidden) {
+      vue = vueBtn.dataset.vue;
+      paintVues();
+      onVue?.(vue);
+      return;
+    }
     const btn = event.target.closest('.vis-hud-scale');
     if (!btn) return;
     scale = Number(btn.dataset.scale);
@@ -72,6 +95,21 @@ export function createOrbitHud(container) {
     },
     onTimeScale(fn) {
       onScale = fn;
+    },
+    setLune(visible) {
+      const btn = vues.find((item) => item.dataset.vue === 'lune');
+      if (btn) btn.hidden = !visible;
+      if (!visible && vue === 'lune') {
+        vue = null;
+        paintVues();
+      }
+    },
+    setVue(id) {
+      vue = id;
+      paintVues();
+    },
+    onVue(fn) {
+      onVue = fn;
     },
     update(t) {
       if (!t) return;

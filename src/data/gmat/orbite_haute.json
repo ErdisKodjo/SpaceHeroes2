@@ -1,18 +1,26 @@
 {
   "type": "orbite_haute",
-  "statut": "placeholder_formule",
-  "note": "Même demi-grand axe que l'orbite géostationnaire (T = 2*PI*sqrt(a^3/mu)), mais inclinaison non nulle : le satellite décrit un analemme dans le ciel et n'est pas fixe. Table provisoire, à remplacer par une sortie GMAT.",
+  "statut": "gmat_r2026a",
+  "note": "GMAT R2026a du 15 novembre 2026, scripts gmat-win-R2026a/output/sh-orbites-periode.script et sh-orbites-extra.script. Meme demi-grand axe que la geostationnaire, inclinaison 28 deg, e = 0,001, JGM2 4x4. D'un periapse au suivant : 86 161,1 s, soit 1 436,0 min, une demi-seconde de plus que l'equateur. Contacts du 01 Jan 2026 12:00 UTC, RAAN 0, masque 5 deg. Svalbard et Madrid ont un long passage par jour (569 min et 465 min). Canberra, 790 min. Kourou et Goldstone ne voient pas ce plan. Le passage deja en cours a l'epoque n'est pas compte dans la moyenne.",
   "parametres": {
     "altitudeKm": 35786,
     "rayonTerreKm": 6378,
     "muTerre": 398600,
     "inclinaisonDeg": 28,
-    "excentricite": 0
+    "excentricite": 0.001
   },
   "resultats": {
-    "periodeMinutes": 1436.1,
+    "periodeMinutes": 1436.0,
     "periodeHeures": 23.93,
+    "stationDeReference": "svalbard",
     "passagesParJourSurUneStation": 1,
-    "dureeContactMoyenneMinutes": 1440
+    "dureeContactMoyenneMinutes": 569.2,
+    "parStation": {
+      "kourou": { "passagesParJour": 0, "dureeMoyenneMinutes": 0 },
+      "svalbard": { "passagesParJour": 1, "dureeMoyenneMinutes": 569.2 },
+      "madrid": { "passagesParJour": 1, "dureeMoyenneMinutes": 465.4 },
+      "goldstone": { "passagesParJour": 0, "dureeMoyenneMinutes": 0 },
+      "canberra": { "passagesParJour": 1, "dureeMoyenneMinutes": 790.0 }
+    }
   }
 }

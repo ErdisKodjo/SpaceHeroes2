@@ -1,0 +1,77 @@
+{
+  "id": "chapitre_08",
+  "titre": "Le point fixe",
+  "sousTitre": "Géostationnaire",
+  "histoire": "Un tour dure autant qu'un jour sidéral. Le satellite reste au-dessus de la même région du sol.",
+  "mission": "Tenir une liaison continue depuis 35 786 km. L'inclinaison est de 0,01 degré, juste de quoi marquer le périapse. Pour le départ du 1 janvier 2026, RAAN 0, seul Canberra voit le satellite, 1 440 minutes sans coupure. Kourou, Svalbard, Madrid et Goldstone ne le voient pas. Ce n'est pas vrai de toute longitude géostationnaire.",
+  "profil": "geo",
+  "gmat": "orbite_geostationnaire",
+  "contraintes": {
+    "budget": 14,
+    "masse": 48,
+    "puissance": 26,
+    "donnees": 12,
+    "communications": 12,
+    "duree": 22
+  },
+  "notionCle": "Période d'un jour, satellite fixe dans le ciel, longitude qui choisit la station",
+  "ressourcesNasa": [
+    "Période GMAT 86 160,6 s, 15 novembre 2026",
+    "Contacts du plan RAAN 0 au 1 janvier 2026, masque 5 degrés"
+  ],
+  "episodes": [
+    {
+      "id": "briefing",
+      "type": "briefing",
+      "titre": "Le Briefing",
+      "texte": "L'orbite fait un tour en 1 436 minutes. Choisis ce que le point fixe doit servir : relais, météo, ou alerte. La longitude du départ décide quelle station le voit.",
+      "astra": "briefing_ch8_intro",
+      "cmlVise": 1
+    },
+    {
+      "id": "atelier",
+      "type": "atelier",
+      "titre": "L'Atelier",
+      "texte": "Prévois une liaison qui ne s'interrompt pas, et une puissance qui traverse l'éclipse d'une orbite d'un jour.",
+      "astra": "atelier_ch8_intro",
+      "cmlVise": 2,
+      "familleAtelier": "communications"
+    },
+    {
+      "id": "essais",
+      "type": "essais",
+      "titre": "Les Essais",
+      "texte": "Vibrations, thermique d'une orbite d'un jour, compatibilité électrique de l'émetteur.",
+      "astra": "essais_ch8_intro",
+      "cmlRequis": 2
+    },
+    {
+      "id": "lancement",
+      "type": "lancement",
+      "titre": "Le Lancement",
+      "texte": "Injection à 35 786 km. Le satellite se cale au-dessus d'une région. Il ne décrit pas le huit de l'orbite inclinée.",
+      "astra": "lancement_ch8_intro",
+      "bouton": "Lancer !",
+      "cmlRequis": 2
+    },
+    {
+      "id": "operations",
+      "type": "operations",
+      "titre": "Les Opérations",
+      "texte": "Pour cet état de départ, Canberra garde le satellite 1 440 minutes. Les quatre autres stations du jeu restent à zéro.",
+      "astra": "operations_ch8_intro"
+    },
+    {
+      "id": "bilan",
+      "type": "bilan",
+      "titre": "Le Bilan",
+      "texte": "Rapport de mission, score, médaille et analyse d'ASTRA.",
+      "astra": null
+    }
+  ],
+  "evenementAleatoire": {
+    "id": "longitude_autre",
+    "texte": "Le créneau a été posé sur Svalbard. Pour cette longitude de départ, seul Canberra voit le satellite. Changer de station coûte la semaine prévue.",
+    "effet": { "duree": -1 }
+  }
+}

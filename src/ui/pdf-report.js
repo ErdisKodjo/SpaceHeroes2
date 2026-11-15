@@ -134,8 +134,26 @@ export async function downloadBilanPdf(rapport, astraTexte) {
     y = paragraph(t('Dans la vraie vie', 'In real life'), y, 12);
     doc.setFont('helvetica', 'normal');
     y = paragraph(rapport.nasa.phrase, y, 10);
+    if (rapport.nasa.outil) y = paragraph(rapport.nasa.outil, y, 10);
     const ref = rapport.nasa.reference;
     if (ref) y = paragraph(`${ref.agence} · ${ref.annee}. ${missionBlurb(ref.id, ref.resume || '')}`, y, 9, [50, 64, 88]);
+    for (const proche of rapport.nasa.proches || []) {
+      y = paragraph(`${proche.nom} · ${proche.agence} · ${proche.annee}. ${missionBlurb(proche.id, proche.resume || '')}`, y, 9, [50, 64, 88]);
+    }
+  }
+
+  if (rapport.commun) {
+    y += 2;
+    doc.setFont('helvetica', 'bold');
+    y = paragraph(t('Bilan commun', 'Shared debrief'), y, 12);
+    doc.setFont('helvetica', 'normal');
+    const veto = rapport.commun.vetoUtilise
+      ? t('Le veto a été utilisé.', 'The veto was used.')
+      : t('Le veto n\'a pas été utilisé.', 'The veto was not used.');
+    y = paragraph(veto, y, 10);
+    for (const r of rapport.commun.rapports || []) {
+      y = paragraph(`${r.nom} · ${r.score}/100 · ${r.medaille}`, y, 10);
+    }
   }
 
   if (rapport.badges?.length) {

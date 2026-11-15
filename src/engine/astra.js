@@ -51,11 +51,14 @@ export class AstraEngine {
     return this.lastLine;
   }
 
-  // Evaluation independante d'un critere CML.
-  // `preuve` est une fonction fournie par l'episode qui dit si le critere est rempli.
+  // Pose le statut à partir d'une preuve. La preuve renvoie
+  // 'vert' | 'jaune' | 'rouge', ou un booléen (vrai = vert).
   evaluerCritereCml(criterionId, preuve) {
-    const rempli = typeof preuve === 'function' ? preuve() : Boolean(preuve);
-    this.cml.setStatus(criterionId, rempli ? 'vert' : 'rouge');
-    return rempli;
+    const rempli = typeof preuve === 'function' ? preuve() : preuve;
+    let value = 'rouge';
+    if (rempli === 'vert' || rempli === 'jaune' || rempli === 'rouge') value = rempli;
+    else if (rempli) value = 'vert';
+    this.cml.setStatus(criterionId, value);
+    return value;
   }
 }

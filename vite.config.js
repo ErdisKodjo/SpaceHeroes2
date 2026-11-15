@@ -1,4 +1,4 @@
-import { defineConfig } from 'vite';
+import { defineConfig } from 'vitest/config';
 
 // GitHub Pages sert le dépôt dans un sous-dossier (https://jodm007.github.io/SpaceHeros/).
 // Une base relative suit le nom du dépôt. En local, le site reste à la racine.
@@ -10,6 +10,11 @@ export default defineConfig({
   root: '.',
   server: {
     host: true
+  },
+  test: {
+    environment: 'node',
+    setupFiles: ['./src/test/setup.js'],
+    passWithNoTests: true
   },
   build: {
     outDir: 'dist',

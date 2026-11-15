@@ -4,7 +4,18 @@ Guide du jeu tel qu'il se joue dans le navigateur. Une mission va du QG au bilan
 
 ## Lancer le jeu
 
+<<<<<<< HEAD
 1. Le premier écran est le logo circulaire Space Heroes, avec une phrase de chargement. Il disparaît quand les textures sont prêtes. Un clic dans la page est nécessaire pour entendre la musique, les effets et la voix : le navigateur bloque le son tant qu'on n'a pas cliqué.
+=======
+1. Ouvrir un terminal dans le dossier du projet.
+2. La première fois : `npm install`.
+3. Ensuite : `npm run dev`.
+4. Ouvrir l'adresse indiquée par Vite, en général `http://127.0.0.1:5173/`.
+
+`npm run server` lance un second processus, sur le port 8787. Il ne fait pas partie de la page Vite. **Partie à 4** affiche les adresses du même réseau, et celles qui sont joignables depuis un autre réseau. Une adresse de partage d'opérateur ne l'est pas. Si cette machine n'en a pas, le salon le dit. Le champ **Serveur déjà joignable** relie le salon à un serveur qui l'est déjà. **Ouvrir le micro** relie les voix des joueurs directement entre leurs navigateurs. Le serveur ne transporte que la signalisation, pas le son. Sans micro autorisé, la partie continue.
+
+Le premier écran est le logo circulaire Space Heroes, avec une phrase de chargement. Il disparaît quand les textures sont prêtes. Un clic dans la page est nécessaire pour entendre la musique, les effets et la voix : le navigateur bloque le son tant qu'on n'a pas cliqué.
+>>>>>>> f3c24a1f91154ae93ad64ca2db74ed5891fc3166
 
 Le bouton en haut à droite affiche **SON** quand le son est ouvert, **MUET** quand il est coupé. Il coupe la musique, les effets et la voix d'ASTRA en même temps.
 
@@ -14,7 +25,8 @@ Le QG est l'accueil. La Terre tourne derrière le panneau.
 
 - Le message d'ASTRA salue le commandant par son nom.
 - **Continuer** n'apparaît que s'il existe une partie en cours. Il reprend le chapitre et l'épisode sauvegardés.
-- Les cinq cartes sont les missions. Seul le chapitre 1 est ouvert au départ. Un chapitre suivant s'ouvre quand le précédent a un score au bilan.
+- Les huit cartes sont les missions. Seul le chapitre 1 est ouvert au départ. Un chapitre suivant s'ouvre quand le précédent a un score au bilan. En Découverte, les huit sont ouvertes.
+- La carte du système solaire suit le même verrou. Elle s'ouvre sur le schéma : Soleil, L1, Terre et ses cinq orbites, Lune, Mars. Ce n'est pas une échelle. Le bouton **Planétaire** remplace ce schéma par les orbites : Terre et Mars suivent les éléments JPL 1800–2050, la Lune part de la nouvelle lune du 8 janvier 2008 et avance d'un mois sidéral. Lune et L1 sont écartés de la Terre, sinon ils se confondraient avec elle. La date avance d'un jour toutes les 0,8 s, et reste fixe si les animations sont réduites. **Schéma** ramène la ligne. Un lieu ouvert lance le chapitre. Un lieu fermé reste inactif.
 - Une carte terminée affiche le meilleur score et une médaille.
 - **Changer de rôle** ouvre le choix du poste et du nom, sans lancer de mission.
 - L'engrenage ouvre les paramètres.
@@ -23,7 +35,7 @@ Cliquer une carte ouverte demande d'abord de confirmer le rôle, puis la mission
 
 ## Choisir un rôle
 
-Quatre postes. En solo, ASTRA tient les trois autres.
+Quatre postes. En solo, ASTRA tient les trois autres, et le veto dépense les jetons enregistrés dans le navigateur. **Partie à 4** ouvre une table sur le serveur : un joueur par poste, un poste ne se partage pas, et un siège vide reste vide. Le salon indique les adresses du même réseau, et celles joignables depuis un autre réseau. Sans adresse joignable, il propose un serveur qui l'est déjà. Le premier joueur lance le chapitre quand les quatre postes sont tenus. Les six jauges et la réserve de veto viennent alors du serveur. La partie à 4 n'est pas écrite dans la sauvegarde du navigateur.
 
 | Sigle | Poste                      | Ce que la carte annonce                              |
 | ----- | -------------------------- | ---------------------------------------------------- |
@@ -34,7 +46,7 @@ Quatre postes. En solo, ASTRA tient les trois autres.
 
 Le nom du commandant accepte 24 caractères. Vide, il redevient « Commandant ». **Confirmer et lancer la mission** entre dans le briefing.
 
-Le rôle est affiché sur le QG. Dans cette version, il ne change pas encore les jauges ni les boutons de la mission : tout le monde joue le même déroulé.
+Le rôle est affiché sur le QG. Au départ d'une mission, il change un plafond : le directeur a 15 % de budget en plus, l'ingénieur véhicule paie la masse 10 % moins cher, l'ingénieur systèmes a 10 % de puissance en plus, le responsable science a 20 % de données en plus. En opérations, chacun a un geste : veto à 2 jetons, affichage du coût en durée, annulation du surcoût de durée, ou transmission à +30 % au lieu de +20 %.
 
 ## Le fil d'une mission
 
@@ -61,45 +73,56 @@ ASTRA évalue 20 critères, 5 par niveau. Le joueur ne coche pas la pastille lui
 
 Un niveau est validé à **80 % de vert**, soit 4 critères sur 5.
 
+<<<<<<< HEAD
 | Niveau | Nom                 | Moment visé                                                        |
 | ------ | ------------------- | ------------------------------------------------------------------ |
 | CML 1  | Idée                | Briefing                                                           |
 | CML 2  | Faisabilité         | Atelier, puis exigé avant les essais et le lancement du chapitre 1 |
 | CML 3  | Études de compromis | Plus tard dans la campagne                                         |
 | CML 4  | Conception précise  | Plus tard dans la campagne                                         |
+=======
+| Niveau | Nom | Moment visé |
+| --- | --- | --- |
+| CML 1 | Idée | Briefing |
+| CML 2 | Faisabilité | Atelier, puis exigé avant les essais et le lancement |
+| CML 3 | Études de compromis | Jugé à l'atelier. Le directeur ne quitte pas l'atelier sans lui |
+| CML 4 | Conception précise | Jugé aux essais. Le directeur ne quitte pas les essais sans lui |
+>>>>>>> f3c24a1f91154ae93ad64ca2db74ed5891fc3166
 
-Si le niveau demandé n'est pas validé, ASTRA le dit. Le compte à rebours reste disponible. Le manque est compté au bilan.
+Si le niveau demandé n'est pas validé, ASTRA le dit et l'épisode ne change pas. Le Cadet arrive avec les CML 1 et 2 déjà verts. Le bac à sable n'est pas retenu par cette porte. Le directeur qui rate le CML 4 peut revenir à l'atelier. Une fois sur l'écran de lancement, le compte à rebours part. Le manque de CML est compté au bilan.
 
 ### Atelier
 
-Cinq familles, un composant chacune : moteur, structure, énergie, communications, instrument. Cliquer un composant le sélectionne. Cliquer une seconde fois le retire. Le CubeSat en fond se construit à mesure.
+Cinq familles, un composant chacune : moteur, structure, énergie, communications, instrument. Cliquer un composant le sélectionne. Cliquer une seconde fois le retire. Une pièce encore réservée à un chapitre ultérieur s'achète en jetons : le prix est le numéro du chapitre. Chaque famille reçoit 12 points sur ses axes. Le plafond de la pièce bloque un axe. La légèreté change la masse, la consommation change la puissance, la résistance élargit la bande verte des vibrations.
 
 **Valider l'atelier** n'est accepté que lorsque les cinq familles ont un choix. Le message « Sélectionne un composant dans chaque famille » apparaît sinon.
+
+En orbite basse, la face du châssis entre dans la durée. Quatre faces propagées 84 jours sont proposées : 0,0100 m² (extrémité 1U), 0,01702 m² (côté 1,5U), 0,0227 m² (côté 2U), 0,03405 m² (côté 3U). La perte de demi-grand axe sur ces 84 jours est rapportée aux 350 km qui mènent à 200 km, puis retirée des 12 semaines. La face 3U à 1,33 kg atteint 200 km au jour 114,8. Hors de 1,33 à 4 kg, l'atelier le dit : le chiffre est prolongé en 1/masse.
 
 ### Essais
 
 Trois épreuves, dans l'ordre. La fiabilité (0 à 100) part au bilan.
 
-- **Vibrations.** La jauge descend toute seule. Le bouton **Maintenir** la remonte. La garder dans la bande verte (entre 35 et 65) pendant 3 secondes, sur une épreuve de 6 secondes. Des clics trop rares laissent la jauge tomber. Des clics trop rapprochés la font sortir par le haut.
-- **Thermique.** Trois isolants. Un seul convient au vol. L'explication s'affiche après le choix.
+- **Vibrations.** La jauge descend toute seule. Le bouton **Maintenir** la remonte. La garder dans la bande verte pendant 3 secondes, sur une épreuve de 6 secondes. La bande dépend de la résistance choisie à l'atelier. Des clics trop rares laissent la jauge tomber. Des clics trop rapprochés la font sortir par le haut.
+- **Thermique.** Trois isolants. Celui qui convient dépend de la trajectoire : isolation près de la Terre, blindage vers Mars et L1. L'explication s'affiche après le choix.
 - **Électrique.** Trois combinaisons. Une seule est compatible en tension. L'explication s'affiche après le choix.
 
 ### Lancement
 
-Le bouton **Lancer** démarre le compte à rebours. La caméra devient cinématique : la souris et le clavier ne dirigent plus la vue. La musique baisse sous le grondement, puis revient une fois l'orbite atteinte.
+Le bouton **Lancer** démarre le compte à rebours. La caméra devient cinématique : la souris et le clavier ne dirigent plus la vue. La musique baisse sous le grondement, puis revient une fois la trajectoire affichée. La légende donne les chiffres GMAT du chapitre : pour la Lune, injection 3,12 km/s, périlune à 50 km et capture de 0,87 km/s ; pour Mars, un tour en 113,3 min et un départ début décembre 2026 ; pour L1, 1,5 million de km, un halo de 173 jours, et 4 corrections par an nommées comme une hypothèse.
 
 ### Opérations
 
 Quatre temps.
 
-1. **Premier contact.** Choisir une station : Madrid, Goldstone, Canberra ou Kourou.
+1. **Premier contact.** Choisir une station : Kourou, Svalbard, Madrid, Goldstone ou Canberra. La bonne station dépend du chapitre.
 2. **Déploiement.** L'ordre correct est communications, puis énergie, puis instrument scientifique. Un autre ordre est signalé.
 3. **Transmission.** Surveiller les jauges et cliquer **Transmettre** pendant que la fenêtre de contact est ouverte.
 4. **Anomalie**, si les événements aléatoires sont activés dans les paramètres. Plusieurs réponses peuvent être justes. ASTRA explique le choix.
 
 ### Bilan
 
-L'écran montre le score sur 100, la médaille, le détail du score, les ressources, trois décisions, une comparaison avec une mission réelle, les badges et les jetons d'atelier.
+L'écran montre le score sur 100, la médaille, le détail du score, les ressources, trois décisions, une comparaison avec une mission réelle, les badges et les jetons d'atelier. Sous « Dans la vraie vie », chaque mission citée est une fiche : nom, agence et année. Un clic ouvre le résumé, un second clic sur la même fiche le referme. Une ligne nomme un outil public quand il a sa place : Debris Assessment Software pour la fin de vie en orbite basse, Trajectory Browser pour Mars et, à côté des chiffres GMAT, pour la Lune. L'atelier cite PyCubed. Le blindage cite SPENVIS. En partie à 4, le rapport ajoute le bilan commun : le score de chaque poste, le veto, et chaque moment où une jauge passe 80 % ou dépasse le plafond.
 
 | Score       | Médaille | Jetons d'atelier |
 | ----------- | -------- | ---------------- |
@@ -119,6 +142,7 @@ Les boutons :
 
 Sous le QG, la Terre tourne seule. En mission, on peut l'explorer, sauf pendant le décollage.
 
+<<<<<<< HEAD
 | Action                 | Effet                                                                  |
 | ---------------------- | ---------------------------------------------------------------------- |
 | Clic gauche et glisser | Tourner autour de la Terre                                             |
@@ -127,14 +151,27 @@ Sous le QG, la Terre tourne seule. En mission, on peut l'explorer, sauf pendant 
 | Q, + ou Page haut      | Zoomer                                                                 |
 | E, − ou Page bas       | Dézoomer                                                               |
 | Clic sur le CubeSat    | Télémétrie : batterie, signal, température, prochain contact, altitude |
+=======
+| Action | Effet |
+| --- | --- |
+| Clic gauche et glisser | Tourner autour de la Terre |
+| Molette | Zoomer |
+| W A S D ou les flèches | Déplacer le point de vue |
+| Q, + ou Page haut | Zoomer |
+| E, − ou Page bas | Dézoomer |
+| Clic sur le CubeSat en orbite | Fiche de la face visée : moteur, structure, énergie, antenne ou instrument, avec la pièce choisie à l'atelier |
+| Ensemble | Cadre toute la trajectoire déjà calculée |
+| Satellite | Suit le CubeSat |
+| Lune | Visible sur le transfert lunaire. Montre la Lune au bout de cette ellipse, au rayon 1 788 km moins 50 km |
+>>>>>>> f3c24a1f91154ae93ad64ca2db74ed5891fc3166
 
-La fiche de télémétrie se ferme avec la croix, ou toute seule au bout de 8 secondes.
+La fiche se ferme avec la croix. Elle reste affichée tant qu'on ne la ferme pas.
 
 Le tutoriel guidé, activé par défaut, pose quatre bulles une seule fois : les six jauges, l'atelier, le lancement, puis la vue 3D après l'orbite. **Compris** ou la croix les range. Elles ne reviennent pas.
 
 ## Le son
 
-Une musique originale joue en boucle, une par écran. Les volumes du tableau sont relatifs. Le curseur **Musique d'ambiance** les baisse ou les monte tous ensemble, après **Enregistrer**.
+Une musique originale joue en boucle, une par écran. Le curseur **Volume général** baisse la musique, les effets et la voix ensemble. Le curseur **Musique d'ambiance** ne change que la bande-son. Les deux s'appliquent après **Enregistrer**.
 
 | Écran      | Tempo | Ambiance                                |
 | ---------- | ----- | --------------------------------------- |
@@ -160,18 +197,36 @@ La langue par défaut est le français. **English** traduit les textes visibles.
 
 Réglages qui changent l'écran ou la partie dès l'enregistrement :
 
+<<<<<<< HEAD
 | Réglage                | Effet                                                                    |
 | ---------------------- | ------------------------------------------------------------------------ |
 | Tutoriel guidé         | Affiche ou cache les bulles d'aide                                       |
 | Événements aléatoires  | Autorise ou retire l'anomalie en opérations                              |
 | Musique d'ambiance     | Volume de la bande-son                                                   |
 | Plein écran            | Passe le navigateur en plein écran                                       |
+=======
+| Réglage | Effet |
+| --- | --- |
+| Tutoriel guidé | Affiche ou cache les bulles d'aide |
+| Événements aléatoires | Autorise ou retire l'anomalie en opérations. Le Cadet n'en a pas, le Directeur en a toujours |
+| Difficulté | Cadet élargit les plafonds et prépare le CML 1 et 2. Directeur les resserre et exige les CML 3 et 4. Bac à sable n'est pas retenu par la porte CML |
+| Mode de jeu | Campagne ouvre le chapitre suivant avec un score. Défi réduit la masse et la durée. Découverte ouvre tout et ne classe pas le parcours |
+| Volume général | Baisse la musique, les effets et la voix ensemble |
+| Effets sonores | Baisse le compte à rebours, le grondement et la radio |
+| Musique d'ambiance | Volume de la bande-son seule |
+| Voix ASTRA | Coupe la synthèse. Le texte reste |
+| Sous-titres ASTRA | Masque le texte quand la voix est allumée |
+| Vitesse de lecture | Lente ralentit la voix et laisse un silence entre deux répliques |
+| Vitesse de simulation | ×1, ×100 ou ×1000 au moment où l'orbite s'affiche. Le HUD peut encore la changer |
+| Qualité graphique | Basse, moyenne, haute ou ultra règle la netteté du rendu 3D |
+| Plein écran | Passe le navigateur en plein écran |
+>>>>>>> f3c24a1f91154ae93ad64ca2db74ed5891fc3166
 | Réduction de mouvement | Coupe les animations, dont le logo du chargement et le compteur du bilan |
 | Contrastes élevés      | Renforce les contrastes                                                  |
 | Mode daltonien         | Filtre deutéranopie, protanopie ou tritanopie                            |
 | Taille de police       | Normale, grande ou très grande                                           |
 
-D'autres options sont enregistrées pour la suite du projet et ne modifient pas encore la mission : difficulté, mode Campagne / Défi / Découverte, vitesse de simulation, volume général, effets sonores, interrupteur « Voix ASTRA », qualité graphique, sous-titres et vitesse de lecture. Le son et la voix se coupent avec le bouton **SON / MUET**.
+Le son et la voix se coupent aussi avec le bouton **SON / MUET**.
 
 ## Adresses de démonstration
 

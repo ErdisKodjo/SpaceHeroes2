@@ -8,15 +8,21 @@ const KEY = 'sh-player';
 const DEFAULT = {
   nom: 'Commandant',
   roleId: 'ingenieur_vehicule',
-  stats: { partiesJouees: 0, meilleursScores: {}, jetons: 0 }
+  stats: { partiesJouees: 0, meilleursScores: {}, jetons: 0, techs: [] }
 };
 
 function load() {
   try {
     const raw = localStorage.getItem(KEY);
-    return raw ? { ...DEFAULT, ...JSON.parse(raw) } : { ...DEFAULT };
+    if (!raw) return { ...DEFAULT, stats: { ...DEFAULT.stats } };
+    const saved = JSON.parse(raw);
+    return {
+      ...DEFAULT,
+      ...saved,
+      stats: { ...DEFAULT.stats, ...(saved.stats || {}) }
+    };
   } catch {
-    return { ...DEFAULT };
+    return { ...DEFAULT, stats: { ...DEFAULT.stats } };
   }
 }
 
@@ -50,7 +56,7 @@ export const playerStore = {
     save(_player);
   },
   getMeilleurScore(chapterId) {
-    return _player.stats.meilleursScores[chapterId] ?? null;
+    return _player.stats.meilleursScores?.[chapterId] ?? null;
   },
   get jetons() {
     return _player.stats.jetons ?? 0;
@@ -60,5 +66,46 @@ export const playerStore = {
     _player.stats.jetons = (_player.stats.jetons ?? 0) + gain;
     save(_player);
     return _player.stats.jetons;
+  },
+  depenserJetons(n) {
+    const cout = Math.max(0, Math.round(n) || 0);
+    if (this.jetons < cout) return false;
+    _player.stats.jetons = this.jetons - cout;
+    save(_player);
+    return true;
+  },
+  possedeTech(id) {
+    return (_player.stats.techs || []).includes(id);
+  },
+  acheterTech(id, prix) {
+    if (!id) return { ok: false, reste: this.jetons };
+    if (this.possedeTech(id)) return { ok: true, reste: this.jetons, deja: true };
+    const cout = Math.max(0, Math.round(prix) || 0);
+    const solde = this.jetons;
+    if (solde < cout) return { ok: false, reste: solde, cout };
+    _player.stats.jetons = solde - cout;
+    _player.stats.techs = [...(_player.stats.techs || []), id];
+    save(_player);
+    return { ok: true, reste: this.jetons, cout };
   }
 };
+
+// Bonus du rôle. Un facteur ≥ 1 élargit le plafond.
+// Un facteur < 1 réduit le coût de cette ressource (masse × 0,9 pour l'IV).
+export function appliquerBonusRole(resources, role) {
+  const bonus = role?.bonus;
+  const key = bonus?.ressource;
+  const facteur = Number(bonus?.facteur);
+  if (!key || resources.max[key] == null || !Number.isFinite(facteur) || facteur <= 0) return;
+  if (facteur >= 1) resources.max[key] *= facteur;
+  else resources.relief[key] = facteur;
+  resources.bonusNote = { ressource: key, facteur, sigle: role.sigle };
+}
+
+export function annoterBonusRole(resources, role) {
+  const bonus = role?.bonus;
+  const key = bonus?.ressource;
+  const facteur = Number(bonus?.facteur);
+  if (!key || !Number.isFinite(facteur)) return;
+  resources.bonusNote = { ressource: key, facteur, sigle: role.sigle };
+}

@@ -1,17 +1,25 @@
 {
   "type": "orbite_polaire",
-  "statut": "placeholder_formule",
-  "note": "Orbite circulaire inclinée à 90 degrés, 500 km. Période calculée par T = 2*PI*sqrt(a^3/mu), a = 6878 km. Table provisoire, à remplacer par une sortie GMAT.",
+  "statut": "gmat_r2026a",
+  "note": "GMAT R2026a du 15 novembre 2026, scripts gmat-win-R2026a/output/sh-polar-periode.script et sh-orbites-extra.script. 500 km, inclinaison 90 deg, e = 0,001 pour definir le periapse, JGM2 4x4, epoque 01 Jan 2026 12:00 UTC. Deux passages a l'anomalie moyenne 360 : 5 669,5 s, soit 94,5 min. Contacts sur 24,8 h, masque 5 deg. Svalbard voit 16 passages (environ 15 par jour), 8,2 min en moyenne. Kourou en voit 4.",
   "parametres": {
     "altitudeKm": 500,
     "rayonTerreKm": 6378,
     "muTerre": 398600,
     "inclinaisonDeg": 90,
-    "excentricite": 0
+    "excentricite": 0.001
   },
   "resultats": {
-    "periodeMinutes": 94.6,
-    "passagesParJourSurUneStation": 2,
-    "dureeContactMoyenneMinutes": 10
+    "periodeMinutes": 94.5,
+    "stationDeReference": "svalbard",
+    "passagesParJourSurUneStation": 15,
+    "dureeContactMoyenneMinutes": 8.2,
+    "parStation": {
+      "kourou": { "passagesParJour": 4, "dureeMoyenneMinutes": 6.4 },
+      "svalbard": { "passagesParJour": 15, "dureeMoyenneMinutes": 8.2 },
+      "madrid": { "passagesParJour": 4, "dureeMoyenneMinutes": 7.7 },
+      "goldstone": { "passagesParJour": 5, "dureeMoyenneMinutes": 7.1 },
+      "canberra": { "passagesParJour": 3, "dureeMoyenneMinutes": 8.1 }
+    }
   }
 }

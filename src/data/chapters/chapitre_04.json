@@ -2,8 +2,8 @@
   "id": "chapitre_04",
   "titre": "Signal de Mars",
   "sousTitre": "Sonde",
-  "histoire": "Mars s'éloigne et se rapproche sur un rythme de 26 mois. La fenêtre ouverte aujourd'hui ne se rouvrira pas avant la prochaine opposition utile.",
-  "mission": "Une sonde en orbite basse martienne, alimentée même loin du Soleil, qui attend jusqu'à vingt minutes la réponse de la Terre.",
+  "histoire": "Mars s'éloigne et se rapproche sur un rythme de 26 mois. La prochaine fenêtre de départ s'ouvre début décembre 2026, pour l'opposition du 20 février 2027.",
+  "mission": "Une sonde en orbite basse martienne, alimentée même loin du Soleil, qui attend jusqu'à quarante minutes la réponse de la Terre.",
   "profil": "mars",
   "gmat": "orbite_mars",
   "contraintes": {
@@ -14,7 +14,7 @@
     "communications": 10,
     "duree": 36
   },
-  "notionCle": "Fenêtre des 26 mois, RTG, délai radio d'environ 20 minutes",
+  "notionCle": "Départ début décembre 2026, RTG, réponse radio en 40 minutes",
   "ressourcesNasa": [
     "Mars Reconnaissance Orbiter",
     "MAVEN et le délai de communication Terre-Mars"
@@ -49,7 +49,7 @@
       "id": "lancement",
       "type": "lancement",
       "titre": "Le Lancement",
-      "texte": "Injection sur la trajectoire interplanétaire. La fenêtre se referme ensuite pour 26 mois.",
+      "texte": "Injection sur la trajectoire interplanétaire. Après la fenêtre de décembre 2026, la suivante attend 26 mois.",
       "astra": "lancement_ch4_intro",
       "bouton": "Lancer !",
       "cmlRequis": 2
@@ -58,7 +58,7 @@
       "id": "operations",
       "type": "operations",
       "titre": "Les Opérations",
-      "texte": "Tu n'es plus en direct. Chaque commande est une séquence, et la réponse met une vingtaine de minutes.",
+      "texte": "Tu n'es plus en direct. Chaque commande est une séquence, et la réponse met une quarantaine de minutes.",
       "astra": "operations_ch4_intro"
     },
     {

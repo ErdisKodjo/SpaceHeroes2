@@ -8,7 +8,10 @@ const CHAPTERS = {
   chapitre_02: { titre: 'Eye of the storm', sousTitre: 'Weather' },
   chapitre_03: { titre: 'Return to the Moon', sousTitre: 'Orbiter' },
   chapitre_04: { titre: 'Signal from Mars', sousTitre: 'Probe' },
-  chapitre_05: { titre: 'The Guardian', sousTitre: 'L1 point' }
+  chapitre_05: { titre: 'The Guardian', sousTitre: 'L1 point' },
+  chapitre_06: { titre: 'Both poles', sousTitre: 'Polar' },
+  chapitre_07: { titre: 'One revolution a day', sousTitre: 'High orbit' },
+  chapitre_08: { titre: 'The fixed point', sousTitre: 'Geostationary' }
 };
 
 const EP_TITLE = {
@@ -36,21 +39,39 @@ const EP_TEXT = {
   'chapitre_03.briefing': 'Choose the science question: relief, ice at the poles, or the gravity field. Transfer and radio delay follow from it.',
   'chapitre_03.atelier': 'Plan transfer propellant, a link that tolerates the delay, and a mapping instrument.',
   'chapitre_03.essais': 'The transfer engine, vacuum thermal control and the electrical chain must hold before injection.',
-  'chapitre_03.lancement': 'Parking orbit, then the burn toward the Moon. Lunar capture is decided at the end of the transfer.',
-  'chapitre_03.operations': 'Commands leave three seconds early. Deploy the instruments once in lunar orbit.',
+  'chapitre_03.lancement': 'Parking orbit, then the burn toward the Moon. Perilune at 50 km, then a 0.87 km/s burn: this is a capture.',
+  'chapitre_03.operations': 'Commands leave three seconds early. On arrival, the 0.87 km/s burn captures the orbiter at 50 km altitude.',
   'chapitre_03.bilan': 'Mission report, score, medal and ASTRA\'s read.',
   'chapitre_04.briefing': 'The launch window is the first choice. Everything else, power and endurance, must last until arrival.',
   'chapitre_04.atelier': 'Compare solar arrays and an RTG. At several astronomical units the Sun is no longer enough, unlike near Earth.',
   'chapitre_04.essais': 'A cruise of several months does not forgive a fault left on the ground.',
-  'chapitre_04.lancement': 'Injection onto the interplanetary trajectory. The window then closes for 26 months.',
-  'chapitre_04.operations': 'You are no longer live. Each command is a sequence, and the reply takes about twenty minutes.',
+  'chapitre_04.lancement': 'Injection onto the interplanetary trajectory. After the December 2026 window, the next one is 26 months away.',
+  'chapitre_04.operations': 'You are no longer live. Each command is a sequence, and the reply takes about forty minutes.',
   'chapitre_04.bilan': 'Mission report, score, medal and ASTRA\'s read.',
   'chapitre_05.briefing': 'Define what the Guardian must see before Earth does: plasma, magnetic field, or an image of the solar disc.',
   'chapitre_05.atelier': 'Outside the magnetosphere, shielding, power and alert data rate matter more than mass alone.',
   'chapitre_05.essais': 'Radiation, thermal and electrical integrity: the halo is not repaired on the ground.',
-  'chapitre_05.lancement': 'Insertion toward L1, then the first corrections to catch the halo orbit.',
+  'chapitre_05.lancement': 'Insertion toward L1, then the halo. Four corrections a year: an operational hypothesis, not a propagation.',
   'chapitre_05.operations': 'Hold the halo and send the alert for as long as the link to Earth holds.',
-  'chapitre_05.bilan': 'Mission report, score, medal and ASTRA\'s read.'
+  'chapitre_05.bilan': 'Mission report, score, medal and ASTRA\'s read.',
+  'chapitre_06.briefing': 'Choose what the polar pass must measure: ice thickness, surface temperature, or both. Solar time is not held.',
+  'chapitre_06.atelier': 'Plan an instrument that sees the ice, enough power for polar eclipses, and a link that fits a pass of about 8 minutes.',
+  'chapitre_06.essais': 'Launch vibration, thermal cycles of a 94.5-minute orbit, electrical compatibility of the altimeter.',
+  'chapitre_06.lancement': 'Injection at 500 km, 90 degrees inclination. One revolution lasts 94.5 minutes.',
+  'chapitre_06.operations': 'Svalbard sees about 15 passes a day, 8 minutes on average. The other stations see far fewer.',
+  'chapitre_06.bilan': 'Mission report, score, medal and ASTRA\'s read.',
+  'chapitre_07.briefing': 'The orbit completes one revolution in 1,436 minutes, half a second longer than the equator. Choose what the long visibility is for: relay, weather, or alert.',
+  'chapitre_07.atelier': 'Plan a link that holds for hours, not minutes, and power that crosses the eclipses of a one-day orbit.',
+  'chapitre_07.essais': 'Vibration, thermal cycles of a slow orbit, electrical compatibility of the transmitter.',
+  'chapitre_07.lancement': 'Injection at 35,786 km, 28 degrees inclination. The satellite draws a figure-eight in the sky. It does not stay over one point.',
+  'chapitre_07.operations': 'For this departure state, Canberra has the longest contact. Kourou and Goldstone stay at zero.',
+  'chapitre_07.bilan': 'Mission report, score, medal and ASTRA\'s read.',
+  'chapitre_08.briefing': 'The orbit completes one revolution in 1,436 minutes. Choose what the fixed point is for: relay, weather, or alert. The departure longitude decides which station sees it.',
+  'chapitre_08.atelier': 'Plan a link that does not drop, and power that crosses the eclipse of a one-day orbit.',
+  'chapitre_08.essais': 'Vibration, thermal cycles of a one-day orbit, electrical compatibility of the transmitter.',
+  'chapitre_08.lancement': 'Injection at 35,786 km. The satellite settles over one region. It does not draw the figure-eight of the inclined orbit.',
+  'chapitre_08.operations': 'For this departure state, Canberra holds the satellite for 1,440 minutes. The other four stations in the game stay at zero.',
+  'chapitre_08.bilan': 'Mission report, score, medal and ASTRA\'s read.'
 };
 
 const EVENTS = {
@@ -58,7 +79,10 @@ const EVENTS = {
   chapitre_02: 'Persistent cloud hides the priority area. An extra pass is required.',
   chapitre_03: 'A mid-course correction is required. It spends part of the duration margin.',
   chapitre_04: 'The launch window tightens. The team loses four months of calendar margin.',
-  chapitre_05: 'A gravitational perturbation shifts the halo. An early correction reduces the duration margin.'
+  chapitre_05: 'A gravitational perturbation shifts the halo. An early correction reduces the duration margin.',
+  chapitre_06: 'The planned pass falls below the 5-degree mask. The next one costs a week of margin.',
+  chapitre_07: 'The slot was booked at Kourou. This orbital plane does not pass there. Changing station costs a week of margin.',
+  chapitre_08: 'The slot was booked at Svalbard. For this departure longitude, only Canberra sees the satellite. Changing station costs the planned week.'
 };
 
 const COMP_NOM = {
@@ -89,12 +113,12 @@ const COMP_DESC = {
   chimique: 'Immediate thrust. The right pick for a CubeSat that must reach its orbit quickly.',
   cryogenique: 'More efficient than chemical. Very cold propellants complicate storage.',
   ionique: 'Very thrifty with propellant. The spiral to the target takes months and a lot of electricity.',
-  chassis_alu: 'Standard CubeSat bus, easy to machine.',
-  chassis_alLi: 'Aluminium-lithium alloy, about 20% lighter than standard aluminium.',
-  chassis_titane: 'Exceptional strength, light, expensive.',
-  chassis_cfrp: 'The lightest, but fragile to impacts and costly.',
+  chassis_alu: 'Standard CubeSat bus, easy to machine. 1U end face, 100 × 100 mm, 0.0100 m².',
+  chassis_alLi: 'Aluminium-lithium alloy, about 20% lighter than standard aluminium. 1.5U side face, 100 × 170.2 mm, 0.01702 m².',
+  chassis_titane: 'Exceptional strength, light, expensive. 2U side face, 100 × 227.0 mm, 0.0227 m².',
+  chassis_cfrp: 'The lightest, but fragile to impacts and costly. 3U side face, 100 × 340.5 mm, 0.03405 m². At 1.33 kg, 200 km on day 114.8.',
   mli: 'Multi-layer blanket, essential in the space environment.',
-  blindage_rad: 'Protects electronics from the Van Allen belts.',
+  blindage_rad: 'Protects electronics from the Van Allen belts. SPENVIS models that radiation.',
   panneaux_gaas_1u: 'Gallium-arsenide cells, high efficiency (28%).',
   panneaux_si_2u: 'Silicon, cheaper but heavier.',
   batterie_liion: 'Standard storage, rechargeable in eclipse.',
@@ -351,13 +375,28 @@ const DECISIONS = {
   },
   chapitre_04: {
     titre: 'Window',
-    choix: 'Departure inside the 26-month window',
+    choix: 'Departure in the December 2026 window',
     consequence: 'Miss the injection and you wait for the next useful opposition.'
   },
   chapitre_05: {
     titre: 'Halo',
     choix: 'Halo orbit around L1',
     consequence: 'The equilibrium point does not hold the satellite: corrections are part of the mission.'
+  },
+  chapitre_06: {
+    titre: 'Poles',
+    choix: '90-degree orbit, 500 km, contact through Svalbard',
+    consequence: 'Both poles are overflown. Solar time is not the same from one pass to the next.'
+  },
+  chapitre_07: {
+    titre: 'High',
+    choix: '35,786 km, 28 degrees, contact through Canberra',
+    consequence: 'For this departure plane, Canberra sees the longest. Kourou and Goldstone see nothing.'
+  },
+  chapitre_08: {
+    titre: 'Fixed',
+    choix: '35,786 km, 0.01 degree inclination, continuous contact through Canberra',
+    consequence: 'For this departure longitude, Canberra sees the satellite without a break. The other four stations in the game do not see it.'
   }
 };
 
@@ -452,7 +491,10 @@ const MISSIONS = {
   soho: 'Solar observatory in a halo orbit around L1, upstream of Earth.',
   ace: 'Measures the solar wind from L1 and gives Earth about an hour of warning before storms.',
   dscovr: 'Solar-wind sentinel at L1, and a camera that returns the sunlit disc of Earth.',
-  wind: 'Studies solar-wind plasma. Its workplace is the neighbourhood of L1.'
+  wind: 'Studies solar-wind plasma. Its workplace is the neighbourhood of L1.',
+  'icesat-2': 'Measures ice from about 500 km, at 92 degrees inclination. Close to this chapter\'s 90-degree orbit, and not the same one.',
+  qzss: 'Inclined geosynchronous orbit, built to linger over Japan. The inclination is not this chapter\'s 28 degrees.',
+  'goes-16': 'Geostationary weather satellite over the Americas. The longitude is not this chapter\'s, where only Canberra keeps the satellite in view.'
 };
 
 export function missionBlurb(id, fr) {

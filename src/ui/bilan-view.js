@@ -3,10 +3,12 @@
 // radar des 6 ressources, décisions, mission NASA, badges.
 
 import { settingsStore } from '../engine/settings-store.js';
+import { pressionScore } from '../engine/mode-jeu.js';
 import { icon, medalIcon } from './icons.js';
 import { downloadBilanPdf } from './pdf-report.js';
 import { t, tf } from '../i18n.js';
 import { missionBlurb } from '../i18n/content.js';
+import { envoyerTable, jaugesCourantes, suivreTable } from '../net/partie.js';
 
 const MEDAILLES = {
   or:     { label: [ 'Médaille d\'or', 'Gold medal' ],    classe: 'is-or' },
@@ -15,6 +17,53 @@ const MEDAILLES = {
   null:   { label: [ 'Sans médaille', 'No medal' ],     classe: 'is-aucune' }
 };
 
+const SIGLES = {
+  directeur: 'DM',
+  ingenieur_vehicule: 'IV',
+  ingenieur_systemes: 'ISB',
+  responsable_science: 'RSN'
+};
+
+const JAUGES = {
+  budget: ['Budget', 'Budget'],
+  masse: ['Masse', 'Mass'],
+  puissance: ['Puissance', 'Power'],
+  donnees: ['Données', 'Data'],
+  communications: ['Communications', 'Links'],
+  duree: ['Durée', 'Duration']
+};
+
+function ligneMoment(moment) {
+  if (moment.type === 'veto') {
+    return t(
+      'Veto du directeur. La réserve a encaissé l\'aléa.',
+      'Director veto. The reserve absorbed the contingency.'
+    );
+  }
+  const nom = JAUGES[moment.cle] ? t(JAUGES[moment.cle][0], JAUGES[moment.cle][1]) : moment.cle;
+  if (moment.niveau === 'rouge') return t(`${nom} dépasse le plafond.`, `${nom} is over the limit.`);
+  return t(`${nom} passe 80 % du plafond.`, `${nom} crosses 80% of the limit.`);
+}
+
+function htmlCommun(commun) {
+  const rapports = commun?.rapports || [];
+  const moments = commun?.moments || [];
+  const scores = rapports.length
+    ? rapports.map((r) => `<li>${esc(SIGLES[r.roleId] || r.roleId)} ${esc(r.nom)} · ${r.score}/100 · ${esc(r.medaille)}</li>`).join('')
+    : `<li>${t('En attente des scores.', 'Waiting for the scores.')}</li>`;
+  const tensions = moments.length
+    ? moments.map((m) => `<li>${esc(ligneMoment(m))}</li>`).join('')
+    : `<li>${t('Aucune jauge n\'a atteint 80 %.', 'No gauge reached 80%.')}</li>`;
+  const veto = commun?.vetoUtilise
+    ? t('Le veto a été utilisé.', 'The veto was used.')
+    : t('Le veto n\'a pas été utilisé.', 'The veto was not used.');
+  return `
+    <h3 class="sh-bilan-section">${t('Bilan commun', 'Shared debrief')}</h3>
+    <p>${esc(veto)}</p>
+    <ul class="sh-bilan-commun-liste">${scores}</ul>
+    <ul class="sh-bilan-commun-liste">${tensions}</ul>
+  `;
+}
 function esc(value) {
   return String(value ?? '').replace(/[&<>"']/g, (c) => ({
     '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
@@ -96,13 +145,21 @@ export function createBilanView({ rapport, astraTexte, onRejouer, onSuivante, on
   `).join('');
 
   const ref = rapport.nasa.reference;
-  const proches = (rapport.nasa.proches || []).map((m) => `<li>${esc(m.nom)} · ${esc(m.annee)}</li>`).join('');
+  const fiches = [ref, ...(rapport.nasa.proches || [])].filter(Boolean);
+  const cartes = fiches.map((m) => `
+    <li>
+      <button type="button" class="sh-bilan-fiche ${m === ref ? 'is-reference' : ''}" data-mission="${esc(m.id)}" aria-expanded="false">
+        <span class="sh-bilan-fiche-nom">${esc(m.nom)}</span>
+        <span class="sh-bilan-fiche-meta">${esc(m.agence)} · ${esc(m.annee)}${m === ref ? ` · ${t('Référence', 'Reference')}` : ''}</span>
+      </button>
+    </li>
+  `).join('');
 
   root.innerHTML = `
     <div class="sh-bilan-overlay">
       <div class="sh-bilan-panel">
         <header class="sh-bilan-header">
-          <p class="sh-bilan-kicker">${t('Bilan de mission', 'Mission debrief')}${rapport.gmatLigne ? ` · ${esc(rapport.gmatLigne)}` : ''}</p>
+          <p class="sh-bilan-kicker">${t('Bilan de mission', 'Mission debrief')}${rapport.gmatLigne ? ` · ${esc(rapport.gmatLigne)}` : ''}${pressionScore() ? '' : ` · ${t('Parcours non classé', 'Unranked run')}`}</p>
           <h2>${esc(rapport.titre)}</h2>
           <span class="sh-bilan-medal ${medal.classe}">
             ${medalHtml} ${esc(t(medal.label[0], medal.label[1]))}
@@ -139,8 +196,13 @@ export function createBilanView({ rapport, astraTexte, onRejouer, onSuivante, on
         <section class="sh-bilan-nasa">
           <h3 class="sh-bilan-section">${t('Dans la vraie vie', 'In real life')}</h3>
           <p class="sh-bilan-equivalence">${esc(rapport.nasa.phrase)}</p>
-          ${ref ? `<p>${esc(ref.agence)} · ${esc(ref.annee)}. ${esc(missionBlurb(ref.id, ref.resume))}</p>` : ''}
-          ${proches ? `<ul class="sh-bilan-proches">${proches}</ul>` : ''}
+          ${rapport.nasa.outil ? `<p class="sh-bilan-outil">${esc(rapport.nasa.outil)}</p>` : ''}
+          ${cartes ? `<ul class="sh-bilan-fiches">${cartes}</ul>` : ''}
+          <div id="sh-bilan-fiche-detail" class="sh-bilan-fiche-detail" hidden></div>
+        </section>
+
+        <section id="sh-bilan-commun" class="sh-bilan-commun"${rapport.table ? '' : ' hidden'}>
+          ${rapport.table ? htmlCommun(null) : ''}
         </section>
 
         <section>
@@ -178,6 +240,24 @@ export function createBilanView({ rapport, astraTexte, onRejouer, onSuivante, on
     raf = requestAnimationFrame(tick);
   }
 
+  let oublierCommun = () => {};
+  if (rapport.table) {
+    const peindre = (commun) => {
+      rapport.commun = commun;
+      const bloc = root.querySelector('#sh-bilan-commun');
+      if (bloc) bloc.innerHTML = htmlCommun(commun);
+    };
+    peindre(jaugesCourantes());
+    envoyerTable({
+      type: 'score',
+      score: rapport.score,
+      medaille: rapport.medaille || 'aucune'
+    });
+    oublierCommun = suivreTable((message) => {
+      if (message.jauges) peindre(message.jauges);
+    });
+  }
+
   root.querySelector('#sh-bilan-rejouer').addEventListener('click', () => onRejouer?.());
   root.querySelector('#sh-bilan-suivant').addEventListener('click', () => {
     if (suivants) onSuivante?.(suivants);
@@ -194,8 +274,28 @@ export function createBilanView({ rapport, astraTexte, onRejouer, onSuivante, on
     }
   });
 
+  const detail = root.querySelector('#sh-bilan-fiche-detail');
+  const boutons = [...root.querySelectorAll('.sh-bilan-fiche')];
+  const parId = new Map(fiches.map((m) => [m.id, m]));
+  boutons.forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const ouverte = btn.getAttribute('aria-expanded') === 'true';
+      boutons.forEach((autre) => autre.setAttribute('aria-expanded', 'false'));
+      if (ouverte) {
+        detail.hidden = true;
+        detail.replaceChildren();
+        return;
+      }
+      const mission = parId.get(btn.dataset.mission);
+      btn.setAttribute('aria-expanded', 'true');
+      detail.hidden = false;
+      detail.textContent = missionBlurb(mission.id, mission.resume);
+    });
+  });
+
   return {
     dispose() {
+      oublierCommun();
       cancelAnimationFrame(raf);
       document.body.classList.remove('is-bilan');
       root.remove();

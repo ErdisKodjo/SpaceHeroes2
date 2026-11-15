@@ -5,18 +5,27 @@ import dialoguesData from './data/astra/dialogues.json';
 import cmlCriteria from './data/cml/checklist.json';
 import { getChapitre } from './data/catalogue.js';
 
-import { ResourceManager } from './engine/resources.js';
+import { ResourceManager, RESOURCE_KEYS } from './engine/resources.js';
 import { CmlChecklist } from './engine/cml.js';
 import { AstraEngine } from './engine/astra.js';
 import { EpisodeRunner } from './engine/episode.js';
 import { evaluerMission } from './engine/bilan.js';
-import { playerStore } from './engine/player.js';
+import { playerStore, appliquerBonusRole, annoterBonusRole } from './engine/player.js';
+import { appliquerMarge, prevaliderCml } from './engine/difficulte.js';
+import { appliquerMode, pressionScore } from './engine/mode-jeu.js';
 import { sauvegarder, charger, restaurerResources, restaurerCml, ageSauvegarde, effacer } from './engine/save.js';
+import { appliquerCoutAtelier, coutNet } from './engine/atelier-cout.js';
+import { appliquerPhase } from './engine/cml-preuves.js';
+import { definirEquipage } from './net/equipage.js';
+import { couperTable, envoyerTable, equipiersTable, jaugesCourantes, moiTable, suivreTable } from './net/partie.js';
+import { couperVoix, mettrePaires, recevoirVoix } from './net/voix.js';
+import { monterVoix } from './ui/voix-barre.js';
 
 import { renderDashboard } from './ui/dashboard.js';
 import { renderAstra } from './ui/astra-widget.js';
 import { renderEpisode } from './ui/episode-view.js';
 import { mountScene } from './vis/scene.js';
+import { bindMontage } from './vis/controls.js';
 import { createGameAudio } from './audio/sfx.js';
 import { createHub } from './ui/hub.js';
 import { applyDocumentSettings } from './ui/settings.js';
@@ -48,6 +57,7 @@ if (!demo) {
 // La scène 3D tourne toujours en fond (Terre + étoiles) — même pendant le hub.
 const vue3d = mountScene(vue3dEl);
 const audio = createGameAudio();
+let lastAstra = null;
 
 // Bouton son
 const audioBtn = document.getElementById('btn-audio');
@@ -76,7 +86,11 @@ window.addEventListener('keydown',     unlockAudio, { once: true });
 
 // Réaction audio + visuelle aux répliques ASTRA.
 window.addEventListener('astra-message', ({ detail }) => {
-  if (detail?.texte) audio.radio(detail.texte);
+  if (detail?.texte) {
+    lastAstra = detail;
+    audio.radio(detail.texte);
+    renderAstra(astraEl, detail);
+  }
   if (detail?.categorie === 'alerte' || detail?.categorie === 'echec') vue3d.flashWarning();
 });
 
@@ -93,12 +107,15 @@ window.addEventListener('vis-announcer', ({ detail }) => {
 window.addEventListener('settings-change', () => {
   applyDocumentSettings();
   applyChrome();
+  audio.applySettings();
+  vue3d.applyQuality();
+  if (lastAstra) renderAstra(astraEl, lastAstra);
 });
 
 // Célébration 3D quand le CubeSat atteint l'orbite.
 // L'astuce « explorer la vue » attend la fin du bandeau, pour ne pas le couvrir.
-window.addEventListener('orbite-atteinte', () => {
-  vue3d.celebrate?.();
+window.addEventListener('orbite-atteinte', ({ detail }) => {
+  vue3d.celebrate?.(detail);
   dismissTutorial();
   setTimeout(() => tutorialStep('orbite'), 3200);
 });
@@ -134,14 +151,16 @@ function openHub() {
 
 if (demo) {
   // Mode démonstration : saute directement à la mission.
-  startMission({ chapterId: 'chapitre_01' });
+  const demande = new URLSearchParams(location.search).get('chapitre');
+  startMission({ chapterId: getChapitre(demande)?.id || 'chapitre_01' });
 } else {
   openHub();
 }
 
 // ─── MISSION ──────────────────────────────────────────────────────────────
 
-function startMission({ chapterId, restore = false }) {
+function startMission({ chapterId, restore = false, table = false }) {
+  if (!table) definirEquipage(null);
   missionCleanup();
   hubApi?.dispose();
   hubApi = null;
@@ -151,16 +170,53 @@ function startMission({ chapterId, restore = false }) {
 
   const chapterData = getChapitre(chapterId) || getChapitre('chapitre_01');
   chapterId = chapterData.id;
+  vue3d.setMission(chapterData.gmat || 'orbite_basse');
 
   const resources = new ResourceManager(chapterData.contraintes);
+  let oublierTable = () => {};
+  let barreVoix = null;
+  if (table) {
+    const appliquer = (etat) => {
+      if (!etat?.max) return;
+      for (const key of RESOURCE_KEYS) {
+        if (etat.max[key] != null) resources.max[key] = etat.max[key];
+        if (etat.used[key] != null) resources.used[key] = etat.used[key];
+      }
+      resources.reserveVeto = etat.reserveVeto;
+      resources.vetoUtilise = etat.vetoUtilise;
+      window.dispatchEvent(new CustomEvent('ressources-change'));
+    };
+    resources.canal = {
+      depense: (key, amount) => envoyerTable({ type: 'depense', key, amount }),
+      usage: (used) => envoyerTable({ type: 'usage', used }),
+      plafond: (key, delta) => envoyerTable({ type: 'plafond', key, delta }),
+      veto: () => envoyerTable({ type: 'veto' })
+    };
+    appliquer(jaugesCourantes());
+    barreVoix = monterVoix();
+    mettrePaires(moiTable(), equipiersTable());
+    oublierTable = suivreTable((message) => {
+      if (message.jauges) appliquer(message.jauges);
+      if (message.type === 'veto' && message.ok) {
+        window.dispatchEvent(new CustomEvent('table-veto'));
+      }
+      if (message.type === 'etat') mettrePaires(moiTable(), message.etat.joueurs);
+      if (message.type === 'voix') recevoirVoix(message);
+    });
+  }
   const cml       = new CmlChecklist(cmlCriteria);
   const astra     = new AstraEngine(dialoguesData, cml);
 
   // Restaurer depuis sauvegarde si demandé
   let savedSelections = {};
+  bindMontage(() => savedSelections);
+  let savedRepartitions = {};
   let savedFiabilite  = null;
   let savedScoreOps   = null;
   let startIndex      = 0;
+  let atelierApplique = false;
+  let aCompare        = false;
+  let chargedCost     = null;
 
   if (restore) {
     const save = charger();
@@ -168,10 +224,29 @@ function startMission({ chapterId, restore = false }) {
       restaurerResources(resources, save.resources);
       restaurerCml(cml, save.cml);
       savedSelections = save.selections ?? {};
+      savedRepartitions = save.repartitions ?? {};
       savedFiabilite  = save.fiabilite  ?? null;
       savedScoreOps   = save.scoreOps   ?? null;
       startIndex      = save.episodeIndex ?? 0;
+      atelierApplique = Boolean(save.atelierApplique);
+      aCompare        = Boolean(save.aCompare);
+      const roleSauve = playerStore.getRoles().find((r) => r.id === save.roleId);
+      if (roleSauve) {
+        const facteur = Number(roleSauve.bonus?.facteur);
+        const cle = roleSauve.bonus?.ressource;
+        if (cle && facteur > 0 && facteur < 1) resources.relief[cle] = facteur;
+        annoterBonusRole(resources, roleSauve);
+      }
+      if (atelierApplique) chargedCost = coutNet(resources, chapterData, savedSelections, savedRepartitions);
     }
+  }
+  if (!table && !resources.bonusNote) appliquerBonusRole(resources, playerStore.role);
+  if (!restore) {
+    if (!table) {
+      appliquerMarge(resources);
+      appliquerMode(resources);
+    }
+    prevaliderCml(astra);
   }
 
   const runner = new EpisodeRunner(chapterData, {
@@ -183,7 +258,7 @@ function startMission({ chapterId, restore = false }) {
 
   // Avancer jusqu'à l'épisode sauvegardé
   if (startIndex > 0) {
-    for (let i = 0; i < startIndex && !runner.isFinished; i++) runner.next();
+    for (let i = 0; i < startIndex && !runner.isFinished; i++) runner.next({ forcer: true });
   }
 
   let busy = false;
@@ -191,15 +266,19 @@ function startMission({ chapterId, restore = false }) {
 
   // Auto-save après chaque changement d'épisode
   function autoSave() {
-    if (demo) return;
+    if (demo || table) return;
     sauvegarder({
       chapterId,
       episodeIndex: runner.index,
       resources,
       cml,
       selections: savedSelections,
+      repartitions: savedRepartitions,
       fiabilite:  savedFiabilite,
-      scoreOps:   savedScoreOps
+      scoreOps:   savedScoreOps,
+      atelierApplique,
+      aCompare,
+      roleId: playerStore.roleId
     });
   }
 
@@ -214,11 +293,12 @@ function startMission({ chapterId, restore = false }) {
       fiabilite: savedFiabilite,
       scoreOps: savedScoreOps
     });
-    if (!demo) {
-      playerStore.enregistrerScore(chapterData.id, rapport.score);
+    if (!demo && !table) {
+      if (pressionScore()) playerStore.enregistrerScore(chapterData.id, rapport.score);
       playerStore.ajouterJetons(rapport.jetons);
       effacer();
     }
+    rapport.table = table;
     return rapport;
   }
 
@@ -238,7 +318,11 @@ function startMission({ chapterId, restore = false }) {
       bilan: episode?.type === 'bilan' ? ensureRapport() : null,
       onRejouer: () => startMission({ chapterId, restore: false }),
       onSuivante: (nextId) => startMission({ chapterId: nextId, restore: false }),
-      onQuitter: openHub
+      onQuitter: openHub,
+      preuves: contextePreuve,
+      lien: vue3d.lienOrbital(),
+      selections: savedSelections,
+      repartitions: savedRepartitions
     });
 
     if (episode?.id !== lastEpisodeId) {
@@ -254,12 +338,33 @@ function startMission({ chapterId, restore = false }) {
     }
   }
 
+  function contextePreuve() {
+    return {
+      chapter: chapterData,
+      resources,
+      selections: savedSelections,
+      fiabilite: savedFiabilite,
+      aCompare
+    };
+  }
+
+  const onRessources = () => {
+    renderDashboard(dashboardEl, resources, { chapter: chapterData });
+  };
+
   const onAtelier = ({ detail }) => {
     savedSelections = detail?.selections ?? {};
+    savedRepartitions = detail?.repartitions ?? {};
+    aCompare = Boolean(detail?.aCompare);
+    chargedCost = appliquerCoutAtelier(resources, chapterData, chargedCost, savedSelections, savedRepartitions);
+    atelierApplique = true;
+    appliquerPhase(astra, 'atelier', contextePreuve());
     autoSave();
+    onRessources();
   };
   const onEssais = ({ detail }) => {
     savedFiabilite = detail?.fiabilite ?? null;
+    appliquerPhase(astra, 'essais', contextePreuve());
     autoSave();
   };
   const onOperations = ({ detail }) => {
@@ -269,17 +374,24 @@ function startMission({ chapterId, restore = false }) {
   window.addEventListener('atelier-valide', onAtelier);
   window.addEventListener('essais-termines', onEssais);
   window.addEventListener('operations-terminees', onOperations);
+  window.addEventListener('ressources-change', onRessources);
   missionCleanup = () => {
+    oublierTable();
+    barreVoix?.dispose();
+    if (table) {
+      couperVoix();
+      couperTable();
+    }
     window.removeEventListener('atelier-valide', onAtelier);
     window.removeEventListener('essais-termines', onEssais);
     window.removeEventListener('operations-terminees', onOperations);
+    window.removeEventListener('ressources-change', onRessources);
   };
 
   async function handleNext() {
     if (busy) return;
 
     if (runner.currentEpisode?.type === 'lancement') {
-      runner.declencherEvenement();
       if (!vue3d.launched) {
         busy = true;
         render();
@@ -291,12 +403,7 @@ function startMission({ chapterId, restore = false }) {
       }
     }
 
-    if (runner.currentEpisode?.id === 'briefing') {
-      astra.evaluerCritereCml('cml1_objectif',      () => Boolean(chapterData.mission));
-      astra.evaluerCritereCml('cml1_classe_budget', () => Boolean(chapterData.contraintes.budget));
-    }
-
-    runner.next();
+    return runner.next();
   }
 
   astra.say('accueil');
@@ -320,9 +427,9 @@ function startMission({ chapterId, restore = false }) {
     };
     savedFiabilite = 82;
     savedScoreOps = 75;
-    while (!runner.isFinished && runner.currentEpisode?.type !== 'bilan') runner.next();
+    while (!runner.isFinished && runner.currentEpisode?.type !== 'bilan') runner.next({ forcer: true });
   } else if (demo === 'lancement') {
-    while (!runner.isFinished && runner.currentEpisode.type !== 'lancement') runner.next();
+    while (!runner.isFinished && runner.currentEpisode.type !== 'lancement') runner.next({ forcer: true });
     const seek = Number(new URLSearchParams(location.search).get('t'));
     if (seek > 0) {
       vue3d.advance(4);

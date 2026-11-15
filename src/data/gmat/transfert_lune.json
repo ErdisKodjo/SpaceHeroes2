@@ -1,16 +1,22 @@
 {
   "type": "transfert_lune",
-  "statut": "placeholder_formule",
-  "note": "Demi-ellipse de Hohmann depuis une orbite de parking à 300 km jusqu'à la distance moyenne de la Lune (384 400 km). Durée du transfert = PI*sqrt(a^3/mu) ≈ 5,0 jours. Un transfert plus rapide, du type Apollo, dure environ 3 jours et demande davantage de delta-v. Le délai radio aller est d'environ 1,3 s à l'arrivée ; le jeu retient 3 s aller-retour. Table provisoire, à remplacer par une sortie GMAT.",
+  "statut": "gmat_r2026a",
+  "note": "GMAT R2026a, 15 novembre 2026, script gmat-win-R2026a/output/sh-lune-capture.script. Parking 300 km, inclinaison 28,5 deg, noeud 355 deg, depart le 1 janvier 2026 00:00. Injection tangentielle de 3,12 km/s. Terre JGM2 8x8, Lune et Soleil en points massifs. Perilune a 7,817 jours : rayon 1 788,183 km, altitude 49,983 km, a 389 653 km de la Terre. Freinage impulsif de 0,87 km/s, anti-vitesse, origine Lune. Juste apres, l'altitude reste 49,983 km. 8,7 jours plus tard, l'altitude est 37,174 km : l'orbiteur est encore lie. Le delai radio est l'aller-retour lumiere a 389 653 km.",
   "parametres": {
     "altitudeParkingKm": 300,
     "distanceLuneKm": 384400,
     "muTerre": 398600,
-    "rayonTerreKm": 6378
+    "rayonTerreKm": 6378,
+    "inclinaisonDeg": 28.5,
+    "raanDeg": 355,
+    "epoque": "01 Jan 2026 00:00:00"
   },
   "resultats": {
-    "dureeTransfertJours": 5.0,
-    "delaiRadioAllerRetourSecondes": 3,
-    "deltaVInjectionKmS": 3.1
+    "dureeTransfertJours": 7.8,
+    "delaiRadioAllerRetourSecondes": 2.6,
+    "deltaVInjectionKmS": 3.12,
+    "approcheMinKm": 1788,
+    "altitudePeriluneKm": 50,
+    "deltaVCaptureKmS": 0.87
   }
 }

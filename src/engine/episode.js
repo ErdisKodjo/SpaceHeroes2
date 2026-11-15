@@ -1,6 +1,8 @@
 // Moteur generique d'episode/chapitre (Document de conception, §5.1).
 // Ne connait aucun chapitre precis : il lit la structure depuis un fichier JSON de data/chapters/.
 
+import { niveauxDirecteur, porteOuverte } from './difficulte.js';
+
 export class EpisodeRunner {
   constructor(chapterData, { resources, astra, cml, onChange } = {}) {
     this.chapter = chapterData;
@@ -28,11 +30,17 @@ export class EpisodeRunner {
     const episode = this.currentEpisode;
     if (!episode) return;
     if (episode.astra) this.astra.say(episode.astra);
-    // Si l'episode exige un niveau CML pour etre accessible, on le signale (pas de blocage dur pour le prototype).
-    if (episode.cmlRequis && !this.cml.isLevelValidated(episode.cmlRequis)) {
-      this.astra.say('cml_niveau_manquant', { niveau: episode.cmlRequis });
-    }
     this.onChange(this.snapshot());
+  }
+
+  // Le niveau demandé par l'épisode en cours, puis celui exigé par le suivant.
+  niveauBloquant() {
+    if (porteOuverte()) return 0;
+    const cur = this.currentEpisode;
+    const prochain = this.chapter.episodes[this.index + 1];
+    if (cur?.cmlVise && !this.cml.isLevelValidated(cur.cmlVise)) return cur.cmlVise;
+    if (prochain?.cmlRequis && !this.cml.isLevelValidated(prochain.cmlRequis)) return prochain.cmlRequis;
+    return niveauxDirecteur(cur, this.cml);
   }
 
   // Declenche l'evenement aleatoire du chapitre, s'il y en a un et qu'il n'a pas deja eu lieu.
@@ -40,10 +48,13 @@ export class EpisodeRunner {
     const evt = this.chapter.evenementAleatoire;
     if (!evt || this._evenementJoue) return null;
     this._evenementJoue = true;
-    if (evt.effet) {
+    if (evt.effet && this.resources) {
       for (const [cle, delta] of Object.entries(evt.effet)) {
-        if (this.resources && this.resources.max[cle] !== undefined) {
-          this.resources.max[cle] += delta;
+        if (this.resources.max[cle] === undefined) continue;
+        if (delta < 0) this.resources.consume(cle, -delta);
+        else if (delta > 0) {
+          if (this.resources.canal) this.resources.canal.plafond(cle, delta);
+          else this.resources.max[cle] += delta;
         }
       }
     }
@@ -52,11 +63,28 @@ export class EpisodeRunner {
     return evt;
   }
 
-  next() {
+  next({ forcer = false } = {}) {
+    const niveau = forcer ? 0 : this.niveauBloquant();
+    if (niveau) {
+      this.astra.say('cml_niveau_manquant', { niveau });
+      return false;
+    }
     this.log.push({ type: 'episode_termine', id: this.currentEpisode?.id });
     this.index += 1;
     if (!this.isFinished) this._enterEpisode();
     else this.onChange(this.snapshot());
+    return true;
+  }
+
+  // Le CML 4 ferme la sortie des essais. On revient à l'atelier pour revoir la conception.
+  retourAtelier() {
+    if (this.currentEpisode?.type !== 'essais') return false;
+    const index = this.chapter.episodes.findIndex((ep) => ep.type === 'atelier');
+    if (index < 0) return false;
+    this.index = index;
+    this._enterEpisode();
+    this.astra?.say('retour_atelier');
+    return true;
   }
 
   snapshot() {

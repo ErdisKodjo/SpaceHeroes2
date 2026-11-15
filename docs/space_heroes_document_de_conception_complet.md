@@ -1,6 +1,68 @@
 # Space Heroes — Document complet du module : préparation, interfaces et déroulé d'une mission
 
 > **Document unique de référence** décrivant l'ensemble de l'expérience joueur dans *Space Heroes* : de l'arrivée au QG jusqu'au bilan post-mission, incluant l'architecture des interfaces asymétriques (HUD) par rôle et le script des validations CML menées par l'IA ASTRA. Il est conçu pour un **jeu interactif en 3D** où chaque choix a une conséquence visible et immédiate.
+<<<<<<< HEAD
+=======
+>
+> Mise à jour du 15 novembre 2026 : la section suivante décrit ce que la version jouable fait vraiment. Le reste du document garde la vision (HUD par rôle, multijoueur, difficultés avancées). Là où les deux divergent, la version jouable prime.
+
+---
+
+## Version jouable — ce qui est en place
+
+Une mission suit toujours le même fil, lu dans le JSON du chapitre :
+
+**QG → rôle → briefing → atelier (5 familles) → trois essais → lancement → opérations → bilan.**
+
+Le chapitre 1 (*Le premier signal*, CubeSat, orbite basse, masse plafonnée à 4 kg) sert de référence. Les chapitres 2 à 5 reprennent le même enchaînement.
+
+### Déroulé réel
+
+- **QG.** Cinq missions au choix, bouton Continuer si une sauvegarde existe, changement de rôle, message d'accueil d'ASTRA. Le tableau de bord mural, la bibliothèque « Dans la vraie vie » et la carte cliquable du système solaire restent de la conception.
+- **Rôle.** Quatre postes (DM, IV, ISB, RSN). En solo, ASTRA tient les trois autres. Au départ, le rôle élargit un plafond ou allège un coût, et il donne un geste en opérations : veto, calcul de durée, reboot ou compression. Le multijoueur en ligne n'est pas dans cette version.
+- **Briefing.** Objectif, ce qui rend la mission unique, fenêtre, classe de budget, croquis. ASTRA évalue le CML 1.
+- **Atelier.** Un composant par famille : moteur, structure, énergie, communications, instrument. Douze points par famille. Une pièce verrouillée s'achète en jetons, au prix du numéro de son chapitre. En orbite, un clic sur le CubeSat ouvre la fiche de la face touchée et de la pièce choisie. Le modèle 3D reste un CubeSat 1U.
+- **Essais.** Trois épreuves seulement : **vibrations**, **isolation thermique**, **compatibilité électrique**. Il n'y a pas de test vide séparé, et rien ne se fabrique sur cet écran.
+- **Lancement.** Compte à rebours et décollage 3D. Si le CML demandé n'est pas à 80 % de vert, on ne quitte pas l'épisode : ASTRA le dit. Une fois sur cet écran, le compte à rebours part. La légende d'orbite lit la table GMAT du chapitre. La Lune part le 1 janvier 2026, injection 3,12 km/s, périlune à 50 km, capture 0,87 km/s. Mars part début décembre 2026. Les 4 corrections par an de L1 sont une hypothèse.
+- **Opérations.** Contact radio vers une station au sol, puis déploiement dans l'ordre **communications → énergie → instrument**, transmission des données, et parfois une anomalie.
+- **Bilan.** Score, ressources, trois décisions, médaille, phrase NASA, citation d'ASTRA. Bouton **Exporter le PDF** : fichier `SpaceHeroes_{titre}_{AAAA-MM-JJ}.pdf`, bandeau sombre, logo, corps blanc.
+
+### ASTRA
+
+- Les répliques ont un texte français et un texte anglais (`texte` / `texteEn`). La langue est choisie au moment où elle parle. Une chaîne anglaise manquante reste en français.
+- Elle ne dit plus qu'il faut fabriquer avant de tester, ni que le lancement est bloqué.
+- À l'écran, le texte suit la langue du jeu. À voix haute, le navigateur utilise une voix `fr-FR` ou `en-US` selon la même langue. Sans voix anglaise installée dans Windows, la phrase anglaise ne peut pas être lue correctement.
+
+### Paramètres, langue, accessibilité
+
+- Français par défaut. L'anglais traduit l'interface visible (QG, paramètres, épisodes, atelier, CML, essais, opérations, bilan, info-bulles, boutons, HUD, télémétrie). Le choix survit au rechargement.
+- Les options cliquables restent un **brouillon** jusqu'à **Enregistrer**. Le bouton n'est actif que si quelque chose a changé. Annuler, fermer, cliquer le fond ou Échap jette le brouillon.
+- Police, contraste, daltonisme, réduction des animations et plein écran ne s'appliquent qu'à l'enregistrement.
+- Effacer, exporter et importer les données s'appliquent tout de suite.
+- Les quatre difficultés s'appliquent au départ d'une mission. Cadet : plafonds ×1,15, CML 1 et 2 déjà verts, pas d'événement aléatoire. Ingénieur : la mission du chapitre, l'aléa suit le réglage. Directeur : plafonds ×0,85, aléa forcé, CML 3 pour quitter l'atelier, CML 4 pour quitter les essais, avec un retour à l'atelier. Bac à sable : la porte CML ne retient pas l'épisode.
+- Le mode de jeu s'applique aussi au départ. Campagne : le chapitre suivant s'ouvre avec un score. Défi : masse ×0,80 et durée ×0,70. Découverte : les cinq cartes sont ouvertes et le parcours n'est pas classé.
+
+### Identité visuelle et premier écran
+
+- Logo circulaire officiel (casque, étoile, « SPACE HEROES ») sur l'écran de chargement : fondu, léger zoom, halo. Si les animations sont réduites, le logo est fixe. L'écran part dès que le chargement est fini.
+- Le même logo sert de favicon, d'icône Apple et d'icônes PWA (192 et 512). Le cache du service worker est `space-heroes-v2`.
+
+### Bande-son
+
+Musique originale synthétisée dans le navigateur, sans fichier audio, une boucle par écran. Le bouton SON / MUET coupe musique, effets et voix. Le curseur **Volume général** baisse les trois. Le curseur **Musique d'ambiance** ne baisse que la bande-son. Au décollage, la musique baisse sous le grondement, puis revient.
+
+| Scène | BPM | Volume | Ambiance | Suite |
+| --- | --- | --- | --- | --- |
+| Hub | 102 | 0,55 | Motivation calme | Toutes les scènes |
+| Briefing | 76 | 0,55 | Concentration émerveillée | Atelier, Essais |
+| Atelier | 112 | 0,90 | Créativité précise | Essais, Lancement |
+| Essais | 124 | 0,85 | Tension contrôlée | Lancement |
+| Lancement | 128 | 1,05 | Adrénaline maximale | Opérations |
+| Opérations | 96 | 0,75 | Concentration spatiale | Bilan |
+| Bilan | 88 | 0,70 | Satisfaction réfléchie | Hub, chapitre suivant |
+
+Le changement de scène tombe sur le temps suivant, pour ne pas couper la mesure. Le retour au QG est immédiat.
+>>>>>>> f3c24a1f91154ae93ad64ca2db74ed5891fc3166
 
 ---
 
@@ -168,7 +230,11 @@ ASTRA joue le rôle d'**évaluateur indépendant** (conforme à la méthodologie
 - Chaque critère est coté **Rouge / Jaune / Vert**.
 - Un niveau est validé dès que **4 critères sur 5 sont verts (seuil 80 %)**.
 - **Le joueur ne coche jamais lui-même** : ASTRA l'interroge et colore la pastille selon l'état réel de la conception.
+<<<<<<< HEAD
 - **Adaptation à la difficulté** : en mode *Cadet*, les niveaux CML 1 et 2 sont pré-validés par ASTRA pour accélérer l'accès à l'Atelier ; en mode *Directeur de mission*, les 4 niveaux doivent être intégralement validés.
+=======
+- **Adaptation à la difficulté, appliquée au départ d'une mission** : en mode *Cadet*, ASTRA pré-valide les CML 1 et 2, les plafonds sont plus larges et il n'y a pas d'événement aléatoire. En mode *Directeur de mission*, les plafonds sont plus serrés, l'événement est toujours là, le CML 3 ferme l'atelier et le CML 4 ferme les essais. Le *Bac à sable* n'est pas retenu par cette porte. L'*Ingénieur* suit la grille du chapitre.
+>>>>>>> f3c24a1f91154ae93ad64ca2db74ed5891fc3166
 
 #### Grille des 20 critères CML
 

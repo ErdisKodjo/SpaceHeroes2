@@ -3,7 +3,7 @@
   "titre": "Retour sur la Lune",
   "sousTitre": "Orbiteur",
   "histoire": "Cartographier la Lune depuis une orbite basse lunaire. Le voyage commence par un transfert, pas par l'arrivée.",
-  "mission": "Un orbiteur lunaire de cartographie qui rejoint la Lune par un transfert de Hohmann et image la surface depuis environ 100 km.",
+  "mission": "Cartographier la Lune. Le transfert propagé du 1 janvier 2026 atteint une périlune à 50 km. Un freinage de 0,87 km/s capture l'orbiteur.",
   "profil": "lune",
   "gmat": "transfert_lune",
   "contraintes": {
@@ -49,7 +49,7 @@
       "id": "lancement",
       "type": "lancement",
       "titre": "Le Lancement",
-      "texte": "Orbite de parking, puis allumage vers la Lune. La capture lunaire se joue à la fin du transfert.",
+      "texte": "Orbite de parking, puis allumage vers la Lune. Périlune à 50 km, puis freinage de 0,87 km/s : c'est une capture.",
       "astra": "lancement_ch3_intro",
       "bouton": "Lancer !",
       "cmlRequis": 2
@@ -58,7 +58,7 @@
       "id": "operations",
       "type": "operations",
       "titre": "Les Opérations",
-      "texte": "Les commandes partent avec trois secondes d'avance. Déploie les instruments une fois en orbite lunaire.",
+      "texte": "Les commandes partent avec trois secondes d'avance. À l'arrivée, le freinage de 0,87 km/s capture l'orbiteur à 50 km d'altitude.",
       "astra": "operations_ch3_intro"
     },
     {

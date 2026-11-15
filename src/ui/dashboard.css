@@ -127,6 +127,13 @@ html, body {
   color: var(--muted);
 }
 
+.hud-equipage {
+  margin-top: 4px;
+  font-size: 0.72rem;
+  letter-spacing: 0.04em;
+  color: var(--hud);
+}
+
 .hud-bars {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));

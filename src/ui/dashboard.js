@@ -1,6 +1,7 @@
 import { computeSegmentStatus, SEGMENTS } from '../engine/segments.js';
 import { t } from '../i18n.js';
 import { chapterText } from '../i18n/content.js';
+import { equipageCourant } from '../net/equipage.js';
 
 const LABELS = {
   budget: ['Budget', 'Budget'],
@@ -42,12 +43,29 @@ export function renderDashboard(container, resourceManager, { chapter } = {}) {
 
   const titre = chapter ? chapterText(chapter, 'titre') : 'Space Heroes';
   const code = (chapter?.id || 'ch').replace('chapitre_', 'CH.');
+  const bonus = resourceManager.bonusNote;
+  const bonusLine = bonus
+    ? ` · ${bonus.sigle} ${t(LABELS[bonus.ressource]?.[0] || bonus.ressource, LABELS[bonus.ressource]?.[1] || bonus.ressource)} ×${bonus.facteur.toFixed(2)}`
+    : '';
+  const marge = resourceManager.margeNote;
+  const margeLine = marge
+    ? ` · ${t(marge.label, marge.labelEn)} ×${marge.facteur.toFixed(2)}`
+    : '';
+  const mode = resourceManager.modeNote;
+  const modeLine = mode
+    ? ` · ${t(mode.label, mode.labelEn)}`
+    : '';
+  const crew = equipageCourant();
+  const crewLine = crew
+    ? `<div class="hud-equipage">${t('Postes tenus par les joueurs.', 'Seats held by players.')} ${crew.joueurs.map((j) => `${j.sigle} ${j.nom}`).join(' · ')}</div>`
+    : '';
 
   container.innerHTML = `
     <div class="hud-brand">
       <div class="hud-brand-kicker">Space Heroes</div>
       <div class="hud-brand-title">${titre}</div>
-      <div class="hud-brand-sub">${code} · ${chapter ? chapterText(chapter, 'sousTitre') : t('Mission', 'Mission')}</div>
+      <div class="hud-brand-sub">${code} · ${chapter ? chapterText(chapter, 'sousTitre') : t('Mission', 'Mission')}${bonusLine}${margeLine}${modeLine}</div>
+      ${crewLine}
     </div>
     <div class="hud-bars">${jauges}</div>
     <div class="hud-segments">${segments}</div>
