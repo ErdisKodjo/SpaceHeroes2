@@ -15,7 +15,7 @@ import { createCubeSat } from './cubesat.js';
 import { createOrbit } from './orbit.js';
 import { createParticlePool } from './particles.js';
 import orbitData from '../data/gmat/orbite_basse.json';
-import { t } from '../i18n.js';
+import { t as tr } from '../i18n.js';
 
 const { altitudeKm: ALT_KM, rayonTerreKm: R_KM, muTerre: MU, excentricite: ECC = 0 } = orbitData.parametres;
 const ORBIT_RADIUS = 1 + ALT_KM / R_KM;
@@ -41,9 +41,25 @@ const STAGE_SEP_U = 0.5;
 const STAGE2_IGNITION_U = 0.54;
 // Angle parcouru pendant l'ascension, choisi pour que la vitesse finale egale la vitesse orbitale.
 const PHI = (OMEGA * ASCENT) / 3;
+// Bras haut de la tour (rocket.js, y = 0.84 en unites fusee).
+// Montee verticale jusqu'a deux fois cette hauteur, puis virage.
+const TOWER_ARM = 0.84 * ROCKET_HEIGHT;
+const VERTICAL_ALT = 2 * TOWER_ARM;
+const CLIMB = ORBIT_RADIUS - 1 - PAD_LIFT;
 
 const easeInOut = (x) => (x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2);
 const smooth01 = (x) => x * x * (3 - 2 * x);
+function smoothstepInverse(y) {
+  let lo = 0;
+  let hi = 1;
+  for (let i = 0; i < 24; i++) {
+    const mid = (lo + hi) / 2;
+    if (smooth01(mid) < y) lo = mid;
+    else hi = mid;
+  }
+  return (lo + hi) / 2;
+}
+const U_PITCH = smoothstepInverse(Math.min(0.85, (VERTICAL_ALT - PAD_LIFT) / CLIMB));
 const clamp01 = (x) => Math.min(1, Math.max(0, x));
 const rand = (a, b) => a + Math.random() * (b - a);
 const fmt = (x, d = 1) => x.toFixed(d).replace('.', ',');
@@ -185,12 +201,21 @@ export function createLaunchSequence({ scene, camera, earth, container, sunDirec
   const C_BLUE_END = new THREE.Color(0x3050ff);
   const C_FLASH = new THREE.Color(0xffffff);
 
-  // --- Trajectoire d'ascension : montee verticale puis basculement vers l'horizontale. ---
+  // --- Trajectoire d'ascension : montee verticale, puis virage une fois la tour degagee. ---
   function radiusAt(u) {
-    return 1 + PAD_LIFT + (ORBIT_RADIUS - 1 - PAD_LIFT) * smooth01(u);
+    return 1 + PAD_LIFT + CLIMB * smooth01(u);
+  }
+  // phi(U_PITCH) = 0 et derivee nulle ; phi(1) = PHI et dphi/du(1) = 3*PHI.
+  function pitchAngle(u) {
+    if (u <= U_PITCH) return 0;
+    const s = (u - U_PITCH) / (1 - U_PITCH);
+    const a = 1 - 3 * U_PITCH;
+    const b = 3 * U_PITCH;
+    const s2 = s * s;
+    return PHI * (a * s2 * s + b * s2);
   }
   function trajectory(u, outP) {
-    const phi = PHI * u * u * u;
+    const phi = pitchAngle(u);
     return outP.copy(S).multiplyScalar(Math.cos(phi)).addScaledVector(T, Math.sin(phi)).multiplyScalar(radiusAt(u));
   }
   function velocity(u, out) {
@@ -223,9 +248,17 @@ export function createLaunchSequence({ scene, camera, earth, container, sunDirec
   }
 
   // --- Camera de poursuite (meme formule au sol et en vol => pas de saut). ---
+  // Tant que la fusee est verticale, on garde le cadrage du pas de tir.
   const chaseDist = (u) => 0.075 + 0.28 * Math.pow(u, 1.5);
   const chaseLift = (u) => -0.0022 + 0.025 * u;
   const chaseBack = (u) => 0.06 * u;
+  function chaseU(u) {
+    const climbed = clamp01((radiusAt(u) - 1 - PAD_LIFT) / Math.max(VERTICAL_ALT - PAD_LIFT, 1e-4));
+    if (u <= U_PITCH) return 0.12 * climbed;
+    const s = (u - U_PITCH) / (1 - U_PITCH);
+    const eased = s * s * (3 - 2 * s);
+    return 0.12 + 0.88 * eased;
+  }
   function chase(focus, forward, u) {
     const radial = vTmp.copy(focus).normalize();
     camera.position
@@ -326,21 +359,21 @@ export function createLaunchSequence({ scene, camera, earth, container, sunDirec
 
   // --- Moments cles (declenches une seule fois, dans l'ordre). ---
   const cues = [
-    { at: 0, run: () => overlay.caption(t('Séquence de lancement', 'Launch sequence'), t('Tous les systèmes sont au vert', 'All systems are green')) },
-    { at: 5, run: () => overlay.caption(t('T-5 · Mise en pression', 'T-5 · Pressurisation'), t('Les réservoirs passent en pression de vol', 'Tanks reach flight pressure')) },
-    { at: T_IGNITION, run: () => overlay.caption(t('Allumage', 'Ignition'), t('Les moteurs montent en poussée', 'Engines come up to thrust')) },
+    { at: 0, run: () => overlay.caption(tr('Séquence de lancement', 'Launch sequence'), tr('Tous les systèmes sont au vert', 'All systems are green')) },
+    { at: 5, run: () => overlay.caption(tr('T-5 · Mise en pression', 'T-5 · Pressurisation'), tr('Les réservoirs passent en pression de vol', 'Tanks reach flight pressure')) },
+    { at: T_IGNITION, run: () => overlay.caption(tr('Allumage', 'Ignition'), tr('Les moteurs montent en poussée', 'Engines come up to thrust')) },
     {
       at: T_LIFTOFF,
       run: () => {
         overlay.count('DÉCOLLAGE !', 'is-liftoff');
-        overlay.caption(t('Décollage', 'Liftoff'), t('Le lanceur quitte le pas de tir', 'The launcher leaves the pad'));
+        overlay.caption(tr('Décollage', 'Liftoff'), tr('Le lanceur quitte le pas de tir', 'The launcher leaves the pad'));
       }
     },
     { at: T_LIFTOFF + 2.5, run: () => overlay.count('') },
     {
       at: T_LIFTOFF + ASCENT * STAGE_SEP_U,
       run: () => {
-        overlay.caption(t('Séparation du 1er étage', 'First-stage separation'), t('Le 1er étage vide retombe, le 2e étage prend le relais', 'The empty first stage falls away, the second stage takes over'));
+        overlay.caption(tr('Séparation du 1er étage', 'First-stage separation'), tr('Le 1er étage vide retombe, le 2e étage prend le relais', 'The empty first stage falls away, the second stage takes over'));
         const debris = rocket.separateLower();
         scene.attach(debris.object);
         velocity(STAGE_SEP_U, vTmp);
@@ -352,7 +385,7 @@ export function createLaunchSequence({ scene, camera, earth, container, sunDirec
     {
       at: T_DEPLOY,
       run: () => {
-        overlay.caption(t('Déploiement du CubeSat', 'CubeSat deployment'), t('La coiffe s\'ouvre, ton satellite est libéré', 'The fairing opens, your satellite is released'));
+        overlay.caption(tr('Déploiement du CubeSat', 'CubeSat deployment'), tr('La coiffe s\'ouvre, ton satellite est libéré', 'The fairing opens, your satellite is released'));
         rocket.jettisonFairing();
         const p0 = trajectory(1, new THREE.Vector3()).normalize();
         const t0 = velocity(1, new THREE.Vector3()).normalize();
@@ -380,7 +413,7 @@ export function createLaunchSequence({ scene, camera, earth, container, sunDirec
       at: T_DEPLOY + 1.6,
       run: () => {
         overlay.count('ORBITE ATTEINTE', 'is-success');
-        overlay.caption(t('Orbite basse terrestre', 'Low Earth orbit'), t(`Altitude ${ALT_KM} km · un tour en ${fmt(ORBIT_PERIOD_MIN)} min`, `Altitude ${ALT_KM} km · one revolution in ${fmt(ORBIT_PERIOD_MIN)} min`));
+        overlay.caption(tr('Orbite basse terrestre', 'Low Earth orbit'), tr(`Altitude ${ALT_KM} km · un tour en ${fmt(ORBIT_PERIOD_MIN)} min`, `Altitude ${ALT_KM} km · one revolution in ${fmt(ORBIT_PERIOD_MIN)} min`));
         window.dispatchEvent(new CustomEvent('orbite-atteinte', { detail: { altitudeKm: ALT_KM } }));
       }
     },
@@ -430,7 +463,7 @@ export function createLaunchSequence({ scene, camera, earth, container, sunDirec
     earth.setSpinEnabled(false);
     earth.setCloudFade(0);
     container.classList.add('vue3d--cinema');
-    overlay.caption(t('Pas de tir', 'Launch pad'), t('Le lanceur est en position. Vérifie tout, puis lance !', 'The launcher is in place. Check everything, then launch!'));
+    overlay.caption(tr('Pas de tir', 'Launch pad'), tr('Le lanceur est en position. Vérifie tout, puis lance !', 'The launcher is in place. Check everything, then launch!'));
     overlay.count('');
     overlay.telemetry('');
     overlay.show();
@@ -514,7 +547,7 @@ export function createLaunchSequence({ scene, camera, earth, container, sunDirec
       telemetry(u);
 
       const focus = vTmp2.copy(P).addScaledVector(dir, ROCKET_HEIGHT / 2);
-      chase(focus, dir, u);
+      chase(focus, dir, chaseU(u));
       if (!reduceMotion) {
         const k = Math.max(0, 1 - (t - T_LIFTOFF) / 5);
         camera.position.add(shake.set(rand(-1, 1), rand(-1, 1), rand(-1, 1)).multiplyScalar(0.0009 * k));

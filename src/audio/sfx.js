@@ -1,5 +1,8 @@
 // Audio arcade (Web Audio) : pas de fichiers, donc PWA hors-ligne.
-// Compte a rebours, rumble de decollage, radio ASTRA (+ voix synthetique si dispo).
+// Effets, voix ASTRA, et bande-son originale par écran (src/audio/music.js).
+
+import { settingsStore } from '../engine/settings-store.js';
+import { createMusic } from './music.js';
 
 const MUTE_KEY = 'sh-mute';
 
@@ -14,12 +17,13 @@ function loadMute() {
 export function createGameAudio() {
   let ctx = null;
   let master = null;
-  let ambientGain = null;
   let rumbleGain = null;
   let rumbleOsc = null;
   let muted = loadMute();
   let pendingLine = null;
   let lastSpoken = '';
+  let music = null;
+  let pendingScene = 'hub';
 
   function ensure() {
     if (ctx) return ctx;
@@ -29,7 +33,11 @@ export function createGameAudio() {
     master = ctx.createGain();
     master.gain.value = muted ? 0 : 0.7;
     master.connect(ctx.destination);
-    startAmbient();
+    music = createMusic(ctx, master);
+    music.setMuted(muted);
+    music.setVolume(settingsStore.get('ambientVolume') ?? 0.4);
+    music.setScene(pendingScene);
+    music.start();
     return ctx;
   }
 
@@ -72,27 +80,6 @@ export function createGameAudio() {
     src.start();
   }
 
-  function startAmbient() {
-    if (!ctx || ambientGain) return;
-    ambientGain = ctx.createGain();
-    ambientGain.gain.value = 0.035;
-    const osc = ctx.createOscillator();
-    osc.type = 'sine';
-    osc.frequency.value = 52;
-    const osc2 = ctx.createOscillator();
-    osc2.type = 'triangle';
-    osc2.frequency.value = 78;
-    const lp = ctx.createBiquadFilter();
-    lp.type = 'lowpass';
-    lp.frequency.value = 180;
-    osc.connect(lp);
-    osc2.connect(lp);
-    lp.connect(ambientGain);
-    ambientGain.connect(master);
-    osc.start();
-    osc2.start();
-  }
-
   function setMuted(value) {
     muted = value;
     try {
@@ -101,7 +88,17 @@ export function createGameAudio() {
       /* ignore quota */
     }
     if (master) master.gain.setTargetAtTime(muted ? 0 : 0.7, now(), 0.05);
+    music?.setMuted(muted);
     if (muted) window.speechSynthesis?.cancel();
+  }
+
+  function speechLanguage() {
+    return settingsStore.get('language') === 'en' ? 'en' : 'fr';
+  }
+
+  function pickVoice(synth, language) {
+    const want = language === 'en' ? 'en' : 'fr';
+    return synth.getVoices().find((v) => v.lang?.toLowerCase().startsWith(want)) || null;
   }
 
   function speak(texte) {
@@ -111,16 +108,31 @@ export function createGameAudio() {
     if (!synth) return;
     if (texte === lastSpoken && synth.speaking) return;
     lastSpoken = texte;
-    synth.cancel();
-    const utter = new SpeechSynthesisUtterance(texte);
-    utter.lang = 'fr-FR';
-    utter.rate = 1.04;
-    utter.pitch = 1.12;
-    utter.volume = 0.95;
-    const voices = synth.getVoices();
-    const fr = voices.find((v) => v.lang?.startsWith('fr'));
-    if (fr) utter.voice = fr;
-    synth.speak(utter);
+    const language = speechLanguage();
+
+    const start = () => {
+      if (muted || pendingLine !== texte) return;
+      synth.cancel();
+      const utter = new SpeechSynthesisUtterance(texte);
+      utter.lang = language === 'en' ? 'en-US' : 'fr-FR';
+      utter.rate = 1.04;
+      utter.pitch = 1.12;
+      utter.volume = 0.95;
+      const voice = pickVoice(synth, language);
+      // Ne pas coller une voix française sur un texte anglais : elle reste muette.
+      if (voice) utter.voice = voice;
+      synth.speak(utter);
+      if (!voice && synth.getVoices().length === 0) {
+        const retry = () => {
+          synth.removeEventListener('voiceschanged', retry);
+          lastSpoken = '';
+          start();
+        };
+        synth.addEventListener('voiceschanged', retry);
+      }
+    };
+
+    start();
   }
 
   return {
@@ -150,7 +162,9 @@ export function createGameAudio() {
       if (n <= 3) tone(freq * 2, 0.06, 'sine', 0.05);
     },
     liftoff() {
-      if (!ensure() || muted) return;
+      ensure();
+      music?.duck(0.45);
+      if (!ctx || muted) return;
       noiseBurst(1.4, 0.22, 120);
       tone(90, 0.8, 'sawtooth', 0.12);
       if (rumbleOsc) return;
@@ -175,10 +189,18 @@ export function createGameAudio() {
       rumbleGain = null;
     },
     success() {
+      music?.duck(1);
       this.stopRumble();
       tone(523, 0.18, 'sine', 0.12);
       setTimeout(() => tone(784, 0.22, 'sine', 0.12), 120);
       setTimeout(() => tone(1046, 0.35, 'sine', 0.1), 260);
+    },
+    setScene(name) {
+      pendingScene = name || 'hub';
+      music?.setScene(pendingScene);
+    },
+    setAmbient(value) {
+      music?.setVolume(value);
     },
     dispose() {
       window.speechSynthesis?.cancel();

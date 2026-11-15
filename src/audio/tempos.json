@@ -1,0 +1,120 @@
+{
+  "version": "1.0",
+  "description": "Tempo map for Space Heroes - easy configuration without code changes",
+  "stability": "32 steps per bar (32nd notes)",
+  "scenes": {
+    "hub": {
+      "bpm": 102,
+      "level": 0.55,
+      "mood": "motivation_calme",
+      "description": "Menu principal, navigations - rythme stable, synthétiseur analogique",
+      "kick": [1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0],
+      "clap": [0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0],
+      "hat": [0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0, 1, 0],
+      "bass": [43, 0, 0, 43, 0, 0, 0, 0, 38, 0, 0, 38, 0, 0, 0, 0, 40, 0, 0, 40, 0, 0, 0, 0, 36, 0, 0, 36, 0, 0, 0, 0],
+      "lead": [67, 0, 71, 0, 74, 0, 0, 76, 0, 74, 0, 71, 0, 0, 67, 0, 69, 0, 72, 0, 76, 0, 0, 74, 0, 72, 0, 69, 0, 0, 67, 0],
+      "transitionFrom": ["atelier", "operations"],
+      "transitionTo": ["briefing", "atelier", "essais", "lancement", "operations", "bilan"]
+    },
+    "briefing": {
+      "bpm": 76,
+      "level": 0.55,
+      "mood": "concentration_emerveillee",
+      "description": "Briefing - pads synth étendus, pas de batterie, synthèse lente",
+      "kick": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+      "clap": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+      "hat": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+      "bass": [43, 43, 43, 43, 38, 38, 38, 38, 40, 40, 40, 40, 36, 36, 36, 36, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+      "lead": [67, 71, 74, 79, 66, 69, 74, 78, 64, 67, 71, 76, 60, 64, 67, 72, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+      "transitionFrom": ["hub"],
+      "transitionTo": ["atelier", "essais"]
+    },
+    "atelier": {
+      "bpm": 112,
+      "level": 0.90,
+      "mood": "creativite_precise",
+      "description": "Atelier - rythme syncopé actif, FM synth, bass lourde",
+      "kick": [1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0],
+      "clap": [0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0],
+      "hat": [1, 0, 1, 0, 1, 0, 1, 1, 1, 0, 1, 0, 1, 0, 1, 1, 1, 0, 1, 0, 1, 0, 1, 1, 1, 0, 1, 0, 1, 0, 1, 0],
+      "bass": [45, 0, 45, 0, 0, 45, 0, 0, 41, 0, 41, 0, 0, 43, 0, 0, 40, 0, 40, 0, 0, 40, 0, 0, 38, 0, 38, 0, 36, 0, 0, 0],
+      "lead": [69, 0, 72, 0, 76, 0, 74, 0, 72, 0, 0, 69, 0, 72, 0, 0, 68, 0, 71, 0, 75, 0, 72, 0, 68, 0, 0, 64, 0, 68, 0, 0],
+      "transitionFrom": ["briefing"],
+      "transitionTo": ["essais", "lancement"]
+    },
+    "essais": {
+      "bpm": 124,
+      "level": 0.85,
+      "mood": "tension_controlee",
+      "description": "Essais - 16th notes, motif de tension montante",
+      "kick": [1, 0, 0, 1, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1, 0, 0],
+      "clap": [0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1],
+      "hat": [0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1],
+      "bass": [40, 0, 40, 0, 40, 0, 0, 0, 40, 0, 43, 0, 40, 0, 0, 0, 38, 0, 38, 0, 38, 0, 0, 0, 36, 0, 36, 0, 35, 0, 0, 0],
+      "lead": [64, 0, 67, 0, 70, 0, 67, 0, 64, 0, 0, 63, 0, 0, 60, 0, 63, 0, 67, 0, 63, 0, 0, 60, 0, 58, 0, 0, 60, 0, 0],
+      "transitionFrom": ["atelier"],
+      "transitionTo": ["lancement"]
+    },
+    "lancement": {
+      "bpm": 128,
+      "level": 1.05,
+      "mood": "adrenaline_maximale",
+      "description": "Lancement - full énergie, 16th hi-hat ouverts, thème triomphant",
+      "kick": [1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0],
+      "clap": [0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0],
+      "hat": [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+      "bass": [36, 0, 36, 0, 36, 0, 43, 0, 36, 0, 36, 0, 38, 0, 36, 0, 41, 0, 43, 0, 43, 0, 41, 0, 43, 0, 36, 0, 0, 0],
+      "lead": [72, 0, 76, 0, 79, 0, 84, 0, 79, 0, 76, 0, 74, 0, 72, 0, 79, 0, 84, 0, 88, 0, 84, 0, 79, 0, 76, 0, 74, 0, 72, 0],
+      "transitionFrom": ["essais"],
+      "transitionTo": ["operations"]
+    },
+    "operations": {
+      "bpm": 96,
+      "level": 0.75,
+      "mood": "concentration_spatiale",
+      "description": "Opérations - maintien calme, arpeggio léger, synthétiseur pad",
+      "kick": [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0],
+      "clap": [0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0],
+      "hat": [0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0],
+      "bass": [41, 0, 0, 0, 41, 0, 0, 0, 36, 0, 0, 0, 36, 0, 0, 0, 43, 0, 0, 0, 43, 0, 0, 0, 38, 0, 0, 0, 38, 0, 0, 0],
+      "lead": [65, 0, 0, 69, 0, 0, 72, 0, 0, 69, 0, 0, 65, 0, 0, 0, 67, 0, 0, 71, 0, 0, 74, 0, 0, 71, 0, 0, 67, 0, 0],
+      "transitionFrom": ["lancement"],
+      "transitionTo": ["bilan"]
+    },
+    "bilan": {
+      "bpm": 88,
+      "level": 0.70,
+      "mood": "satification_reflechie",
+      "description": "Bilan - pads doux, cordes, rythme sparse",
+      "kick": [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+      "clap": [0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0],
+      "hat": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+      "bass": [43, 43, 38, 38, 40, 40, 36, 36, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+      "lead": [67, 71, 74, 79, 66, 69, 74, 78, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+      "transitionFrom": ["operations"],
+      "transitionTo": ["hub"]
+    }
+  },
+  "utilities": {
+    "midiToFreq": "function(note) { return 440 * Math.pow(2, (note - 69) / 12); }",
+    "stability": "32 steps per bar (32nd notes)",
+    "notes_range": "C1 (36) to C8 (96)",
+    "bpm_range": "76 (briefing/bilan) to 128 (lancement)",
+    "level_range": "0.55 (atmospheric) to 1.05 (lancement)"
+  },
+  "scene_transitions": {
+    "hub": ["briefing", "atelier", "essais", "lancement", "operations", "bilan"],
+    "briefing": ["atelier", "essais"],
+    "atelier": ["essais", "lancement"],
+    "essais": ["lancement"],
+    "lancement": ["operations"],
+    "operations": ["bilan"],
+    "bilan": ["hub"]
+  },
+  "playlists": {
+    "buildup": ["hub", "atelier", "essais", "lancement"],
+    "teardown": ["lancement", "operations", "bilan", "hub"],
+    "mission_loop": ["briefing", "atelier", "essais", "lancement", "operations", "bilan"],
+    "menu_loop": ["hub"]
+  }
+}
