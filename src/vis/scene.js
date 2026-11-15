@@ -14,6 +14,7 @@ import { createPlayerControls } from './controls.js';
 import { gmatPour } from '../engine/gmat.js';
 import { settingsStore } from '../engine/settings-store.js';
 import { t } from '../i18n.js';
+import { distanceEnsemble } from './vues.js';
 
 // Direction du Soleil (monde). Legerement de cote pour montrer le terminateur
 // jour/nuit et les lumieres des villes.
@@ -76,7 +77,14 @@ export function mountScene(container) {
 
   const hud = createOrbitHud(container);
   let hudArmed = false;
+  let vueActuelle = null;
+  let vuePosee = false;
+  let lune = null;
   hud.onTimeScale((scale) => launch.orbit?.setTimeScale(scale));
+  hud.onVue((id) => {
+    vueActuelle = id;
+    vuePosee = false;
+  });
 
   const player = createPlayerControls({
     camera,
@@ -132,9 +140,19 @@ export function mountScene(container) {
         hudArmed = true;
         launch.orbit.setTimeScale(echelleDepart());
         hud.setTimeScale(echelleDepart());
+        hud.setLune(launch.profile?.type === 'transfert_lune');
         hud.show();
         player.setCubesat(launch.cubesat?.object, launch.orbit);
+        vueActuelle = 'ensemble';
+        vuePosee = false;
+        hud.setVue('ensemble');
       }
+      if (player.prendreSaisie()) {
+        vueActuelle = null;
+        vuePosee = true;
+        hud.setVue(null);
+      }
+      if (vueActuelle && (vueActuelle === 'satellite' || !vuePosee)) poserVue();
       hud.update(launch.orbit.telemetry());
     }
 
@@ -156,6 +174,70 @@ export function mountScene(container) {
     }
   }
   document.addEventListener('visibilitychange', onVisibility);
+
+  function retirerLune() {
+    if (!lune) return;
+    scene.remove(lune);
+    lune.geometry.dispose();
+    lune.material.dispose();
+    lune = null;
+  }
+
+  function assurerLune(orbit, profile) {
+    const km = profile?.rayonLuneKm;
+    if (profile?.type !== 'transfert_lune' || !(km > 0)) {
+      retirerLune();
+      return null;
+    }
+    const rayon = km / (profile.bodyRadiusKm || 6378);
+    if (!lune) {
+      lune = new THREE.Mesh(
+        new THREE.SphereGeometry(1, 32, 24),
+        new THREE.MeshStandardMaterial({ color: 0xb7b7c0, roughness: 1, metalness: 0 })
+      );
+      lune.name = 'lune';
+      scene.add(lune);
+    }
+    lune.scale.setScalar(rayon);
+    lune.position.copy(orbit.positionAt(Math.PI));
+    return lune;
+  }
+
+  function poserVue() {
+    const orbit = launch.orbit;
+    const sat = launch.cubesat?.object;
+    const profile = launch.profile;
+    if (!orbit) return;
+    const apo = orbit.a * (1 + orbit.e);
+    const plafond = Math.max(10, distanceEnsemble(apo, cameraHome.length()) * 1.4);
+    if (vueActuelle === 'ensemble') {
+      const dist = distanceEnsemble(apo, cameraHome.length());
+      const eye = cameraHome.clone().normalize().multiplyScalar(dist);
+      player.cadrer(new THREE.Vector3(), eye, { min: 1.22, max: plafond });
+      vuePosee = true;
+      return;
+    }
+    if (vueActuelle === 'satellite' && sat) {
+      const pos = sat.position.clone();
+      const dir = orbit.directionAt(orbit.theta);
+      const haut = pos.clone().normalize();
+      const eye = pos.clone().addScaledVector(dir, -0.04).addScaledVector(haut, 0.016);
+      player.cadrer(pos, eye, { min: 0.008, max: plafond });
+      return;
+    }
+    if (vueActuelle === 'lune') {
+      const astre = assurerLune(orbit, profile);
+      const centre = astre ? astre.position.clone() : orbit.positionAt(Math.PI);
+      const rayon = astre ? astre.scale.x : 1;
+      const radial = centre.clone().normalize();
+      const cote = new THREE.Vector3(0, 1, 0).cross(radial);
+      if (cote.lengthSq() < 1e-6) cote.set(1, 0, 0);
+      cote.normalize();
+      const eye = centre.clone().addScaledVector(cote, rayon * 4).addScaledVector(radial, -rayon * 2);
+      player.cadrer(centre, eye, { min: Math.max(0.05, rayon * 1.3), max: plafond });
+      vuePosee = true;
+    }
+  }
 
   function showMissionBanner(type) {
     document.getElementById('sh-mission-accomplie')?.remove();
@@ -194,7 +276,12 @@ export function mountScene(container) {
     /** Pose la trajectoire du chapitre et démonte un lancement précédent. */
     setMission(gmatId) {
       hudArmed = false;
+      vueActuelle = null;
+      vuePosee = false;
+      retirerLune();
       hud.hide();
+      hud.setVue(null);
+      hud.setLune(false);
       hud.setTimeScale(echelleDepart());
       player.setCubesat(null, null);
       launch.setProfile(gmatPour(gmatId));
@@ -259,6 +346,7 @@ export function mountScene(container) {
     },
     dispose() {
       running = false;
+      retirerLune();
       cancelAnimationFrame(frameId);
       resizeObserver.disconnect();
       document.removeEventListener('visibilitychange', onVisibility);

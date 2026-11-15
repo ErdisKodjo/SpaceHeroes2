@@ -15,6 +15,7 @@ import { createCubeSat } from './cubesat.js';
 import { createOrbit } from './orbit.js';
 import { createParticlePool } from './particles.js';
 import { gmatPour } from '../engine/gmat.js';
+import { distanceEnsemble } from './vues.js';
 import { t as tr } from '../i18n.js';
 
 const ORBIT_DISPLAY_PERIOD = 40; // secondes a l'ecran pour un tour pendant le lancement
@@ -464,7 +465,7 @@ export function createLaunchSequence({ scene, camera, earth, container, sunDirec
       at: T_FLYOUT,
       run: () => {
         const home = getHomeView();
-        const need = Math.max(home.position.length(), derived.apoapsisScene * 2.15);
+        const need = distanceEnsemble(derived.apoapsisScene, home.position.length());
         const position = home.position.clone().normalize().multiplyScalar(need);
         const quaternion = lookQuaternion(position, new THREE.Vector3(0, 0, 0), new THREE.Vector3(0, 1, 0));
         cameraMove = createCameraMove(camera, position, quaternion, FLYOUT_DURATION);

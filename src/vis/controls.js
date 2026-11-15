@@ -107,6 +107,7 @@ export function createPlayerControls({ camera, domElement, isBlocked }) {
   const spherical   = new THREE.Spherical();
 
   let onFirstInput  = null;
+  let saisie        = false;
   let cubesatRef    = null;
   let orbitRef      = null;
   let pointerMoved  = false;
@@ -116,6 +117,7 @@ export function createPlayerControls({ camera, domElement, isBlocked }) {
 
   function markInput() {
     controls.autoRotate = false;
+    saisie = true;
     onFirstInput?.();
     onFirstInput = null;
   }
@@ -224,6 +226,23 @@ export function createPlayerControls({ camera, domElement, isBlocked }) {
     onFirstInput(fn) { onFirstInput = fn; },
     /** Injecte la référence au CubeSat une fois qu'il est en orbite. */
     setCubesat(obj, orb) { cubesatRef = obj; orbitRef = orb; },
+    prendreSaisie() {
+      const vu = saisie;
+      saisie = false;
+      return vu;
+    },
+    cadrer(cible, position, limites) {
+      if (limites) {
+        controls.minDistance = limites.min;
+        controls.maxDistance = limites.max;
+      }
+      controls.autoRotate = false;
+      controls.target.copy(cible);
+      camera.position.copy(position);
+      camera.up.set(0, 1, 0);
+      camera.lookAt(cible);
+      controls.update();
+    },
     update(dt) {
       const blocked = isBlocked();
       controls.enabled = !blocked;

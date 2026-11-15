@@ -72,6 +72,7 @@ function profil(fields) {
     sceneA: fields.sceneA,
     periodMin: fields.periodMin,
     periodS: fields.periodMin * 60,
+    rayonLuneKm: Number.isFinite(fields.rayonLuneKm) ? fields.rayonLuneKm : null,
     circularSpeedKms: Math.sqrt(fields.mu / (body + alt)),
     periapsisScene: fields.sceneA * (1 - e),
     apoapsisScene: fields.sceneA * (1 + e),
@@ -111,6 +112,7 @@ export function resolveGmat(table) {
     const dv = Number(r.deltaVInjectionKmS);
     const injection = Number.isFinite(dv) ? ` · injection ${virgule(dv)} km/s` : '';
     const injectionEn = Number.isFinite(dv) ? ` · injection ${dv} km/s` : '';
+    const rayonLuneKm = liee ? approche - altitudeLune : null;
     return profil({
       type,
       labelFr: 'Transfert Terre-Lune',
@@ -124,6 +126,7 @@ export function resolveGmat(table) {
       inclinationDeg: p.inclinaisonDeg,
       periodMin,
       sceneA: aKm / body,
+      rayonLuneKm: Number.isFinite(rayonLuneKm) && rayonLuneKm > 0 ? rayonLuneKm : null,
       delayMs: (r.delaiRadioAllerRetourSecondes || 0) * 1000,
       contactMin: r.dureeContactMoyenneMinutes ?? null
     });

@@ -188,11 +188,13 @@
   margin-right: 0.3em;
 }
 
+.vis-hud-vues,
 .vis-hud-scales {
   display: flex;
   gap: 6px;
 }
 
+.vis-hud-vue,
 .vis-hud-scale {
   cursor: pointer;
   border: 1px solid rgba(124, 240, 255, 0.35);
@@ -205,6 +207,11 @@
   letter-spacing: 0.04em;
 }
 
+.vis-hud-vue[hidden] {
+  display: none;
+}
+
+.vis-hud-vue.is-active,
 .vis-hud-scale.is-active {
   background: #7cf0ff;
   color: #06101c;

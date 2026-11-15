@@ -88,4 +88,6 @@ Hors réseau. Le salon sépare les adresses du même réseau de celles qu'un aut
 
 Capture lunaire. Le départ du 1 janvier 2026 à 00:00, nœud 355°, injection 3,12 km/s, atteint une périlune à 50 km. Le freinage de 0,87 km/s capture l'orbiteur. Huit jours et sept dixièmes plus tard, l'altitude propagée est 37 km.
 
+Vues. Après l'orbite, trois boutons cadrent la trajectoire déjà calculée : Ensemble, Satellite, Lune. Lune n'apparaît que sur le transfert. La sphère est au bout de l'ellipse, et son rayon est 1 788 km moins les 50 km de périlune.
+
 Traînée. En orbite basse, les 12 semaines perdent une part des 350 km qui séparent le départ d'une orbite circulaire à 200 km. Cette part est la perte de demi-grand axe propagée sur 84 jours. Quatre faces du CDS sont dans la table : 0,0100 m² (extrémité 1U, aluminium), 0,01702 m² (côté 1,5U, Al-Li), 0,0227 m² (côté 2U, titane), 0,03405 m² (côté 3U, CFRP). Les masses des pièces ne changent pas. À 1,33 kg, ces faces perdent 43,1 km, 65,5 km, 85,5 km et 137,6 km. La face 3U à 1,33 kg atteint 200 km au jour 114,8. Les autres lignes tiennent 120 jours. Hors de 1,33 à 4 kg, la perte est prolongée en 1/masse. Entre 2,22 et 4 kg, la perte à 84 jours n'est pas monotone : l'excentricité 0,035 est lue à un jour fixe.

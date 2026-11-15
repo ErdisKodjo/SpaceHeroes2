@@ -137,6 +137,9 @@ Sous le QG, la Terre tourne seule. En mission, on peut l'explorer, sauf pendant 
 | Q, + ou Page haut | Zoomer |
 | E, − ou Page bas | Dézoomer |
 | Clic sur le CubeSat en orbite | Fiche de la face visée : moteur, structure, énergie, antenne ou instrument, avec la pièce choisie à l'atelier |
+| Ensemble | Cadre toute la trajectoire déjà calculée |
+| Satellite | Suit le CubeSat |
+| Lune | Visible sur le transfert lunaire. Montre la Lune au bout de cette ellipse, au rayon 1 788 km moins 50 km |
 
 La fiche se ferme avec la croix. Elle reste affichée tant qu'on ne la ferme pas.
 

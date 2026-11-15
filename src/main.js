@@ -151,7 +151,8 @@ function openHub() {
 
 if (demo) {
   // Mode démonstration : saute directement à la mission.
-  startMission({ chapterId: 'chapitre_01' });
+  const demande = new URLSearchParams(location.search).get('chapitre');
+  startMission({ chapterId: getChapitre(demande)?.id || 'chapitre_01' });
 } else {
   openHub();
 }
