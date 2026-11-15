@@ -444,5 +444,5 @@ function startMission({ chapterId, restore = false, table = false }) {
 // ─── PWA ──────────────────────────────────────────────────────────────────
 
 if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('/service-worker.js').catch(() => {});
+  navigator.serviceWorker.register(`${import.meta.env.BASE_URL}service-worker.js`).catch(() => {});
 }

@@ -2,13 +2,14 @@
   "name": "Space Heroes",
   "short_name": "SpaceHeroes",
   "description": "Jeu de conception de mission spatiale - NASA Space Apps Challenge",
-  "start_url": "/",
+  "start_url": "./",
+  "scope": "./",
   "display": "standalone",
   "background_color": "#0b1026",
   "theme_color": "#0b1026",
   "icons": [
-    { "src": "/favicon.png", "sizes": "32x32", "type": "image/png", "purpose": "any" },
-    { "src": "/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
-    { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+    { "src": "favicon.png", "sizes": "32x32", "type": "image/png", "purpose": "any" },
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
   ]
 }

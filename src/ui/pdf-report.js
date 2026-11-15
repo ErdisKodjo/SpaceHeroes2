@@ -5,7 +5,7 @@ import { t } from '../i18n.js';
 import { missionBlurb } from '../i18n/content.js';
 
 function loadLogo() {
-  return fetch('/icon-512.png')
+  return fetch(`${import.meta.env.BASE_URL}icon-512.png`)
     .then((res) => (res.ok ? res.blob() : Promise.reject(new Error('logo'))))
     .then((blob) => new Promise((resolve, reject) => {
       const reader = new FileReader();

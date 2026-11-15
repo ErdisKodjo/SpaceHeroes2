@@ -1,6 +1,8 @@
 # Space Heroes — Document complet du module : préparation, interfaces et déroulé d'une mission
 
 > **Document unique de référence** décrivant l'ensemble de l'expérience joueur dans *Space Heroes* : de l'arrivée au QG jusqu'au bilan post-mission, incluant l'architecture des interfaces asymétriques (HUD) par rôle et le script des validations CML menées par l'IA ASTRA. Il est conçu pour un **jeu interactif en 3D** où chaque choix a une conséquence visible et immédiate.
+<<<<<<< HEAD
+=======
 >
 > Mise à jour du 15 novembre 2026 : la section suivante décrit ce que la version jouable fait vraiment. Le reste du document garde la vision (HUD par rôle, multijoueur, difficultés avancées). Là où les deux divergent, la version jouable prime.
 
@@ -60,6 +62,7 @@ Musique originale synthétisée dans le navigateur, sans fichier audio, une bouc
 | Bilan | 88 | 0,70 | Satisfaction réfléchie | Hub, chapitre suivant |
 
 Le changement de scène tombe sur le temps suivant, pour ne pas couper la mesure. Le retour au QG est immédiat.
+>>>>>>> f3c24a1f91154ae93ad64ca2db74ed5891fc3166
 
 ---
 
@@ -74,7 +77,7 @@ Dans *Space Heroes*, **la 3D n'est pas un décor : c'est le terrain de jeu**. Ch
 | Tu sélectionnes un moteur ionique                 | Orbitale              | La poussée bleutée est faible mais continue → la trajectoire montre une spirale lente au lieu d'une courbe rapide |
 | Tu négliges le blindage antiradiations            | Vaisseau              | En approchant de Jupiter, l'écran se teinte de rouge (tempête solaire) et les instruments clignotent en panne     |
 | Tu économises sur les communications              | Orbitale              | Le faisceau de liaison se coupe à distance → la jauge « Données » chute, tu perds le contrôle à distance          |
-| Tu valides une checklist CML bâclée               | Vaisseau (Pas de tir) | ASTRA signale le niveau manquant. Le compte à rebours reste disponible ; le bilan compte le manque               |
+| Tu valides une checklist CML bâclée               | Vaisseau (Pas de tir) | ASTRA refuse le lancement → le compte à rebours se fige, le vaisseau reste au sol                                 |
 
 **Rien n'est caché : tout se lit dans la scène 3D et les jauges.**
 
@@ -95,7 +98,7 @@ Avant toute mission, le joueur arrive dans le **QG de Mission** avec ASTRA comme
 
 - **Choix de la difficulté** : 4 niveaux — **Cadet, Ingénieur, Directeur de mission, Bac à sable** — qui modulent les marges techniques, les événements imprévus et le niveau d'assistance d'ASTRA sur la checklist CML.
 - **Fiches pédagogiques** : bouton *« Pourquoi ? »* sur chaque élément, glossaire illustré, mini-tutoriels.
-- **Accessibilité intégrée** : sous-titres, contrastes élevés, tailles de police modulables, mode daltonien pour les jauges et pastilles colorées, réduction des animations. Ces réglages visuels, comme la langue et le volume d'ambiance, ne s'appliquent qu'après **Enregistrer**.
+- **Accessibilité intégrée** : sous-titres, contrastes élevés, tailles de police modulables, mode daltonien pour les jauges et pastilles colorées.
 
 ---
 
@@ -214,7 +217,7 @@ Le joueur parcourt le catalogue des **5 familles de composants** :
 
 - **12 points à répartir sur 4 axes** par famille, avec impact affiché en direct sur le devis.
 - **Jetons d'Atelier** à dépenser pour débloquer des technologies avancées.
-- **Trois essais après l'atelier**, et seulement ensuite : vibrations, isolation thermique, compatibilité électrique. Pas de test vide, pas d'étape de fabrication sur cet écran.
+- **Test ASTRA + banc d'essai** : validation technique en 3D avant de passer à la suite (le moteur s'allume, le panneau se déploie, l'instrument pointe).
 - **Équilibrage du devis de mission** : le joueur doit respecter **4 contraintes de conception** (**Budget en €**, **Masse totale en kg**, **Bilan de puissance en W**, **Durée de mission en mois**) qui conditionnent directement les **4 jauges dynamiques en vol** (**Carburant / $\Delta v$**, **Énergie stockée**, **Volume de données**, **Qualité de liaison**).
 
 ### 2.3 Checklist CML — validation par ASTRA (mécanique clé)
@@ -227,7 +230,11 @@ ASTRA joue le rôle d'**évaluateur indépendant** (conforme à la méthodologie
 - Chaque critère est coté **Rouge / Jaune / Vert**.
 - Un niveau est validé dès que **4 critères sur 5 sont verts (seuil 80 %)**.
 - **Le joueur ne coche jamais lui-même** : ASTRA l'interroge et colore la pastille selon l'état réel de la conception.
+<<<<<<< HEAD
+- **Adaptation à la difficulté** : en mode *Cadet*, les niveaux CML 1 et 2 sont pré-validés par ASTRA pour accélérer l'accès à l'Atelier ; en mode *Directeur de mission*, les 4 niveaux doivent être intégralement validés.
+=======
 - **Adaptation à la difficulté, appliquée au départ d'une mission** : en mode *Cadet*, ASTRA pré-valide les CML 1 et 2, les plafonds sont plus larges et il n'y a pas d'événement aléatoire. En mode *Directeur de mission*, les plafonds sont plus serrés, l'événement est toujours là, le CML 3 ferme l'atelier et le CML 4 ferme les essais. Le *Bac à sable* n'est pas retenu par cette porte. L'*Ingénieur* suit la grille du chapitre.
+>>>>>>> f3c24a1f91154ae93ad64ca2db74ed5891fc3166
 
 #### Grille des 20 critères CML
 
@@ -311,12 +318,12 @@ Une fois la checklist validée, la mission se déroule en **4 segments** :
 
 - Choix du lanceur candidat (parmi ceux listés dès CML 2).
 - Simulation du décollage en 3D et vérification des marges techniques.
-- Si le CML requis n'est pas à 80 % de vert, ASTRA le dit. Le compte à rebours n'est pas interrompu.
+- Si un paramètre est hors tolérance, ASTRA interrompt le compte à rebours.
 
 ### 🛰️ Segment 2 — Spatial (orbite / transit)
 
-- **Communications** : établir le contact avec une station au sol (Madrid, Goldstone, Canberra ou Kourou).
-- **Déploiement** dans l'ordre communications, énergie, puis instrument scientifique (visible en 3D : antenne, panneaux, instrument). Une séquence inversée est signalée.
+- **Communications** : établir le contact avec les stations au sol et gérer les délais radio selon la distance (ex : ~3 s aller-retour Terre-Lune, ~20 min Terre-Mars).
+- **Déploiement des instruments** et mise en configuration opérationnelle (visible en 3D : panneaux qui se déploient, antennes qui s'orientent).
 - **Pilotage des jauges dynamiques en temps réel** : carburant ($\Delta v$), énergie stockée, volume de données, liaison radio et budget résiduel.
 - Navigation et corrections de trajectoire (assistance gravitationnelle pour Jupiter, poussée continue pour moteur ionique…).
 
@@ -337,7 +344,7 @@ Une fois la checklist validée, la mission se déroule en **4 segments** :
 
 ## 📊 Étape 4 — Bilan post-mission
 
-- **Rapport post-mission** : score global, ressources, **3 décisions clés**, médaille, phrase NASA et citation d'ASTRA. Export PDF `SpaceHeroes_{titre}_{date}.pdf`.
+- **Rapport post-mission** : score global, graphique d'évolution des ressources en vol, **3 décisions clés** mises en avant.
 - **Médailles et badges spéciaux** selon la performance et les contraintes relevées.
 - **Fiche « Dans la vraie vie »** : comparaison détaillée avec la mission historique qui a inspiré le scénario.
 - **Débriefing multijoueur** (si applicable) : replay des moments de tension, compromis et vetos utilisés.
@@ -351,7 +358,7 @@ Une fois la checklist validée, la mission se déroule en **4 segments** :
 ### Les 3 boucles de rétroaction
 
 1. **Boucle Atelier (conception)** : `Choix de composant → Vaisseau 3D se transforme → Devis (Masse/Puissance/Budget) réagit → ASTRA commente → Ajustement`
-2. **Boucle Checklist CML (validation)** : `ASTRA pose une question → Réponse du joueur → Pastille R/J/V s'allume → Seuil 80 % atteint ou non → ASTRA signale le manque, le lancement reste possible`
+2. **Boucle Checklist CML (validation)** : `ASTRA pose une question → Réponse du joueur → Pastille R/J/V s'allume → Seuil 80 % atteint ou non → Lancement autorisé ou bloqué`
 3. **Boucle Opérations (mission en cours)** : `Événement (débris, tempête, panne) → Scène 3D réagit → Joueur prend une décision → Conséquence immédiate sur le vaisseau / trajectoire / jauges`
 
 ### Exemple concret — Chapitre 4 « Cap sur la Lune »
@@ -361,7 +368,7 @@ Une fois la checklist validée, la mission se déroule en **4 segments** :
 | Choisir un moteur cryogénique plutôt que chimique           | Masse d'ergols réduite, $\Delta v$ accru  | Plus de marge de masse pour un instrument scientifique → score science augmenté                   |
 | Négliger le contrôle thermique (MLI)                        | Économie de masse et de budget            | Sur la face éclairée de la Lune (+120 °C), l'électronique surchauffe → panne critique en 3D       |
 | Oublier le bouclier ablatif (mission retour d'échantillons) | Gain de masse au décollage                | À la rentrée atmosphérique terrestre, le bouclier fond → **game over en 3D** (vaisseau qui brûle) |
-| Valider CML 3 sans comparer 2 architectures                 | ASTRA signale le niveau incomplet         | Le compte à rebours reste ouvert ; le manque est compté au bilan                                   |
+| Valider CML 3 sans comparer 2 architectures                 | ASTRA bloque le lancement                 | Le joueur doit revenir en Atelier et perd sa fenêtre de tir optimale                              |
 | Choisir une orbite polaire                                  | Couverture complète de la surface lunaire | Consommation en carburant plus élevée → nécessite une réserve de $\Delta v$ supérieure            |
 
 ---
