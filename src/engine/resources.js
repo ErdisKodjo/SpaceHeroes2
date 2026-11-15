@@ -28,6 +28,10 @@ export class ResourceManager {
       throw new Error(`Ressource inconnue : ${key}`);
     }
     const relief = amount > 0 ? (this.relief[key] ?? 1) : 1;
+    if (this.canal) {
+      this.canal.depense(key, amount * relief);
+      return this.remaining(key);
+    }
     this.used[key] += amount * relief;
     return this.remaining(key);
   }

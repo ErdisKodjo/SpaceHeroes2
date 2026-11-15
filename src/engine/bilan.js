@@ -152,6 +152,21 @@ const DECISIONS_CHAPITRE = {
     titre: 'Halo',
     choix: 'Orbite en halo autour de L1',
     consequence: 'Le point d\'équilibre ne retient pas le satellite : les corrections font partie de la mission.'
+  },
+  chapitre_06: {
+    titre: 'Pôles',
+    choix: 'Orbite à 90 degrés, 500 km, contact par Svalbard',
+    consequence: 'Les deux pôles sont survolés. L\'heure solaire n\'est pas la même d\'un passage à l\'autre.'
+  },
+  chapitre_07: {
+    titre: 'Haute',
+    choix: '35 786 km, inclinaison 28 degrés, contact par Canberra',
+    consequence: 'Pour ce plan de départ, Canberra voit le plus longtemps. Kourou et Goldstone ne voient rien.'
+  },
+  chapitre_08: {
+    titre: 'Fixe',
+    choix: '35 786 km, inclinaison 0,01 degré, contact continu par Canberra',
+    consequence: 'Pour cette longitude de départ, Canberra voit le satellite sans coupure. Les quatre autres stations du jeu ne le voient pas.'
   }
 };
 
@@ -190,8 +205,19 @@ function ligneGmat(chapter) {
   const table = GMAT[chapter.gmat];
   if (!table) return null;
   const r = table.resultats || {};
-  if (r.periodeMinutes) {
+    if (r.periodeMinutes) {
     const base = t(`Période ${r.periodeMinutes} min`, `Period ${r.periodeMinutes} min`);
+    if (table.type === 'orbite_geostationnaire') {
+      const contact = r.parStation?.canberra?.dureeMoyenneMinutes;
+      const autres = Object.entries(r.parStation || {}).filter(([id]) => id !== 'canberra');
+      const autresZero = autres.length > 0 && autres.every(([, v]) => v.passagesParJour === 0);
+      if (Number.isFinite(contact) && autresZero) {
+        return base + t(
+          ` · Canberra ${contact} min, les autres stations à 0 pour ce départ`,
+          ` · Canberra ${contact} min, the other stations at 0 for this departure`
+        );
+      }
+    }
     if (r.departHohmann !== 'debut decembre 2026') return base;
     return base + t(' · départ début décembre 2026', ' · departure early December 2026');
   }

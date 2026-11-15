@@ -142,5 +142,6 @@ export function appliquerCoutAtelier(resources, chapter, charged, selections, re
     const prev = charged?.[key] || 0;
     resources.used[key] = Math.max(0, (resources.used[key] || 0) - prev + net[key]);
   }
+  resources.canal?.usage({ ...resources.used });
   return net;
 }

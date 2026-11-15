@@ -1,0 +1,77 @@
+{
+  "id": "chapitre_06",
+  "titre": "Les deux pôles",
+  "sousTitre": "Polaire",
+  "histoire": "Une orbite inclinée à 90 degrés passe au-dessus des deux pôles. Svalbard la voit environ 15 fois par jour.",
+  "mission": "Mesurer la glace aux deux pôles depuis 500 km. Un tour dure 94,5 min. Ce n'est pas l'orbite héliosynchrone : l'heure solaire change d'un passage à l'autre.",
+  "profil": "polaire",
+  "gmat": "orbite_polaire",
+  "contraintes": {
+    "budget": 6,
+    "masse": 8,
+    "puissance": 14,
+    "donnees": 8,
+    "communications": 6,
+    "duree": 16
+  },
+  "notionCle": "Inclinaison 90 degrés, passages polaires, station de Svalbard",
+  "ressourcesNasa": [
+    "ICESat-2, glace depuis une orbite quasi polaire vers 500 km",
+    "Masque de station à 5 degrés, contacts GMAT du 15 novembre 2026"
+  ],
+  "episodes": [
+    {
+      "id": "briefing",
+      "type": "briefing",
+      "titre": "Le Briefing",
+      "texte": "Choisis ce que le passage polaire doit mesurer : épaisseur de glace, température de surface, ou les deux. L'heure solaire n'est pas tenue.",
+      "astra": "briefing_ch6_intro",
+      "cmlVise": 1
+    },
+    {
+      "id": "atelier",
+      "type": "atelier",
+      "titre": "L'Atelier",
+      "texte": "Prévois un instrument qui voit la glace, assez de puissance pour les éclipses polaires, et une liaison qui tient dans un passage d'environ 8 minutes.",
+      "astra": "atelier_ch6_intro",
+      "cmlVise": 2,
+      "familleAtelier": "instrument"
+    },
+    {
+      "id": "essais",
+      "type": "essais",
+      "titre": "Les Essais",
+      "texte": "Vibrations du lancement, cycles thermiques d'une orbite de 94,5 min, compatibilité électrique de l'altimètre.",
+      "astra": "essais_ch6_intro",
+      "cmlRequis": 2
+    },
+    {
+      "id": "lancement",
+      "type": "lancement",
+      "titre": "Le Lancement",
+      "texte": "Injection à 500 km, inclinaison 90 degrés. Un tour dure 94,5 min.",
+      "astra": "lancement_ch6_intro",
+      "bouton": "Lancer !",
+      "cmlRequis": 2
+    },
+    {
+      "id": "operations",
+      "type": "operations",
+      "titre": "Les Opérations",
+      "texte": "Svalbard voit environ 15 passages par jour, 8 minutes en moyenne. Les autres stations en voient beaucoup moins.",
+      "astra": "operations_ch6_intro"
+    },
+    {
+      "id": "bilan",
+      "type": "bilan",
+      "titre": "Le Bilan",
+      "texte": "Rapport de mission, score, médaille et analyse d'ASTRA.",
+      "astra": null
+    }
+  ],
+  "evenementAleatoire": {
+    "id": "passage_rate",
+    "texte": "Le passage prévu tombe sous le masque de 5 degrés. Il faut attendre le suivant, et une semaine de marge y passe.",
+    "effet": { "duree": -1 }
+  }
+}

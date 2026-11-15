@@ -9,6 +9,8 @@ Guide du jeu tel qu'il se joue dans le navigateur. Une mission va du QG au bilan
 3. Ensuite : `npm run dev`.
 4. Ouvrir l'adresse indiquée par Vite, en général `http://127.0.0.1:5173/`.
 
+`npm run server` lance un second processus, sur `ws://127.0.0.1:8787`. Il ne fait pas partie de la page Vite. **Partie à 4**, au QG, s'y connecte.
+
 Le premier écran est le logo circulaire Space Heroes, avec une phrase de chargement. Il disparaît quand les textures sont prêtes. Un clic dans la page est nécessaire pour entendre la musique, les effets et la voix : le navigateur bloque le son tant qu'on n'a pas cliqué.
 
 Le bouton en haut à droite affiche **SON** quand le son est ouvert, **MUET** quand il est coupé. Il coupe la musique, les effets et la voix d'ASTRA en même temps.
@@ -19,7 +21,8 @@ Le QG est l'accueil. La Terre tourne derrière le panneau.
 
 - Le message d'ASTRA salue le commandant par son nom.
 - **Continuer** n'apparaît que s'il existe une partie en cours. Il reprend le chapitre et l'épisode sauvegardés.
-- Les cinq cartes sont les missions. Seul le chapitre 1 est ouvert au départ. Un chapitre suivant s'ouvre quand le précédent a un score au bilan.
+- Les huit cartes sont les missions. Seul le chapitre 1 est ouvert au départ. Un chapitre suivant s'ouvre quand le précédent a un score au bilan. En Découverte, les huit sont ouvertes.
+- La carte du système solaire suit le même verrou. Soleil, L1, Terre et ses cinq orbites, Lune, Mars : un schéma, pas une échelle. Un lieu ouvert lance le chapitre. Un lieu fermé reste inactif.
 - Une carte terminée affiche le meilleur score et une médaille.
 - **Changer de rôle** ouvre le choix du poste et du nom, sans lancer de mission.
 - L'engrenage ouvre les paramètres.
@@ -28,7 +31,7 @@ Cliquer une carte ouverte demande d'abord de confirmer le rôle, puis la mission
 
 ## Choisir un rôle
 
-Quatre postes. En solo, ASTRA tient les trois autres.
+Quatre postes. En solo, ASTRA tient les trois autres, et le veto dépense les jetons enregistrés dans le navigateur. **Partie à 4** ouvre une table sur le serveur : un joueur par poste, un poste ne se partage pas, et un siège vide reste vide. Le premier joueur lance le chapitre quand les quatre postes sont tenus. Les six jauges et la réserve de veto viennent alors du serveur. La partie à 4 n'est pas écrite dans la sauvegarde du navigateur.
 
 | Sigle | Poste | Ce que la carte annonce |
 | --- | --- | --- |
@@ -104,7 +107,7 @@ Quatre temps.
 
 ### Bilan
 
-L'écran montre le score sur 100, la médaille, le détail du score, les ressources, trois décisions, une comparaison avec une mission réelle, les badges et les jetons d'atelier.
+L'écran montre le score sur 100, la médaille, le détail du score, les ressources, trois décisions, une comparaison avec une mission réelle, les badges et les jetons d'atelier. Sous « Dans la vraie vie », chaque mission citée est une fiche : nom, agence et année. Un clic ouvre le résumé, un second clic sur la même fiche le referme.
 
 | Score | Médaille | Jetons d'atelier |
 | --- | --- | --- |

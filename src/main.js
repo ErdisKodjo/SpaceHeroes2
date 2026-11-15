@@ -5,7 +5,7 @@ import dialoguesData from './data/astra/dialogues.json';
 import cmlCriteria from './data/cml/checklist.json';
 import { getChapitre } from './data/catalogue.js';
 
-import { ResourceManager } from './engine/resources.js';
+import { ResourceManager, RESOURCE_KEYS } from './engine/resources.js';
 import { CmlChecklist } from './engine/cml.js';
 import { AstraEngine } from './engine/astra.js';
 import { EpisodeRunner } from './engine/episode.js';
@@ -16,6 +16,8 @@ import { appliquerMode, pressionScore } from './engine/mode-jeu.js';
 import { sauvegarder, charger, restaurerResources, restaurerCml, ageSauvegarde, effacer } from './engine/save.js';
 import { appliquerCoutAtelier, coutNet } from './engine/atelier-cout.js';
 import { appliquerPhase } from './engine/cml-preuves.js';
+import { definirEquipage } from './net/equipage.js';
+import { couperTable, envoyerTable, jaugesCourantes, suivreTable } from './net/partie.js';
 
 import { renderDashboard } from './ui/dashboard.js';
 import { renderAstra } from './ui/astra-widget.js';
@@ -154,7 +156,8 @@ if (demo) {
 
 // ─── MISSION ──────────────────────────────────────────────────────────────
 
-function startMission({ chapterId, restore = false }) {
+function startMission({ chapterId, restore = false, table = false }) {
+  if (!table) definirEquipage(null);
   missionCleanup();
   hubApi?.dispose();
   hubApi = null;
@@ -167,6 +170,32 @@ function startMission({ chapterId, restore = false }) {
   vue3d.setMission(chapterData.gmat || 'orbite_basse');
 
   const resources = new ResourceManager(chapterData.contraintes);
+  let oublierTable = () => {};
+  if (table) {
+    const appliquer = (etat) => {
+      if (!etat?.max) return;
+      for (const key of RESOURCE_KEYS) {
+        if (etat.max[key] != null) resources.max[key] = etat.max[key];
+        if (etat.used[key] != null) resources.used[key] = etat.used[key];
+      }
+      resources.reserveVeto = etat.reserveVeto;
+      resources.vetoUtilise = etat.vetoUtilise;
+      window.dispatchEvent(new CustomEvent('ressources-change'));
+    };
+    resources.canal = {
+      depense: (key, amount) => envoyerTable({ type: 'depense', key, amount }),
+      usage: (used) => envoyerTable({ type: 'usage', used }),
+      plafond: (key, delta) => envoyerTable({ type: 'plafond', key, delta }),
+      veto: () => envoyerTable({ type: 'veto' })
+    };
+    appliquer(jaugesCourantes());
+    oublierTable = suivreTable((message) => {
+      if (message.jauges) appliquer(message.jauges);
+      if (message.type === 'veto' && message.ok) {
+        window.dispatchEvent(new CustomEvent('table-veto'));
+      }
+    });
+  }
   const cml       = new CmlChecklist(cmlCriteria);
   const astra     = new AstraEngine(dialoguesData, cml);
 
@@ -203,10 +232,12 @@ function startMission({ chapterId, restore = false }) {
       if (atelierApplique) chargedCost = coutNet(resources, chapterData, savedSelections, savedRepartitions);
     }
   }
-  if (!resources.bonusNote) appliquerBonusRole(resources, playerStore.role);
+  if (!table && !resources.bonusNote) appliquerBonusRole(resources, playerStore.role);
   if (!restore) {
-    appliquerMarge(resources);
-    appliquerMode(resources);
+    if (!table) {
+      appliquerMarge(resources);
+      appliquerMode(resources);
+    }
     prevaliderCml(astra);
   }
 
@@ -227,7 +258,7 @@ function startMission({ chapterId, restore = false }) {
 
   // Auto-save après chaque changement d'épisode
   function autoSave() {
-    if (demo) return;
+    if (demo || table) return;
     sauvegarder({
       chapterId,
       episodeIndex: runner.index,
@@ -336,6 +367,8 @@ function startMission({ chapterId, restore = false }) {
   window.addEventListener('operations-terminees', onOperations);
   window.addEventListener('ressources-change', onRessources);
   missionCleanup = () => {
+    oublierTable();
+    if (table) couperTable();
     window.removeEventListener('atelier-valide', onAtelier);
     window.removeEventListener('essais-termines', onEssais);
     window.removeEventListener('operations-terminees', onOperations);

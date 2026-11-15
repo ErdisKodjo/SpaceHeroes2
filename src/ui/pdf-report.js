@@ -136,6 +136,9 @@ export async function downloadBilanPdf(rapport, astraTexte) {
     y = paragraph(rapport.nasa.phrase, y, 10);
     const ref = rapport.nasa.reference;
     if (ref) y = paragraph(`${ref.agence} · ${ref.annee}. ${missionBlurb(ref.id, ref.resume || '')}`, y, 9, [50, 64, 88]);
+    for (const proche of rapport.nasa.proches || []) {
+      y = paragraph(`${proche.nom} · ${proche.agence} · ${proche.annee}. ${missionBlurb(proche.id, proche.resume || '')}`, y, 9, [50, 64, 88]);
+    }
   }
 
   if (rapport.badges?.length) {

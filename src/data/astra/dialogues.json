@@ -239,6 +239,81 @@
     "texte": "Tu es en avant de la Terre. Ce que tu mesures maintenant, on le verra ici environ une heure plus tard.",
     "texteEn": "You are upstream of Earth. What you measure now will be seen here about an hour later."
   },
+  "briefing_ch6_intro": {
+    "categorie": "narration",
+    "texte": "À 90 degrés, le satellite passe au-dessus des deux pôles. L'heure solaire n'est pas fixe : ce n'est pas l'orbite du chapitre météo.",
+    "texteEn": "At 90 degrees the satellite passes over both poles. Solar time is not fixed: this is not the weather chapter's orbit."
+  },
+  "atelier_ch6_intro": {
+    "categorie": "narration",
+    "texte": "Un passage utile dure environ 8 minutes. La liaison et l'instrument doivent tenir dans cette fenêtre.",
+    "texteEn": "A useful pass lasts about 8 minutes. The link and the instrument have to fit that window."
+  },
+  "essais_ch6_intro": {
+    "categorie": "narration",
+    "texte": "Un tour dure 94,5 minutes. Le thermique voit ce rythme, pas celui d'une journée.",
+    "texteEn": "One revolution lasts 94.5 minutes. Thermal sees that rhythm, not the length of a day."
+  },
+  "lancement_ch6_intro": {
+    "categorie": "narration",
+    "texte": "Injection à 500 km, inclinaison 90 degrés. Les pôles entrent dans le plan de l'orbite.",
+    "texteEn": "Injection at 500 km, 90 degrees inclination. The poles enter the orbital plane."
+  },
+  "operations_ch6_intro": {
+    "categorie": "narration",
+    "texte": "Svalbard voit environ 15 passages par jour. Kourou n'en voit que quelques-uns.",
+    "texteEn": "Svalbard sees about 15 passes a day. Kourou sees only a few."
+  },
+  "briefing_ch7_intro": {
+    "categorie": "narration",
+    "texte": "Même altitude que la géostationnaire, mais 28 degrés d'inclinaison. Le satellite bouge dans le ciel.",
+    "texteEn": "The same altitude as geostationary, but 28 degrees of inclination. The satellite moves in the sky."
+  },
+  "atelier_ch7_intro": {
+    "categorie": "narration",
+    "texte": "Le contact utile se compte en heures. La liaison doit tenir, et la puissance aussi pendant l'éclipse.",
+    "texteEn": "A useful contact is counted in hours. The link has to hold, and so does power through eclipse."
+  },
+  "essais_ch7_intro": {
+    "categorie": "narration",
+    "texte": "Un tour dure 1 436 minutes. Le thermique n'a plus le rythme d'une orbite basse.",
+    "texteEn": "One revolution lasts 1,436 minutes. Thermal no longer follows a low-orbit rhythm."
+  },
+  "lancement_ch7_intro": {
+    "categorie": "narration",
+    "texte": "Injection à 35 786 km. L'inclinaison de 28 degrés empêche le satellite de rester au-dessus d'un seul point.",
+    "texteEn": "Injection at 35,786 km. The 28-degree inclination keeps the satellite from staying over one point."
+  },
+  "operations_ch7_intro": {
+    "categorie": "narration",
+    "texte": "Pour ce départ, Canberra voit 790 minutes. Kourou et Goldstone ne voient pas ce plan.",
+    "texteEn": "For this departure, Canberra sees 790 minutes. Kourou and Goldstone do not see this plane."
+  },
+  "briefing_ch8_intro": {
+    "categorie": "narration",
+    "texte": "Un tour dure un jour. Le satellite reste au-dessus de la même région. Ce n'est pas l'orbite inclinée du chapitre précédent.",
+    "texteEn": "One revolution lasts a day. The satellite stays over the same region. This is not the previous chapter's inclined orbit."
+  },
+  "atelier_ch8_intro": {
+    "categorie": "narration",
+    "texte": "La liaison ne s'interrompt pas. La puissance doit tenir pendant l'éclipse, qui revient une fois par orbite.",
+    "texteEn": "The link does not drop. Power has to hold through eclipse, which returns once per orbit."
+  },
+  "essais_ch8_intro": {
+    "categorie": "narration",
+    "texte": "Un tour dure 1 436 minutes. Le thermique suit ce jour, pas le rythme d'une orbite basse.",
+    "texteEn": "One revolution lasts 1,436 minutes. Thermal follows that day, not a low-orbit rhythm."
+  },
+  "lancement_ch8_intro": {
+    "categorie": "narration",
+    "texte": "Injection à 35 786 km. L'inclinaison de 0,01 degré sert à marquer le périapse. Le satellite se cale.",
+    "texteEn": "Injection at 35,786 km. The 0.01-degree inclination marks periapsis. The satellite settles."
+  },
+  "operations_ch8_intro": {
+    "categorie": "narration",
+    "texte": "Pour ce départ, Canberra voit 1 440 minutes sans coupure. Les quatre autres stations du jeu ne voient pas cette longitude.",
+    "texteEn": "For this departure, Canberra sees 1,440 minutes without a break. The other four stations in the game do not see this longitude."
+  },
   "bilan_or": {
     "categorie": "succes",
     "texte": "Médaille d'or. Le rapport donne le score sur 100, les six ressources, trois décisions et la mission NASA de référence. Tu peux l'exporter en PDF.",

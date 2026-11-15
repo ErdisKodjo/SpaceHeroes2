@@ -52,7 +52,10 @@ export class EpisodeRunner {
       for (const [cle, delta] of Object.entries(evt.effet)) {
         if (this.resources.max[cle] === undefined) continue;
         if (delta < 0) this.resources.consume(cle, -delta);
-        else if (delta > 0) this.resources.max[cle] += delta;
+        else if (delta > 0) {
+          if (this.resources.canal) this.resources.canal.plafond(cle, delta);
+          else this.resources.max[cle] += delta;
+        }
       }
     }
     this.log.push({ type: 'evenement', id: evt.id, texte: evt.texte });

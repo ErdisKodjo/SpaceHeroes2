@@ -1152,7 +1152,41 @@
 }
 .sh-bilan-nasa p { margin: 0 0 8px; font-size: 0.92rem; line-height: 1.4; }
 .sh-bilan-equivalence { font-size: 1.02rem; color: var(--amber); }
-.sh-bilan-proches { margin: 0; padding-left: 18px; color: var(--muted); font-size: 0.82rem; }
+.sh-bilan-fiches {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 8px;
+}
+.sh-bilan-fiche {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  width: 100%;
+  padding: 8px 10px;
+  border: 1px solid rgba(255, 210, 122, 0.28);
+  background: rgba(4, 10, 22, 0.45);
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.sh-bilan-fiche.is-reference { border-color: rgba(255, 210, 122, 0.72); }
+.sh-bilan-fiche[aria-expanded="true"] { background: rgba(255, 210, 122, 0.12); }
+.sh-bilan-fiche-nom { font-weight: 600; color: var(--ink); }
+.sh-bilan-fiche-meta {
+  font-size: 0.75rem;
+  letter-spacing: 0.04em;
+  color: var(--muted);
+}
+.sh-bilan-fiche-detail {
+  margin-top: 8px;
+  font-size: 0.92rem;
+  line-height: 1.4;
+}
+.sh-bilan-fiche-detail[hidden] { display: none; }
 
 .sh-bilan-badges {
   list-style: none;

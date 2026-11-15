@@ -97,7 +97,15 @@ export function createBilanView({ rapport, astraTexte, onRejouer, onSuivante, on
   `).join('');
 
   const ref = rapport.nasa.reference;
-  const proches = (rapport.nasa.proches || []).map((m) => `<li>${esc(m.nom)} · ${esc(m.annee)}</li>`).join('');
+  const fiches = [ref, ...(rapport.nasa.proches || [])].filter(Boolean);
+  const cartes = fiches.map((m) => `
+    <li>
+      <button type="button" class="sh-bilan-fiche ${m === ref ? 'is-reference' : ''}" data-mission="${esc(m.id)}" aria-expanded="false">
+        <span class="sh-bilan-fiche-nom">${esc(m.nom)}</span>
+        <span class="sh-bilan-fiche-meta">${esc(m.agence)} · ${esc(m.annee)}${m === ref ? ` · ${t('Référence', 'Reference')}` : ''}</span>
+      </button>
+    </li>
+  `).join('');
 
   root.innerHTML = `
     <div class="sh-bilan-overlay">
@@ -140,8 +148,8 @@ export function createBilanView({ rapport, astraTexte, onRejouer, onSuivante, on
         <section class="sh-bilan-nasa">
           <h3 class="sh-bilan-section">${t('Dans la vraie vie', 'In real life')}</h3>
           <p class="sh-bilan-equivalence">${esc(rapport.nasa.phrase)}</p>
-          ${ref ? `<p>${esc(ref.agence)} · ${esc(ref.annee)}. ${esc(missionBlurb(ref.id, ref.resume))}</p>` : ''}
-          ${proches ? `<ul class="sh-bilan-proches">${proches}</ul>` : ''}
+          ${cartes ? `<ul class="sh-bilan-fiches">${cartes}</ul>` : ''}
+          <div id="sh-bilan-fiche-detail" class="sh-bilan-fiche-detail" hidden></div>
         </section>
 
         <section>
@@ -193,6 +201,25 @@ export function createBilanView({ rapport, astraTexte, onRejouer, onSuivante, on
     } finally {
       btn.disabled = false;
     }
+  });
+
+  const detail = root.querySelector('#sh-bilan-fiche-detail');
+  const boutons = [...root.querySelectorAll('.sh-bilan-fiche')];
+  const parId = new Map(fiches.map((m) => [m.id, m]));
+  boutons.forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const ouverte = btn.getAttribute('aria-expanded') === 'true';
+      boutons.forEach((autre) => autre.setAttribute('aria-expanded', 'false'));
+      if (ouverte) {
+        detail.hidden = true;
+        detail.replaceChildren();
+        return;
+      }
+      const mission = parId.get(btn.dataset.mission);
+      btn.setAttribute('aria-expanded', 'true');
+      detail.hidden = false;
+      detail.textContent = missionBlurb(mission.id, mission.resume);
+    });
   });
 
   return {

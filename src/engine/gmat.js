@@ -50,6 +50,17 @@ function lumiereMs(distanceKm) {
   return (2 * distanceKm / C_KMS) * 1000;
 }
 
+function legendeGeo(resultats) {
+  const contact = resultats?.parStation?.canberra?.dureeMoyenneMinutes;
+  const autres = Object.entries(resultats?.parStation || {}).filter(([id]) => id !== 'canberra');
+  const autresZero = autres.length > 0 && autres.every(([, v]) => v.passagesParJour === 0);
+  if (!Number.isFinite(contact) || !autresZero) return null;
+  return {
+    fr: ` · Canberra ${milliers(contact, ' ')} min, les autres stations à 0 pour ce départ`,
+    en: ` · Canberra ${milliers(contact, ',')} min, the other stations at 0 for this departure`
+  };
+}
+
 function profil(fields) {
   const body = fields.bodyRadiusKm;
   const alt = fields.altitudeKm;
@@ -177,6 +188,25 @@ export function resolveGmat(table) {
   const alt = p.altitudeKm || 550;
   const periodMin = r.periodeMinutes;
   const [labelFr, labelEn] = LABELS[type] || LABELS.orbite_basse;
+  const geo = type === 'orbite_geostationnaire' ? legendeGeo(r) : null;
+  if (geo) {
+    return profil({
+      type,
+      labelFr,
+      labelEn,
+      captionFr: `Altitude ${milliers(alt, ' ')} km · un tour en ${milliers(periodMin, ' ')} min${geo.fr}`,
+      captionEn: `Altitude ${milliers(alt, ',')} km · one revolution in ${milliers(periodMin, ',')} min${geo.en}`,
+      altitudeKm: alt,
+      bodyRadiusKm: body,
+      mu,
+      eccentricity: p.excentricite || 0,
+      inclinationDeg: p.inclinaisonDeg,
+      periodMin,
+      sceneA: (body + alt) / body,
+      delayMs: lumiereMs(alt),
+      contactMin: r.dureeContactMoyenneMinutes ?? null
+    });
+  }
   return profil({
     type,
     labelFr,

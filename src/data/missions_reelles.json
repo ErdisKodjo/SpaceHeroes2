@@ -163,5 +163,32 @@
     "annee": 1994,
     "profil": "l1",
     "resume": "Étudie le plasma du vent solaire. Sa place de travail est le voisinage du point L1."
+  },
+  {
+    "id": "icesat-2",
+    "nom": "ICESat-2",
+    "agence": "NASA",
+    "annee": 2018,
+    "profil": "polaire",
+    "reference": true,
+    "resume": "Mesure la glace depuis environ 500 km, sur une inclinaison de 92 degrés. Proche de l'orbite à 90 degrés de ce chapitre, sans être la même."
+  },
+  {
+    "id": "qzss",
+    "nom": "QZSS",
+    "agence": "JAXA",
+    "annee": 2010,
+    "profil": "haute",
+    "reference": true,
+    "resume": "Orbite géosynchrone inclinée, pour rester longtemps au-dessus du Japon. L'inclinaison n'est pas les 28 degrés de ce chapitre."
+  },
+  {
+    "id": "goes-16",
+    "nom": "GOES-16",
+    "agence": "NOAA",
+    "annee": 2016,
+    "profil": "geo",
+    "reference": true,
+    "resume": "Satellite météo géostationnaire au-dessus des Amériques. La longitude n'est pas celle de ce chapitre, où seul Canberra garde le satellite en vue."
   }
 ]

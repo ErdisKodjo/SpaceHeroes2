@@ -254,6 +254,30 @@ export function createOperationsView(container, { resources, astra, lien, chapte
 
     let reponduIdx = null;
 
+    function resoudreVeto() {
+      if (reponduIdx !== null) return;
+      reponduIdx = -1;
+      container.querySelectorAll('.sh-ops-ev-opt').forEach(b => { b.disabled = true; });
+      const fb = container.querySelector('#sh-ops-ev-fb');
+      fb.textContent = t(
+        'Veto du directeur. La réserve du serveur encaisse l\'aléa, sans perdre de durée.',
+        'Director veto. The server reserve absorbs the contingency, with no duration lost.'
+      );
+      fb.className = 'sh-ops-ev-feedback is-ok';
+      evenementResolu = true;
+      scoreOps += 25;
+      astra?.sayRandomFrom('succes');
+      const suivant = container.querySelector('#sh-ops-next');
+      if (suivant) suivant.style.display = '';
+      const bouton = container.querySelector('#sh-ops-veto');
+      if (bouton) bouton.disabled = true;
+    }
+
+    if (resources?.canal) {
+      vetoEcoute = resoudreVeto;
+      window.addEventListener('table-veto', vetoEcoute);
+    }
+
     const coutSem = Math.abs(evenement.effet?.duree || 0);
     const calcul = competence.calcul && coutSem
       ? `<p class="sh-ops-hint">${t(
@@ -263,9 +287,13 @@ export function createOperationsView(container, { resources, astra, lien, chapte
       : '';
     const jetons = playerStore.jetons;
     const prixVeto = competence.prixVeto || 2;
+    const reserve = resources?.canal ? (resources.reserveVeto ?? 0) : jetons;
+    const vetoFerme = resources?.canal
+      ? reserve < prixVeto || resources.vetoUtilise
+      : jetons < prixVeto;
     const veto = competence.veto
-      ? `<button type="button" id="sh-ops-veto" class="sh-ops-btn-secondary" ${jetons < prixVeto ? 'disabled' : ''}>
-          ${t(`VETO · ${prixVeto} jetons`, `VETO · ${prixVeto} tokens`)} · ${jetons}
+      ? `<button type="button" id="sh-ops-veto" class="sh-ops-btn-secondary" ${vetoFerme ? 'disabled' : ''}>
+          ${t(`VETO · ${prixVeto} jetons`, `VETO · ${prixVeto} tokens`)} · ${reserve}
         </button>`
       : '';
 
@@ -331,6 +359,10 @@ export function createOperationsView(container, { resources, astra, lien, chapte
 
     container.querySelector('#sh-ops-veto')?.addEventListener('click', () => {
       if (reponduIdx !== null) return;
+      if (resources?.canal) {
+        resources.canal.veto();
+        return;
+      }
       if (!playerStore.depenserJetons(prixVeto)) return;
       reponduIdx = -1;
       container.querySelectorAll('.sh-ops-ev-opt').forEach(b => { b.disabled = true; });
@@ -346,6 +378,8 @@ export function createOperationsView(container, { resources, astra, lien, chapte
       container.querySelector('#sh-ops-next').style.display = '';
       container.querySelector('#sh-ops-veto').disabled = true;
     });
+
+    if (resources?.canal && resources.vetoUtilise) resoudreVeto();
 
     container.querySelector('#sh-ops-next')?.addEventListener('click', () => {
       etape = 4;
@@ -394,7 +428,11 @@ export function createOperationsView(container, { resources, astra, lien, chapte
 
   // ── Routeur principal ─────────────────────────────────────────────────────
 
+  let vetoEcoute = null;
+
   function render() {
+    if (vetoEcoute) window.removeEventListener('table-veto', vetoEcoute);
+    vetoEcoute = null;
     if      (etape === 0) renderContact();
     else if (etape === 1) renderInstruments();
     else if (etape === 2) renderCollecte();

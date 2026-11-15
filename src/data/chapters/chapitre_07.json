@@ -1,0 +1,77 @@
+{
+  "id": "chapitre_07",
+  "titre": "Un tour par jour",
+  "sousTitre": "Orbite haute",
+  "histoire": "Même hauteur que la géostationnaire, mais le plan est incliné à 28 degrés. Le satellite ne reste pas fixe dans le ciel.",
+  "mission": "Tenir une liaison longue depuis 35 786 km. Pour le plan de départ du 1 janvier 2026, Canberra voit le satellite 790 minutes, Svalbard 569, Madrid 465. Kourou et Goldstone ne le voient pas. Ce n'est pas vrai de toute longitude géostationnaire.",
+  "profil": "haute",
+  "gmat": "orbite_haute",
+  "contraintes": {
+    "budget": 12,
+    "masse": 40,
+    "puissance": 22,
+    "donnees": 10,
+    "communications": 8,
+    "duree": 20
+  },
+  "notionCle": "Orbite haute inclinée, un tour en 1 436 min, stations qui voient ce plan",
+  "ressourcesNasa": [
+    "Période GMAT 86 161 s, 15 novembre 2026",
+    "Contacts du plan RAAN 0 au 1 janvier 2026, masque 5 degrés"
+  ],
+  "episodes": [
+    {
+      "id": "briefing",
+      "type": "briefing",
+      "titre": "Le Briefing",
+      "texte": "L'orbite fait un tour en 1 436 minutes, une demi-seconde de plus que l'équateur. Choisis ce que la longue visibilité doit servir : relais, météo, ou alerte.",
+      "astra": "briefing_ch7_intro",
+      "cmlVise": 1
+    },
+    {
+      "id": "atelier",
+      "type": "atelier",
+      "titre": "L'Atelier",
+      "texte": "Prévois une liaison qui tient des heures, pas des minutes, et une puissance qui traverse les éclipses d'une orbite d'un jour.",
+      "astra": "atelier_ch7_intro",
+      "cmlVise": 2,
+      "familleAtelier": "communications"
+    },
+    {
+      "id": "essais",
+      "type": "essais",
+      "titre": "Les Essais",
+      "texte": "Vibrations, thermique d'une orbite lente, compatibilité électrique de l'émetteur.",
+      "astra": "essais_ch7_intro",
+      "cmlRequis": 2
+    },
+    {
+      "id": "lancement",
+      "type": "lancement",
+      "titre": "Le Lancement",
+      "texte": "Injection à 35 786 km, inclinaison 28 degrés. Le satellite décrit un huit dans le ciel, il ne reste pas au-dessus d'un point.",
+      "astra": "lancement_ch7_intro",
+      "bouton": "Lancer !",
+      "cmlRequis": 2
+    },
+    {
+      "id": "operations",
+      "type": "operations",
+      "titre": "Les Opérations",
+      "texte": "Pour cet état de départ, Canberra a le plus long contact. Kourou et Goldstone restent à zéro.",
+      "astra": "operations_ch7_intro"
+    },
+    {
+      "id": "bilan",
+      "type": "bilan",
+      "titre": "Le Bilan",
+      "texte": "Rapport de mission, score, médaille et analyse d'ASTRA.",
+      "astra": null
+    }
+  ],
+  "evenementAleatoire": {
+    "id": "station_aveugle",
+    "texte": "Le créneau a été posé sur Kourou. Ce plan d'orbite n'y passe pas. Il faut changer de station, et une semaine de marge y passe.",
+    "effet": { "duree": -1 }
+  }
+}

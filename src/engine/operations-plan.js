@@ -15,7 +15,10 @@ const STATION_CORRECTE = {
   meteo_sso: 'svalbard',
   lune: 'goldstone',
   mars: 'canberra',
-  l1: 'madrid'
+  l1: 'madrid',
+  polaire: 'svalbard',
+  haute: 'canberra',
+  geo: 'canberra'
 };
 
 const SEQUENCE_PROCHE = [
@@ -75,6 +78,75 @@ const OPTIONS = {
       correct: false,
       explication: 'Changer d\'inclinaison casse l\'heure solaire. Le coût dépasse un simple passage.',
       explicationEn: 'Changing inclination breaks the solar time. The cost exceeds a single pass.'
+    }
+  ],
+  passage_rate: [
+    {
+      label: 'Attendre le passage suivant de Svalbard',
+      labelEn: 'Wait for the next Svalbard pass',
+      correct: true,
+      explication: 'Le passage raté coûte la semaine prévue. Le suivant dure encore environ 8 minutes.',
+      explicationEn: 'The missed pass costs the planned week. The next one still lasts about 8 minutes.'
+    },
+    {
+      label: 'Forcer un contact bas vers Kourou',
+      labelEn: 'Force a low pass over Kourou',
+      correct: false,
+      explication: 'Kourou voit peu de passages, et sous le masque le contact ne tient pas.',
+      explicationEn: 'Kourou sees few passes, and below the mask the contact does not hold.'
+    },
+    {
+      label: 'Sauter la mesure de ce jour',
+      labelEn: 'Skip this day\'s measurement',
+      correct: false,
+      explication: 'La glace du jour n\'est pas enregistrée. Il faudra quand même un passage.',
+      explicationEn: 'That day\'s ice is not recorded. A pass is still required.'
+    }
+  ],
+  station_aveugle: [
+    {
+      label: 'Basculer le contact vers Canberra',
+      labelEn: 'Move the contact to Canberra',
+      correct: true,
+      explication: 'Pour cet état de départ, Canberra tient 790 minutes. La semaine prévue couvre le changement.',
+      explicationEn: 'For this departure state, Canberra holds 790 minutes. The planned week covers the change.'
+    },
+    {
+      label: 'Garder Kourou',
+      labelEn: 'Keep Kourou',
+      correct: false,
+      explication: 'Kourou ne voit pas ce plan. Le créneau reste vide.',
+      explicationEn: 'Kourou does not see this plane. The slot stays empty.'
+    },
+    {
+      label: 'Attendre Goldstone',
+      labelEn: 'Wait for Goldstone',
+      correct: false,
+      explication: 'Goldstone non plus ne voit pas ce plan. Ce n\'est pas vrai de toute orbite haute.',
+      explicationEn: 'Goldstone does not see this plane either. That is not true of every high orbit.'
+    }
+  ],
+  longitude_autre: [
+    {
+      label: 'Basculer le contact vers Canberra',
+      labelEn: 'Move the contact to Canberra',
+      correct: true,
+      explication: 'Pour cette longitude de départ, Canberra tient 1 440 minutes, sans coupure. La semaine prévue couvre le changement.',
+      explicationEn: 'For this departure longitude, Canberra holds 1,440 minutes, without a break. The planned week covers the change.'
+    },
+    {
+      label: 'Garder Svalbard',
+      labelEn: 'Keep Svalbard',
+      correct: false,
+      explication: 'Svalbard ne voit pas cette longitude. Le créneau reste vide.',
+      explicationEn: 'Svalbard does not see this longitude. The slot stays empty.'
+    },
+    {
+      label: 'Attendre Madrid',
+      labelEn: 'Wait for Madrid',
+      correct: false,
+      explication: 'Madrid ne voit pas cette longitude non plus. Une autre longitude géostationnaire changerait la station.',
+      explicationEn: 'Madrid does not see this longitude either. Another geostationary longitude would change the station.'
     }
   ],
   correction_trajectoire: [
@@ -178,7 +250,10 @@ export function appliquerEffet(resources, effet, { supplement = 0 } = {}) {
     for (const [cle, delta] of Object.entries(effet)) {
       if (resources.max[cle] === undefined) continue;
       if (delta < 0) resources.consume(cle, -delta);
-      else if (delta > 0) resources.max[cle] += delta;
+      else if (delta > 0) {
+        if (resources.canal) resources.canal.plafond(cle, delta);
+        else resources.max[cle] += delta;
+      }
     }
   }
   if (supplement > 0) resources.consume('duree', supplement);

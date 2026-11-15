@@ -109,7 +109,7 @@ Dépend : rien pour démarrer. Le lanceur de tests est Vitest. Le workflow est `
 4. Lot C seulement après un choix explicite d'ajouter des chapitres.
 5. Lot D en dernier. Il demande un serveur qui n'existe pas.
 
-Lot suivant à coder si on reprend « la suite » sans autre consigne : **aucun, sans un choix**. Le lot C demande de décider si la polaire, la haute et la GEO deviennent des chapitres. Le lot D, le multijoueur, reste le dernier.
+Lot suivant à coder si on reprend « la suite » sans autre consigne : **D5, le bilan commun**. Score, vetos et moments de tension partagés.
 
 ## Fait le 15 novembre 2026
 
@@ -132,3 +132,23 @@ E2. `src/engine/moteur.test.js` couvre les portes CML, la difficulté, le mode d
 E3. `.github/workflows/verifier.yml` lance `npm test` puis `npm run build` à chaque push et sur chaque pull request, avec Node 22.
 
 E4. Le guide joueur et la section « version jouable » disent la même chose que Plan3 : difficulté, mode de jeu, rôle, porte CML, fiche du CubeSat, et les légendes GMAT de la Lune, de Mars et de L1.
+
+C1. La polaire, la haute et la géostationnaire deviennent les chapitres 6, 7 et 8.
+
+C2, premier fichier. Le chapitre 6, *Les deux pôles*, est jouable : 500 km, 90°, 94,5 min, station Svalbard.
+
+C2, deuxième fichier. Le chapitre 7, *Un tour par jour*, est jouable : 35 786 km, 28°, 1 436 min. Pour le départ propagé, Canberra voit 790 min. Kourou et Goldstone ne voient pas ce plan.
+
+C2, troisième fichier. Le chapitre 8, *Le point fixe*, est jouable : 35 786 km, inclinaison 0,01°, 1 436 min. Pour le départ propagé, Canberra seul, 1 440 min sans coupure. Les quatre autres stations du jeu restent à 0. Ce n'est pas vrai de toute longitude géostationnaire.
+
+C4. Au bilan, « Dans la vraie vie » liste la mission de référence et les missions proches comme des fiches. Un clic ouvre le résumé. Un second clic sur la même fiche la referme.
+
+C5. Le QG montre un schéma du système solaire : Soleil, L1, cinq orbites autour de la Terre, Lune, Mars. Un lieu ouvert lance le même chapitre que la carte. Un lieu fermé ne se lance pas.
+
+D1. Le transport du multijoueur est un WebSocket avec un serveur Node.
+
+D2. `ws` est une dépendance. `npm run server` lance `server/index.js` sur le port 8787. Ce processus n'est pas importé par la page Vite.
+
+D3. **Partie à 4** au QG ouvre une table. Quatre postes, un joueur chacun. Un poste déjà pris est refusé. ASTRA ne prend pas les sièges vides. Le premier joueur lance quand la table est complète.
+
+D4. Une fois la table lancée, les six jauges et la réserve de veto sont celles du serveur. Le directeur dépense cette réserve, pas les jetons du navigateur. Le veto ne retire pas de durée. La partie à 4 n'est pas sauvegardée dans `localStorage`. En solo, les jauges et les jetons restent locaux.
