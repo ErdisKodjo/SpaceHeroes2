@@ -4,12 +4,7 @@ Guide du jeu tel qu'il se joue dans le navigateur. Une mission va du QG au bilan
 
 ## Lancer le jeu
 
-1. Ouvrir un terminal dans le dossier du projet.
-2. La première fois : `npm install`.
-3. Ensuite : `npm run dev`.
-4. Ouvrir l'adresse indiquée par Vite, en général `http://127.0.0.1:5173/`.
-
-Le premier écran est le logo circulaire Space Heroes, avec une phrase de chargement. Il disparaît quand les textures sont prêtes. Un clic dans la page est nécessaire pour entendre la musique, les effets et la voix : le navigateur bloque le son tant qu'on n'a pas cliqué.
+1. Le premier écran est le logo circulaire Space Heroes, avec une phrase de chargement. Il disparaît quand les textures sont prêtes. Un clic dans la page est nécessaire pour entendre la musique, les effets et la voix : le navigateur bloque le son tant qu'on n'a pas cliqué.
 
 Le bouton en haut à droite affiche **SON** quand le son est ouvert, **MUET** quand il est coupé. Il coupe la musique, les effets et la voix d'ASTRA en même temps.
 
@@ -30,12 +25,12 @@ Cliquer une carte ouverte demande d'abord de confirmer le rôle, puis la mission
 
 Quatre postes. En solo, ASTRA tient les trois autres.
 
-| Sigle | Poste | Ce que la carte annonce |
-| --- | --- | --- |
-| DM | Directeur de mission | Budgets, veto, réserve d'urgence |
-| IV | Ingénieur véhicule | Masse, structure, propulsion. Rôle proposé au départ |
-| ISB | Ingénieur systèmes de bord | Énergie, thermique, communications |
-| RSN | Responsable science | Instruments et données |
+| Sigle | Poste                      | Ce que la carte annonce                              |
+| ----- | -------------------------- | ---------------------------------------------------- |
+| DM    | Directeur de mission       | Budgets, veto, réserve d'urgence                     |
+| IV    | Ingénieur véhicule         | Masse, structure, propulsion. Rôle proposé au départ |
+| ISB   | Ingénieur systèmes de bord | Énergie, thermique, communications                   |
+| RSN   | Responsable science        | Instruments et données                               |
 
 Le nom du commandant accepte 24 caractères. Vide, il redevient « Commandant ». **Confirmer et lancer la mission** entre dans le briefing.
 
@@ -66,12 +61,12 @@ ASTRA évalue 20 critères, 5 par niveau. Le joueur ne coche pas la pastille lui
 
 Un niveau est validé à **80 % de vert**, soit 4 critères sur 5.
 
-| Niveau | Nom | Moment visé |
-| --- | --- | --- |
-| CML 1 | Idée | Briefing |
-| CML 2 | Faisabilité | Atelier, puis exigé avant les essais et le lancement du chapitre 1 |
-| CML 3 | Études de compromis | Plus tard dans la campagne |
-| CML 4 | Conception précise | Plus tard dans la campagne |
+| Niveau | Nom                 | Moment visé                                                        |
+| ------ | ------------------- | ------------------------------------------------------------------ |
+| CML 1  | Idée                | Briefing                                                           |
+| CML 2  | Faisabilité         | Atelier, puis exigé avant les essais et le lancement du chapitre 1 |
+| CML 3  | Études de compromis | Plus tard dans la campagne                                         |
+| CML 4  | Conception précise  | Plus tard dans la campagne                                         |
 
 Si le niveau demandé n'est pas validé, ASTRA le dit. Le compte à rebours reste disponible. Le manque est compté au bilan.
 
@@ -106,12 +101,12 @@ Quatre temps.
 
 L'écran montre le score sur 100, la médaille, le détail du score, les ressources, trois décisions, une comparaison avec une mission réelle, les badges et les jetons d'atelier.
 
-| Score | Médaille | Jetons d'atelier |
-| --- | --- | --- |
-| 85 et plus | Or | 4 |
-| 70 à 84 | Argent | 3 |
-| 50 à 69 | Bronze | 2 |
-| Moins de 50 | Aucune | 1 |
+| Score       | Médaille | Jetons d'atelier |
+| ----------- | -------- | ---------------- |
+| 85 et plus  | Or       | 4                |
+| 70 à 84     | Argent   | 3                |
+| 50 à 69     | Bronze   | 2                |
+| Moins de 50 | Aucune   | 1                |
 
 Les boutons :
 
@@ -124,14 +119,14 @@ Les boutons :
 
 Sous le QG, la Terre tourne seule. En mission, on peut l'explorer, sauf pendant le décollage.
 
-| Action | Effet |
-| --- | --- |
-| Clic gauche et glisser | Tourner autour de la Terre |
-| Molette | Zoomer |
-| W A S D ou les flèches | Déplacer le point de vue |
-| Q, + ou Page haut | Zoomer |
-| E, − ou Page bas | Dézoomer |
-| Clic sur le CubeSat | Télémétrie : batterie, signal, température, prochain contact, altitude |
+| Action                 | Effet                                                                  |
+| ---------------------- | ---------------------------------------------------------------------- |
+| Clic gauche et glisser | Tourner autour de la Terre                                             |
+| Molette                | Zoomer                                                                 |
+| W A S D ou les flèches | Déplacer le point de vue                                               |
+| Q, + ou Page haut      | Zoomer                                                                 |
+| E, − ou Page bas       | Dézoomer                                                               |
+| Clic sur le CubeSat    | Télémétrie : batterie, signal, température, prochain contact, altitude |
 
 La fiche de télémétrie se ferme avec la croix, ou toute seule au bout de 8 secondes.
 
@@ -141,15 +136,15 @@ Le tutoriel guidé, activé par défaut, pose quatre bulles une seule fois : les
 
 Une musique originale joue en boucle, une par écran. Les volumes du tableau sont relatifs. Le curseur **Musique d'ambiance** les baisse ou les monte tous ensemble, après **Enregistrer**.
 
-| Écran | Tempo | Ambiance |
-| --- | --- | --- |
-| QG | 102 | Calme, motivante |
-| Briefing | 76 | Nappes, sans batterie |
-| Atelier | 112 | Plus rythmée |
-| Essais | 124 | Plus tendue |
-| Lancement | 128 | La plus forte. Elle baisse au décollage |
-| Opérations | 96 | Plus posée |
-| Bilan | 88 | Plus chaude |
+| Écran      | Tempo | Ambiance                                |
+| ---------- | ----- | --------------------------------------- |
+| QG         | 102   | Calme, motivante                        |
+| Briefing   | 76    | Nappes, sans batterie                   |
+| Atelier    | 112   | Plus rythmée                            |
+| Essais     | 124   | Plus tendue                             |
+| Lancement  | 128   | La plus forte. Elle baisse au décollage |
+| Opérations | 96    | Plus posée                              |
+| Bilan      | 88    | Plus chaude                             |
 
 ASTRA lit ses répliques à voix haute dans la langue du jeu. En français, Windows utilise Hortense, Julie ou Paul. En anglais, il lui faut une voix `en-US` (David, Mark ou Zira). Sans cette voix, la phrase anglaise ne se prononce pas correctement. Après l'installation d'une voix, fermer complètement le navigateur et le rouvrir.
 
@@ -165,16 +160,16 @@ La langue par défaut est le français. **English** traduit les textes visibles.
 
 Réglages qui changent l'écran ou la partie dès l'enregistrement :
 
-| Réglage | Effet |
-| --- | --- |
-| Tutoriel guidé | Affiche ou cache les bulles d'aide |
-| Événements aléatoires | Autorise ou retire l'anomalie en opérations |
-| Musique d'ambiance | Volume de la bande-son |
-| Plein écran | Passe le navigateur en plein écran |
+| Réglage                | Effet                                                                    |
+| ---------------------- | ------------------------------------------------------------------------ |
+| Tutoriel guidé         | Affiche ou cache les bulles d'aide                                       |
+| Événements aléatoires  | Autorise ou retire l'anomalie en opérations                              |
+| Musique d'ambiance     | Volume de la bande-son                                                   |
+| Plein écran            | Passe le navigateur en plein écran                                       |
 | Réduction de mouvement | Coupe les animations, dont le logo du chargement et le compteur du bilan |
-| Contrastes élevés | Renforce les contrastes |
-| Mode daltonien | Filtre deutéranopie, protanopie ou tritanopie |
-| Taille de police | Normale, grande ou très grande |
+| Contrastes élevés      | Renforce les contrastes                                                  |
+| Mode daltonien         | Filtre deutéranopie, protanopie ou tritanopie                            |
+| Taille de police       | Normale, grande ou très grande                                           |
 
 D'autres options sont enregistrées pour la suite du projet et ne modifient pas encore la mission : difficulté, mode Campagne / Défi / Découverte, vitesse de simulation, volume général, effets sonores, interrupteur « Voix ASTRA », qualité graphique, sous-titres et vitesse de lecture. Le son et la voix se coupent avec le bouton **SON / MUET**.
 
@@ -182,11 +177,11 @@ D'autres options sont enregistrées pour la suite du projet et ne modifient pas 
 
 Ces adresses sautent le logo de chargement et le QG. Elles ne créent pas de sauvegarde et n'enregistrent pas le score.
 
-| Adresse | Où l'on arrive |
-| --- | --- |
-| `http://127.0.0.1:5173/?demo=1` | Chapitre 1, au briefing |
+| Adresse                                 | Où l'on arrive                                               |
+| --------------------------------------- | ------------------------------------------------------------ |
+| `http://127.0.0.1:5173/?demo=1`         | Chapitre 1, au briefing                                      |
 | `http://127.0.0.1:5173/?demo=lancement` | Au décollage. Le compte à rebours part au bout de 4 secondes |
-| `http://127.0.0.1:5173/?demo=bilan` | Au rapport, avec un CubeSat d'exemple |
+| `http://127.0.0.1:5173/?demo=bilan`     | Au rapport, avec un CubeSat d'exemple                        |
 
 Sans `?demo=`, le jeu ouvre le QG.
 
