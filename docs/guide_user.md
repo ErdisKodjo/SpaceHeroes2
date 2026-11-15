@@ -96,7 +96,7 @@ Trois épreuves, dans l'ordre. La fiabilité (0 à 100) part au bilan.
 
 ### Lancement
 
-Le bouton **Lancer** démarre le compte à rebours. La caméra devient cinématique : la souris et le clavier ne dirigent plus la vue. La musique baisse sous le grondement, puis revient une fois la trajectoire affichée. La légende donne les chiffres GMAT du chapitre : pour la Lune, injection 3,12 km/s, périlune à 50 km et capture de 0,87 km/s ; pour Mars, un tour en 113,3 min et un départ début décembre 2026 ; pour L1, 1,5 million de km, un halo de 173 jours, et 4 corrections par an nommées comme une hypothèse.
+Le bouton **Lancer** démarre le compte à rebours. Le centre de lancement montre l'aire, le carneau, la tour, les mâts, le blockhaus et les réservoirs. Pendant la montée, la légende nomme la couche traversée : troposphère jusqu'à 12 km, stratosphère jusqu'à 50 km, mésosphère jusqu'à 80 km, puis la thermosphère et la ligne de Kármán à 100 km. Ces bornes sont les limites usuelles, pas une sortie GMAT. L'altitude affichée reste celle du chapitre. La caméra devient cinématique : la souris et le clavier ne dirigent plus la vue. La musique baisse sous le grondement, puis revient une fois la trajectoire affichée. La légende donne les chiffres GMAT du chapitre : pour la Lune, injection 3,12 km/s, périlune à 50 km et capture de 0,87 km/s ; pour Mars, un tour en 113,3 min et un départ début décembre 2026 ; pour L1, 1,5 million de km, un halo de 173 jours, et 4 corrections par an nommées comme une hypothèse.
 
 ### Opérations
 

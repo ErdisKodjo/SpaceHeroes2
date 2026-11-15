@@ -1,45 +1,82 @@
-# Project Demo — 7 slides
+# Project Demo — seven slides
 
-Paste these as the slide deck. One idea per slide. Speak in English. Suggested timing: about 45 seconds each, under 6 minutes.
+## Instruction
 
-## 1. The trade nobody sees
+Le site demande soit sept diapositives, soit une vidéo de 30 secondes. Ce fichier est le jeu de sept diapositives. Il n'y a pas de vidéo ici.
 
-**On screen:** the title Space Heroes, NASA Space Apps Challenge 2026, and one sentence: "Design the mission before you fly it."
+1. Créez le diaporama en anglais. Une idée par diapositive. Pas de paragraphe entier à l'écran : le texte long est ce que vous dites.
+2. Pour chaque diapositive, copiez le titre, les éléments « À l'écran », et apprenez « À dire ». Ne lisez pas « Ne pas dire » : c'est une garde pour vous.
+3. Durée visée : environ 45 secondes par diapositive, moins de six minutes au total. Si le jury ne vous donne que trois minutes, gardez les diapositives 1, 4, 5 et 7.
+4. Montrez le jeu au moins une fois, à la diapositive 4 ou 7. Une capture de la Lune ou du bilan vaut mieux qu'un schéma refait.
+5. Parlez en anglais. Si une vidéo est ajoutée plus tard dans une autre langue, elle doit avoir des sous-titres anglais. Un participant de moins de 18 ans ne doit pas apparaître à l'image et doit modifier sa voix.
+6. Désignez une personne responsable du fichier, et enregistrez le diaporama là où le champ Project Demo peut le recevoir.
 
-A science mission fails in the spreadsheet long before it fails on the pad. Budget, mass, power, data, the link, and the calendar all move together. We built a game that makes that trade the gameplay.
+## Diapositive 1 — The trade before the flight
 
-## 2. One seat, one mission
+Critère visé : impact et pertinence. Durée : 40 secondes.
 
-**On screen:** the four seats — Mission Director, Vehicle Engineer, Systems Engineer, Science Lead.
+À l'écran : titre « Space Heroes », sous-titre « NASA Space Apps Challenge 2026 », une seule phrase : « Design the mission before you fly it. »
 
-You pick a seat. Alone, ASTRA covers the other three. At a table of four, each person holds one seat and the server holds the gauges. The mission still has to pass the same gate: 80 percent of the Concept Maturity Level checks in the green.
+À dire : A science mission is decided long before liftoff. Budget, mass, power, data, the link, and the calendar all spend the same design. Space Heroes turns that trade into a game, so a player feels the constraint instead of reading it on a poster. This is our answer to Design and Develop Science Missions.
 
-## 3. Build it, then prove it
+Ne pas dire : que le jeu remplace GMAT ou la formation d'une agence.
 
-**On screen:** the workshop with the six gauges, then the three tests.
+## Diapositive 2 — One seat, one gate
 
-Five families: propulsion, structure, power, communications, instrument. Twelve points shape the part you picked. Then three tests: vibration, thermal isolation, electrical compatibility. If the gate is red, ASTRA says so and you can return to the workshop. The cost is replaced, not charged twice.
+Critère visé : créativité. Durée : 45 secondes.
 
-## 4. The orbit is a GMAT run
+À l'écran : les quatre postes — Mission Director, Vehicle Engineer, Systems Engineer, Science Lead — et la phrase « 80 percent green ».
 
-**On screen:** the Moon chapter legend — injection 3.12 km/s, perilune 50 km, capture 0.87 km/s — and the Earth with the transfer ellipse.
+À dire : You choose a seat. Alone, ASTRA covers the other three. She does not improvise: she speaks lines written for each step, in French or in English. At a table of four, each person holds one seat and the server holds the six gauges. Either way, the team may not leave a phase until 80 percent of the Concept Maturity Level checks are green. That gate is how the game keeps a concept from jumping straight to the rocket.
 
-We did not invent the trajectories. GMAT R2026a propagated them. The Moon leaves on 1 January 2026 and is captured. Mars leaves in early December 2026 and orbits in 113.3 minutes. The polar orbit lasts 94.5 minutes. High orbit and geostationary orbit both last 1,436 minutes. L1 is 1.5 million km away, with a 173-day halo. The four corrections a year at L1 are labeled as an operational hypothesis, not a GMAT measurement.
+Ne pas dire : qu'ASTRA est une intelligence artificielle générative.
 
-## 5. After the pass
+## Diapositive 3 — Build it, then prove it
 
-**On screen:** the debrief, a real-mission card (GeneSat-1 or LRO), and the optional orrery.
+Critère visé : créativité et validité. Durée : 45 secondes.
 
-The score is out of 100. The debrief names a real NASA mission and, where it belongs, a public tool: the Debris Assessment Software beside the 200 km end-of-life stop, the Trajectory Browser beside Mars and beside the GMAT lunar figures. The hub still opens on the simple solar-system line. A button reveals an orrery driven by the published JPL Keplerian elements for 1800–2050.
+À l'écran : les six jauges, puis les trois essais : vibration, thermal isolation, electrical compatibility.
 
-## 6. What we are not claiming
+À dire : The workshop asks for one part in each family: propulsion, structure, power, communications, and instrument. Twelve points shape the part. On the low-Earth mission, drag over twelve weeks comes from an 84-day GMAT grid on four CubeSat faces. Then three tests. If the gate is still red, ASTRA says so and the team can return to the workshop. The workshop cost is replaced, not charged a second time.
 
-**On screen:** three short lines.
+Ne pas dire : qu'un essai du jeu est une qualification de vol.
 
-The game stores GMAT results. The browser never calls GMAT. Naming a tool does not mean a real mission was designed with it. The orrery uses the JPL rotation, not a tutorial that treats inclination as pitch. Distances on the drawing are compressed so the Moon and L1 stay visible.
+## Diapositive 4 — The orbit is a GMAT run
 
-## 7. Play it
+Critère visé : validité. Durée : 60 secondes. C'est la diapositive qui doit rester si le temps est coupé.
 
-**On screen:** `https://github.com/ErdisKodjo/SpaceHeroes2/tree/dev4` and the three commands `npm install`, `npm run dev`, `npm test`.
+À l'écran : la légende du chapitre Lune — injection 3.12 km/s, perilune 50 km, capture 0.87 km/s — et la Terre avec l'ellipse.
 
-Open the repository, branch `dev4`. The game runs in the browser in French or English. Forty-five automated tests cover the gates, the drag table, the orrery, and the named tools. The same link is the public project link.
+À dire : We did not invent these trajectories. GMAT R2026a propagated them on 15 November 2026, and the game displays the reports. The Moon leaves on 1 January 2026, injects at 3.12 kilometers per second, and is captured at 50 kilometers perilune by a 0.87 kilometer-per-second burn. Mars leaves in early December 2026 and orbits in 113.3 minutes. The polar orbit lasts 94.5 minutes. High orbit and geostationary orbit both last 1,436 minutes at 35,786 kilometers. L1 sits 1.5 million kilometers from Earth, on a halo of 173 days. Four corrections a year at L1 are labeled on screen as an operational hypothesis. They are not a GMAT measurement. The browser never calls GMAT.
+
+Ne pas dire : qu'une propagation a été refaite pendant le pitch.
+
+## Diapositive 5 — The debrief tells the truth about tools
+
+Critère visé : validité et présentation. Durée : 45 secondes.
+
+À l'écran : une fiche « In real life », par exemple Lunar Reconnaissance Orbiter ou GeneSat-1, et une ligne d'outil.
+
+À dire : The score is out of 100. The debrief names a real NASA mission and opens a short public summary. It also names a public tool only where that tool belongs, and it does not pretend the real mission was designed with it. The Debris Assessment Software is named beside the 200 kilometer end-of-life stop. The Trajectory Browser is named as the public catalogue of trajectories to planets and small bodies. The lunar numbers stay attributed to GMAT. In the workshop, PyCubed is a public avionics board, not the player's chassis. On the radiation shield, SPENVIS is named as the model of that environment.
+
+Ne pas dire : que ces quatre outils ont produit les chiffres du jeu.
+
+## Diapositive 6 — What we left out, on purpose
+
+Critère visé : validité. Durée : 30 secondes.
+
+À l'écran : trois lignes seulement. « GMAT results, stored. » « Hypothesis, labeled. » « Distances on the orrery, compressed. »
+
+À dire : The hub opens on a simple line: Sun, L1, Earth and its five orbits, Moon, Mars. A button opens an orrery. Earth and Mars follow the JPL Keplerian elements for 1800 to 2050, with the published rotation. The Moon starts at the new moon of 8 January 2008 and advances by the published sidereal month. The Moon and L1 are drawn away from Earth, because at the scale of the semi-major axes they would sit on top of it. We would rather show a compressed drawing than a false distance.
+
+Ne pas dire : que le planétaire est une éphéméride de précision, ni qu'il remplace Horizons.
+
+## Diapositive 7 — Open it
+
+Critère visé : présentation. Durée : 30 secondes.
+
+À l'écran : le lien `https://github.com/ErdisKodjo/SpaceHeroes2/tree/dev4` et les trois commandes `git checkout dev4`, `npm install`, `npm run dev`.
+
+À dire : This is the public project. Branch dev4. The game runs in the browser, in French or in English, on a laptop. The same link is the one on our project page. If you only have a minute, start chapter 1, or open Discovery mode and fly the Moon. The automated tests cover the gates, the drag table, the orrery, and the sentences that name the tools.
+
+Ne pas dire : qu'un site web public héberge déjà une partie en ligne. Ce n'est pas le cas.

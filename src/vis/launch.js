@@ -17,6 +17,7 @@ import { createParticlePool } from './particles.js';
 import { gmatPour } from '../engine/gmat.js';
 import { distanceEnsemble } from './vues.js';
 import { t as tr } from '../i18n.js';
+import { coucheA } from './couches.js';
 
 const ORBIT_DISPLAY_PERIOD = 40; // secondes a l'ecran pour un tour pendant le lancement
 const OMEGA = (Math.PI * 2) / ORBIT_DISPLAY_PERIOD;
@@ -204,6 +205,9 @@ export function createLaunchSequence({ scene, camera, earth, container, sunDirec
   let lowerDebris = null;
   let upperTheta = 0;
 
+  let coucheVue = null;
+  const passages = [];
+  const passageGeo = new THREE.RingGeometry(0.02, 0.14, 64);
   let prepared = false;
   let launching = false;
   let launched = false;
@@ -473,15 +477,66 @@ export function createLaunchSequence({ scene, camera, earth, container, sunDirec
     }
   ];
 
+  function retirerCouches() {
+    for (const mesh of passages) {
+      scene.remove(mesh);
+      mesh.material.dispose();
+    }
+    passages.length = 0;
+  }
+
+  function animerPassages(dt) {
+    for (let i = passages.length - 1; i >= 0; i--) {
+      const mesh = passages[i];
+      mesh.userData.age += dt;
+      const k = 1 - mesh.userData.age / 1.8;
+      mesh.material.opacity = Math.max(0, 0.8 * k);
+      mesh.scale.setScalar(1 + mesh.userData.age * 1.4);
+      if (k <= 0) {
+        scene.remove(mesh);
+        mesh.material.dispose();
+        passages.splice(i, 1);
+      }
+    }
+  }
+
+  function annoncerCouche(altKm) {
+    const couche = coucheA(altKm);
+    if (couche.id === coucheVue) return;
+    const premiere = coucheVue == null;
+    coucheVue = couche.id;
+    if (premiere || t >= T_LIFTOFF + ASCENT * STAGE_SEP_U) return;
+    if (couche.jusqua >= derived.altitudeKm) return;
+    overlay.caption(tr(couche.fr, couche.en), tr(couche.detailFr, couche.detailEn));
+    const mesh = new THREE.Mesh(
+      passageGeo,
+      new THREE.MeshBasicMaterial({
+        color: couche.couleur,
+        transparent: true,
+        opacity: 0.8,
+        side: THREE.DoubleSide,
+        depthWrite: false
+      })
+    );
+    mesh.position.copy(P);
+    mesh.quaternion.setFromUnitVectors(new THREE.Vector3(0, 0, 1), S);
+    mesh.userData.age = 0;
+    scene.add(mesh);
+    passages.push(mesh);
+  }
+
   function telemetry(u) {
     const frac = clamp01((radiusAt(u) - 1 - PAD_LIFT) / derived.climb);
     const altKm = frac * derived.altitudeKm;
+    annoncerCouche(altKm);
     velocity(u, vTmp);
     const speed = (vTmp.length() / (OMEGA * derived.deployR)) * derived.circularSpeedKms;
     const met = Math.max(0, t - T_LIFTOFF);
+    const couche = coucheA(altKm);
     overlay.telemetry(`
       <span><b>T+</b> ${String(Math.floor(met)).padStart(2, '0')} s</span>
       <span><b>ALT</b> ${fmt(Math.max(0, altKm), 0)} km</span>
+      <span><b>${tr('COUCHE', 'LAYER')}</b> ${tr(couche.fr, couche.en)}</span>
       <span><b>VIT</b> ${fmt(speed, 2)} km/s</span>
     `);
   }
@@ -526,6 +581,7 @@ export function createLaunchSequence({ scene, camera, earth, container, sunDirec
     launching = true;
     t = 0;
     cueIndex = 0;
+    coucheVue = null;
     return new Promise((resolve) => {
       resolveLaunch = resolve;
     });
@@ -538,6 +594,7 @@ export function createLaunchSequence({ scene, camera, earth, container, sunDirec
     camera.up.set(0, 1, 0);
     earth.setSpinEnabled(true);
     earth.setCloudFade(1);
+    retirerCouches();
     container.classList.remove('vue3d--cinema');
     overlay.hide();
     if (rocket) {
@@ -666,6 +723,8 @@ export function createLaunchSequence({ scene, camera, earth, container, sunDirec
       pad.dispose();
       pad = null;
     }
+    retirerCouches();
+    coucheVue = null;
   }
 
   function reset() {
@@ -724,6 +783,7 @@ export function createLaunchSequence({ scene, camera, earth, container, sunDirec
       updateDebris(dt);
       smoke.update(dt);
       fire.update(dt);
+      animerPassages(dt);
       orbit?.update(dt);
       cubesat?.update(dt);
     },
@@ -732,6 +792,8 @@ export function createLaunchSequence({ scene, camera, earth, container, sunDirec
       fire.setViewport(heightPx, fovDeg);
     },
     dispose() {
+      retirerCouches();
+      passageGeo.dispose();
       overlay.dispose();
       smoke.dispose();
       fire.dispose();
